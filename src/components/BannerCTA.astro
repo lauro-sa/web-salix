@@ -1,36 +1,45 @@
 ---
 // ============================================================
-// BannerCTA.astro — Banner de llamada a la acción
-// Aparece entre secciones para invitar a contactar.
-// EDITAR: CONTENIDO abajo
+// BannerCTA.astro — Banner de llamada a la accion
 // ============================================================
 
+import GridMagnetico from './ui/GridMagnetico.astro';
+
 const CONTENIDO = {
-  etiqueta:    'Sin costo de entrada',   // ← EDITAR
-  tituloN:     'Empezá hoy.',            // ← EDITAR
-  tituloG:     'Sin compromisos.',       // ← EDITAR
-  textoBoton:  'Hablar con nosotros',    // ← EDITAR
-  linkBoton:   '#contacto',             // ← EDITAR
+  etiqueta:   'Sin costo de entrada',
+  titulo:     'Empeza hoy.',
+  subtitulo:  'Sin compromisos.',
+  textoBoton: 'Hablar con nosotros',
+  linkBoton:  '#contacto',
 };
 ---
 
-<div class="cta-fondo fondo-puntos">
-  <div class="cta-contenido">
+<GridMagnetico id="grid-cta" clase="cta-fondo">
+  <div class="cta-contenido aparecer-escala">
     <span class="etiqueta">{CONTENIDO.etiqueta}</span>
-    <h2 class="titulo-dos-tonos" style="text-align:center">
-      <span class="negro">{CONTENIDO.tituloN}</span><br>
-      <span class="gris">{CONTENIDO.tituloG}</span>
+    <h2 class="titulo-seccion" style="text-align:center">
+      <span>{CONTENIDO.titulo}</span><br>
+      <span style="color:var(--gris-titulo)">{CONTENIDO.subtitulo}</span>
     </h2>
-    <a href={CONTENIDO.linkBoton} class="boton-oscuro">
+    <p class="subtitulo" style="text-align:center">
+      Probalo gratis, sin tarjeta. Contanos que necesitas y te ayudamos a arrancar.
+    </p>
+    <a href={CONTENIDO.linkBoton} class="boton boton-primario">
       {CONTENIDO.textoBoton}
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </a>
   </div>
-</div>
+</GridMagnetico>
 
 <style>
-  .cta-fondo    { position: relative; z-index: 2; padding: clamp(80px, 10vw, 140px) 24px; }
-  .cta-contenido { max-width: 600px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .cta-fondo {
+    position: relative; z-index: 2;
+    padding: clamp(5rem, 10vw, 8rem) 1.5rem;
+  }
+
+  .cta-contenido {
+    max-width: 560px; margin: 0 auto;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
+  }
 </style>

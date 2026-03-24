@@ -1,137 +1,126 @@
 ---
 // ============================================================
-// SeccionPlanes.astro — Dos paneles con particle morphing
-//
-// Al hacer hover en el panel izquierdo → partículas forman { }
-// Al hacer hover en el panel derecho  → partículas forman anillos
-//
-// EDITAR: contenido de cada panel en PANELES abajo
+// SeccionPlanes.astro — Resumen de precios por producto
+// Cada card lleva a la pagina individual del producto
 // ============================================================
+import IconoSVG from './ui/IconoSVG.astro';
 
-const PANELES = {
-  izquierdo: {
-    etiqueta:    'Disponible ahora',
-    tituloN:     'Para tu empresa',
-    tituloG:     'Empezá hoy mismo.',
-    descripcion: 'Salix CRM y Sites by Salix ya disponibles. Sin configuración larga, operativo en días.',
-    textoBoton:  'Empezar gratis',
-    linkBoton:   '#contacto',
-  },
-  derecho: {
-    etiqueta:    'Próximamente',
-    tituloN:     'Para organizaciones',
-    tituloG:     'Toda tu operación.',
-    descripcion: 'Go, Court y Turno by Salix en camino. Anotate para ser de los primeros.',
-    textoBoton:  'Avisame cuando esté',
-    linkBoton:   '#',
-  },
+interface PlanProducto {
+  nombre:     string;
+  desde:      string;
+  detalle:    string;
+  icono:      string;
+  url:        string;
+  disponible: boolean;
+}
+
+const PRODUCTOS: PlanProducto[] = [
+  { nombre: 'Flux',           desde: 'USD $150',   detalle: '/mes · 3 planes',              icono: 'flujo',    url: '/flux',           disponible: true  },
+  { nombre: 'Sites',          desde: 'A medida',   detalle: 'segun proyecto',               icono: 'sitio',    url: '/sites',          disponible: true  },
+  { nombre: 'Go',             desde: 'USD $100',   detalle: '/mes · 2 planes',              icono: 'delivery', url: '/go',             disponible: false },
+  { nombre: 'Play',           desde: 'USD $80',    detalle: '/mes · 2 planes',              icono: 'cancha',   url: '/play',           disponible: false },
+  { nombre: 'Book',           desde: 'USD $100',   detalle: '/mes · 2 planes',              icono: 'agenda',   url: '/book',           disponible: false },
+  { nombre: 'Integraciones',  desde: 'USD $70',    detalle: 'primera sesion',               icono: 'link',     url: '/integraciones',  disponible: true  },
+];
+
+const TEXTO = {
+  etiqueta:  'Precios',
+  titulo:    'Simple y transparente.',
+  subtitulo: 'Cada producto tiene su precio. Sin sorpresas, sin letra chica.',
 };
 ---
 
-<div class="planes-contenedor fondo-puntos" id="planes">
-  <div class="planes-grilla">
+<section class="seccion" id="planes">
 
-    <!-- Panel izquierdo — partículas forman llaves { } -->
-    <div class="plan-panel" id="panel-izq">
-      <!-- Canvas de partículas de este panel (position: absolute) -->
-      <canvas class="panel-canvas" id="canvas-izq"></canvas>
-
-      <div class="panel-contenido">
-        <span class="etiqueta" style="background:transparent">{PANELES.izquierdo.etiqueta}</span>
-        <h2 class="plan-titulo">
-          <span class="negro">{PANELES.izquierdo.tituloN}</span><br>
-          <span class="gris">{PANELES.izquierdo.tituloG}</span>
-        </h2>
-        <p class="plan-descripcion">{PANELES.izquierdo.descripcion}</p>
-        <a href={PANELES.izquierdo.linkBoton} class="boton-oscuro plan-boton">
-          {PANELES.izquierdo.textoBoton}
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-
-    <!-- Panel derecho — partículas forman anillos -->
-    <div class="plan-panel" id="panel-der">
-      <canvas class="panel-canvas" id="canvas-der"></canvas>
-
-      <div class="panel-contenido">
-        <span class="etiqueta" style="background:transparent">{PANELES.derecho.etiqueta}</span>
-        <h2 class="plan-titulo">
-          <span class="negro">{PANELES.derecho.tituloN}</span><br>
-          <span class="gris">{PANELES.derecho.tituloG}</span>
-        </h2>
-        <p class="plan-descripcion">{PANELES.derecho.descripcion}</p>
-        <button class="boton-fantasma plan-boton" id="boton-avisame">
-          {PANELES.derecho.textoBoton}
-        </button>
-      </div>
-    </div>
-
+  <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+    <span class="etiqueta">{TEXTO.etiqueta}</span>
+    <h2 class="titulo-seccion">{TEXTO.titulo}</h2>
+    <p class="typewriter subtitulo" style="text-align:center" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
   </div>
-</div>
+
+  <div class="grilla-precios">
+    {PRODUCTOS.map((prod, indice) => (
+      <a href={prod.url} class={`card-precio aparecer-escala delay-${indice + 1}`}>
+        <div class="precio-cabecera">
+          <div class="icono-contenedor item-precio">
+            <IconoSVG nombre={prod.icono} tamaño={20} grosor={1.5} />
+          </div>
+          <span class={`etiqueta-estado ${prod.disponible ? 'disponible' : 'proximamente'}`}>
+            <span class="punto-estado"></span>
+            {prod.disponible ? 'Disponible' : 'Pronto'}
+          </span>
+        </div>
+        <h3 class="precio-nombre">{prod.nombre}</h3>
+        <div class="precio-valor">
+          <span class="precio-monto">{prod.desde}</span>
+          <span class="precio-periodo">{prod.detalle}</span>
+        </div>
+        <span class="precio-link">
+          Ver detalle
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
+      </a>
+    ))}
+  </div>
+
+</section>
 
 <style>
-  .planes-contenedor {
-    position: relative; z-index: 2;
+  .encabezado-seccion {
+    margin-bottom: 3rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
   }
 
-  .planes-grilla {
-    display: grid; grid-template-columns: 1fr 1fr; min-height: 72vh;
+  .grilla-precios {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
   }
 
-  .plan-panel {
-    position: relative; overflow: hidden;
-    padding: clamp(60px, 8vw, 100px) clamp(48px, 7vw, 96px);
-    display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 20px;
+  .card-precio {
+    background: var(--card); border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: clamp(1.25rem, 2.5vw, 1.5rem);
+    display: flex; flex-direction: column; gap: 0.75rem;
+    transition: all var(--transicion);
+    text-decoration: none; color: inherit; position: relative;
   }
 
-  .panel-canvas {
-    position: absolute; inset: 0; z-index: 0; display: block;
+  .card-precio::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: var(--salix);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .panel-contenido {
-    position: relative; z-index: 1;
-    display: flex; flex-direction: column; gap: 16px; max-width: 440px;
+  .card-precio:hover {
+    border-color: var(--salix-borde); transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.07);
   }
 
-  /* Separador entre paneles */
-  .plan-panel:first-child { border-right: 1px solid var(--borde); transition: border-color .5s; }
+  .card-precio:hover::before { transform: scaleX(1); }
+  .card-precio:hover .icono-contenedor { transform: scale(1.1) rotate(-5deg); }
+  .card-precio:hover .precio-link { color: var(--salix); }
 
-  .plan-titulo {
-    font-size: clamp(26px, 4vw, 50px); font-weight: 700; line-height: 1.05; letter-spacing: -1.5px;
+  .precio-cabecera { display: flex; align-items: center; justify-content: space-between; }
+  .precio-nombre { font-size: 1.05rem; font-weight: 700; color: var(--texto); letter-spacing: -0.02em; }
+  .precio-valor { display: flex; flex-direction: column; gap: 0.15rem; }
+
+  .precio-monto {
+    font-size: clamp(1.4rem, 2.5vw, 1.7rem);
+    font-weight: 700; color: var(--texto); letter-spacing: -0.03em;
   }
-  .plan-titulo .negro { color: var(--texto); transition: color .5s; }
-  .plan-titulo .gris  { color: var(--gris-titulo); transition: color .5s; }
 
-  .plan-descripcion { font-size: 15px; color: var(--gris-sub); line-height: 1.7; transition: color .5s; }
+  .precio-periodo { font-size: 0.75rem; color: var(--texto-terciario); }
 
-  .plan-boton { align-self: flex-start; margin-top: 8px; }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .planes-grilla { grid-template-columns: 1fr; }
-    .plan-panel:first-child { border-right: none; border-bottom: 1px solid var(--borde); }
+  .precio-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--texto-terciario); transition: color var(--transicion);
+    margin-top: auto;
   }
-  @media (max-width: 600px) {
-    .plan-panel { padding: 60px 24px; }
-  }
+
+  @media (max-width: 1024px) { .grilla-precios { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .grilla-precios { grid-template-columns: 1fr; } }
 </style>
-
-<!-- Inicializar el morphing cuando carga la página -->
-<script>
-  import { iniciarMorphing } from '../scripts/morphing.js';
-
-  // Botón de "Avisame" — mostrar feedback
-  document.getElementById('boton-avisame')?.addEventListener('click', () => {
-    alert('¡Anotado! Te avisamos cuando esté listo.');
-  });
-
-  // Inicializar morphing en ambos paneles
-  // Primer parámetro: id del canvas, segundo: id del panel, tercero: tipo de figura
-  window.addEventListener('load', () => {
-    iniciarMorphing('canvas-izq', 'panel-izq', 'llaves');
-    iniciarMorphing('canvas-der', 'panel-der', 'anillos');
-  });
-</script>

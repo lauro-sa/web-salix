@@ -1,0 +1,307 @@
+---
+// ============================================================
+// PlantillaProducto.astro — Layout reutilizable para paginas de producto
+// Soporta multiples planes de precio o sin precio (consultar).
+// ============================================================
+import IconoSVG from './ui/IconoSVG.astro';
+
+interface Feature {
+  titulo:      string;
+  descripcion: string;
+  icono:       string;
+}
+
+interface Plan {
+  nombre:    string;
+  precio:    string;
+  periodo:   string;
+  destacado: boolean;
+  items:     string[];
+  textoBoton: string;
+}
+
+interface Props {
+  nombre:       string;
+  subtitulo:    string;
+  descripcion:  string;
+  icono:        string;
+  disponible:   boolean;
+  color:        string;
+  features:     Feature[];
+  planes?:      Plan[];
+  sinPrecio?:   boolean;
+  textoSinPrecio?: string;
+}
+
+const {
+  nombre,
+  subtitulo,
+  descripcion,
+  icono,
+  disponible,
+  color,
+  features,
+  planes,
+  sinPrecio = false,
+  textoSinPrecio = 'Cada proyecto es unico. Contanos tu idea y te armamos un presupuesto a medida.',
+} = Astro.props;
+---
+
+<!-- Hero del producto -->
+<section class="producto-hero">
+  <div class="producto-hero-contenido">
+    <div class="aparecer">
+      <span class={`etiqueta-estado ${disponible ? 'disponible' : 'proximamente'}`}>
+        <span class="punto-estado"></span>
+        {disponible ? 'Disponible ahora' : 'Proximamente'}
+      </span>
+    </div>
+
+    <div class="producto-icono-grande aparecer delay-1">
+      <div class="icono-contenedor icono-grande item-producto">
+        <IconoSVG nombre={icono} tamaño={36} grosor={1.5} />
+      </div>
+    </div>
+
+    <h1 class="titulo-hero aparecer delay-2">{nombre}</h1>
+    <p class="producto-subtitulo aparecer delay-3">{subtitulo}</p>
+    <p class="producto-desc aparecer delay-4">{descripcion}</p>
+
+    <div class="producto-botones aparecer delay-5">
+      {disponible ? (
+        <a href="/#contacto" class="boton boton-verde">
+          Empezar ahora
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      ) : (
+        <a href="/#contacto" class="boton boton-primario">
+          Avisame cuando este
+        </a>
+      )}
+      <a href="/#productos" class="boton boton-secundario">Ver todos los productos</a>
+    </div>
+  </div>
+</section>
+
+<!-- Features del producto -->
+<section class="seccion">
+  <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+    <span class="etiqueta">Funcionalidades</span>
+    <h2 class="titulo-seccion">Todo lo que incluye.</h2>
+  </div>
+
+  <div class="grilla-features-producto">
+    {features.map((feat, indice) => (
+      <div class={`card-feature aparecer delay-${(indice % 4) + 1}`}>
+        <div class="icono-contenedor item-producto">
+          <IconoSVG nombre={feat.icono} tamaño={22} grosor={1.5} />
+        </div>
+        <h3 class="feat-nombre">{feat.titulo}</h3>
+        <p class="feat-desc">{feat.descripcion}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<!-- Planes de precio -->
+{planes && planes.length > 0 && (
+  <div class="fondo-puntos">
+    <div class="panel-interior">
+      <section class="seccion">
+        <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+          <span class="etiqueta">Precios</span>
+          <h2 class="titulo-seccion">Elegi tu plan.</h2>
+          <p class="subtitulo" style="text-align:center">Sin costos ocultos. Cancela cuando quieras.</p>
+        </div>
+
+        <div class={`grilla-planes grilla-planes-${planes.length}`}>
+          {planes.map((plan, indice) => (
+            <div class={`card-plan aparecer-escala delay-${indice + 1} ${plan.destacado ? 'plan-destacado' : ''}`}>
+              {plan.destacado && <span class="plan-badge-popular">Mas popular</span>}
+              <h3 class="plan-nombre">{plan.nombre}</h3>
+              <div class="plan-precio-bloque">
+                <span class="plan-monto">{plan.precio}</span>
+                <span class="plan-periodo">{plan.periodo}</span>
+              </div>
+              <ul class="plan-items">
+                {plan.items.map((item) => (
+                  <li>
+                    <IconoSVG nombre="check" tamaño={15} grosor={2.5} clase="plan-check" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <a href="/#contacto" class={`boton ${plan.destacado ? 'boton-verde' : 'boton-secundario'}`} style="width:100%;text-align:center">
+                {plan.textoBoton}
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  </div>
+)}
+
+<!-- Sin precio: consultar -->
+{sinPrecio && (
+  <div class="fondo-puntos">
+    <div class="panel-interior">
+      <section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
+        <span class="etiqueta">Precio</span>
+        <h2 class="titulo-seccion aparecer">A medida.</h2>
+        <p class="subtitulo aparecer delay-1" style="text-align:center;max-width:480px">{textoSinPrecio}</p>
+        <a href="/#contacto" class="boton boton-verde aparecer delay-2">
+          Pedir presupuesto
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </section>
+    </div>
+  </div>
+)}
+
+<!-- CTA final -->
+<section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
+  <h2 class="titulo-seccion aparecer">
+    <span>Listo para probarlo?</span>
+  </h2>
+  <p class="subtitulo aparecer delay-1" style="text-align:center">
+    Contactanos y te ayudamos a arrancar. Sin compromiso.
+  </p>
+  <div class="aparecer delay-2" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+    <a href="mailto:hola@salixweb.com" class="boton boton-primario">Escribirnos</a>
+    <a href="https://wa.me/5491100000000" class="boton boton-secundario" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+  </div>
+</section>
+
+<style>
+  /* ─── Hero ─── */
+  .producto-hero {
+    min-height: 70vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 120px 24px 80px;
+    background: var(--gradiente-hero);
+    position: relative; z-index: 2;
+  }
+
+  .producto-hero-contenido {
+    max-width: 700px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  }
+
+  .icono-grande { width: 72px; height: 72px; border-radius: 18px; }
+
+  .producto-subtitulo {
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    color: var(--salix); font-weight: 600; letter-spacing: -0.01em;
+  }
+
+  .producto-desc {
+    font-size: clamp(1rem, 1.4vw, 1.1rem);
+    color: var(--texto-secundario); line-height: 1.7; max-width: 520px;
+  }
+
+  .producto-botones {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem;
+  }
+
+  /* ─── Features ─── */
+  .encabezado-seccion {
+    margin-bottom: 3rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
+  }
+
+  .grilla-features-producto {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+  }
+
+  .card-feature {
+    background: var(--card); border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    display: flex; flex-direction: column; gap: 0.75rem;
+    transition: all var(--transicion);
+  }
+
+  .card-feature:hover {
+    border-color: var(--salix-borde); transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  }
+
+  .card-feature:hover .icono-contenedor { transform: scale(1.1) rotate(-5deg); }
+
+  .feat-nombre { font-size: 1rem; font-weight: 700; color: var(--texto); }
+  .feat-desc { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; }
+
+  /* ─── Planes de precio ─── */
+  .grilla-planes {
+    display: grid; gap: 1.25rem; align-items: start;
+  }
+
+  .grilla-planes-2 { grid-template-columns: repeat(2, 1fr); max-width: 700px; margin: 0 auto; }
+  .grilla-planes-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .card-plan {
+    background: var(--card); border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: clamp(1.5rem, 3vw, 2rem);
+    display: flex; flex-direction: column; gap: 1.25rem;
+    position: relative; transition: all var(--transicion);
+  }
+
+  .card-plan:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+  }
+
+  .plan-destacado {
+    border-color: var(--salix-borde);
+    background: var(--gradiente-card), var(--card);
+    box-shadow: 0 0 0 1px var(--salix-borde);
+  }
+
+  .plan-destacado:hover {
+    box-shadow: 0 12px 40px rgba(22, 163, 74, 0.12);
+  }
+
+  .plan-badge-popular {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    background: var(--salix); color: #fff;
+    font-size: 0.72rem; font-weight: 600;
+    padding: 3px 14px; border-radius: var(--radio-pill);
+  }
+
+  .plan-nombre { font-size: 1.1rem; font-weight: 700; color: var(--texto); }
+
+  .plan-precio-bloque { display: flex; align-items: baseline; gap: 0.4rem; }
+
+  .plan-monto {
+    font-size: clamp(1.8rem, 3vw, 2.2rem); font-weight: 700;
+    color: var(--texto); letter-spacing: -0.03em;
+  }
+
+  .plan-periodo { font-size: 0.8rem; color: var(--texto-terciario); }
+
+  .plan-items {
+    display: flex; flex-direction: column; gap: 0.6rem; flex: 1;
+  }
+
+  .plan-items li {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 0.85rem; color: var(--texto-secundario);
+  }
+
+  .plan-items :global(.plan-check) {
+    stroke: var(--salix) !important; flex-shrink: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .grilla-features-producto { grid-template-columns: repeat(2, 1fr); }
+    .grilla-planes-3 { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+    .grilla-planes-2 { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+  }
+
+  @media (max-width: 640px) {
+    .grilla-features-producto { grid-template-columns: 1fr; }
+  }
+</style>

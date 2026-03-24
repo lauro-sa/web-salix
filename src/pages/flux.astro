@@ -1,0 +1,83 @@
+---
+// ============================================================
+// flux.astro — Pagina de Flux by Salix (CRM multiempresa)
+// ============================================================
+import Plantilla         from '../layouts/Plantilla.astro';
+import Nav               from '../components/Nav.astro';
+import PlantillaProducto from '../components/PlantillaProducto.astro';
+import Footer            from '../components/Footer.astro';
+---
+
+<Plantilla
+  titulo="Flux by Salix — Gestion integral multiempresa"
+  descripcion="App PWA para gestionar servicios: marketing, correos, WhatsApp, contactos, presupuestos, informes y facturas. Multiempresa."
+>
+  <Nav />
+  <main>
+    <PlantillaProducto
+      nombre="Flux by Salix"
+      subtitulo="Gestion integral multiempresa"
+      descripcion="Todo lo que necesitas para administrar tu empresa desde un solo lugar. Marketing, comunicaciones, presupuestos, facturas e informes. Con integracion nativa de WhatsApp y MercadoPago."
+      icono="flujo"
+      disponible={true}
+      color="var(--salix)"
+      features={[
+        { titulo: 'Contactos y empresas', descripcion: 'Base de datos de clientes, proveedores y empresas. Busca, filtra y segmenta.', icono: 'usuarios' },
+        { titulo: 'Presupuestos', descripcion: 'Crea presupuestos profesionales en minutos. Envia por WhatsApp o email.', icono: 'codigo' },
+        { titulo: 'Facturas', descripcion: 'Genera facturas electronicas integradas con AFIP. Control de cobros automatico.', icono: 'dinero' },
+        { titulo: 'Marketing', descripcion: 'Campañas por email y WhatsApp. Segmenta tu audiencia y mide resultados.', icono: 'correo' },
+        { titulo: 'Informes', descripcion: 'Dashboards en tiempo real. Ventas, cobros, clientes activos y mas.', icono: 'grafico' },
+        { titulo: 'WhatsApp integrado', descripcion: 'Envia mensajes, presupuestos y facturas directo por WhatsApp Business.', icono: 'whatsapp' },
+        { titulo: 'MercadoPago', descripcion: 'Genera links de pago automaticos. Cobra sin fricciones.', icono: 'pago' },
+        { titulo: 'Multiempresa', descripcion: 'Gestiona varias empresas desde una misma cuenta. Cambia entre ellas con un clic.', icono: 'cubo' },
+        { titulo: 'IA integrada', descripcion: 'Sugerencias inteligentes, automatizaciones y analisis de datos con IA.', icono: 'ia' },
+      ]}
+      planes={[
+        {
+          nombre: 'Starter',
+          precio: 'USD $150',
+          periodo: '/mes',
+          destacado: false,
+          items: [
+            '1 empresa',
+            'Contactos y presupuestos',
+            'Facturas basicas',
+            'WhatsApp (envio manual)',
+            'Soporte por email',
+          ],
+          textoBoton: 'Empezar',
+        },
+        {
+          nombre: 'Pro',
+          precio: 'USD $300',
+          periodo: '/mes',
+          destacado: true,
+          items: [
+            'Empresas ilimitadas',
+            'Flux completo (marketing, informes, facturas)',
+            'WhatsApp API automatizado',
+            'MercadoPago integrado',
+            'IA integrada',
+            'Soporte prioritario',
+          ],
+          textoBoton: 'Elegir Pro',
+        },
+        {
+          nombre: 'Enterprise',
+          precio: 'Consultar',
+          periodo: 'a medida',
+          destacado: false,
+          items: [
+            'Todo lo de Pro',
+            'Onboarding personalizado',
+            'API dedicada',
+            'SLA garantizado',
+            'Desarrollo a medida',
+          ],
+          textoBoton: 'Contactar ventas',
+        },
+      ]}
+    />
+  </main>
+  <Footer />
+</Plantilla>

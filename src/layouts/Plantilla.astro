@@ -1,15 +1,13 @@
 ---
 // ============================================================
 // Plantilla.astro — Layout base del sitio
-// Todos los componentes de página usan este layout.
-// Modificar el <head> acá afecta a todas las páginas.
+// Todos los componentes de pagina usan este layout.
 // ============================================================
 
-// Props que recibe este layout
 interface Props {
-  titulo:      string;   // Título de la página (para <title> y OG)
-  descripcion: string;   // Meta descripción
-  imagen?:     string;   // Imagen OG (opcional)
+  titulo:      string;
+  descripcion: string;
+  imagen?:     string;
 }
 
 const {
@@ -18,7 +16,6 @@ const {
   imagen = '/og-image.jpg',
 } = Astro.props;
 
-// URL canónica para SEO
 const urlCanonica = Astro.url.href;
 ---
 
@@ -27,24 +24,22 @@ const urlCanonica = Astro.url.href;
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#fafafa" />
 
   <!-- SEO Principal -->
   <title>{titulo}</title>
   <meta name="description"  content={descripcion} />
-  <meta name="keywords"     content="CRM Argentina, software gestión, delivery, turnos online, consorcios" />
+  <meta name="keywords"     content="CRM Argentina, software gestion, delivery, turnos online, canchas padel, PWA" />
   <meta name="author"       content="Salix" />
   <meta name="robots"       content="index, follow" />
   <link rel="canonical"     href={urlCanonica} />
 
-  <!-- Open Graph (para compartir en redes y WhatsApp) -->
+  <!-- Open Graph -->
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content={urlCanonica} />
   <meta property="og:title"       content={titulo} />
   <meta property="og:description" content={descripcion} />
   <meta property="og:image"       content={imagen} />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
   <meta property="og:locale"      content="es_AR" />
   <meta property="og:site_name"   content="Salix" />
 
@@ -54,7 +49,7 @@ const urlCanonica = Astro.url.href;
   <meta name="twitter:description" content={descripcion} />
   <meta name="twitter:image"       content={imagen} />
 
-  <!-- Schema.org — Datos estructurados para Google -->
+  <!-- Schema.org -->
   <script type="application/ld+json">
     {JSON.stringify({
       "@context":    "https://schema.org",
@@ -62,75 +57,61 @@ const urlCanonica = Astro.url.href;
       "name":        "Salix",
       "url":         "https://salixweb.com",
       "description": "Suite de productos de software para empresas argentinas",
-      "address": {
-        "@type":          "PostalAddress",
-        "addressCountry": "AR"
-      }
+      "address": { "@type": "PostalAddress", "addressCountry": "AR" }
     })}
   </script>
 
-  <!-- Google Analytics — REEMPLAZAR G-XXXXXXXXXX con tu ID real -->
-  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script> -->
-
-  <!-- Meta Pixel — REEMPLAZAR PIXEL_ID con tu ID real -->
-  <!-- <script>
-    !function(f,b,e,v,n,t,s){...}
-    fbq('init', 'PIXEL_ID');
-    fbq('track', 'PageView');
-  </script> -->
-
-  <!-- Tipografía — Instrument Sans de Google Fonts -->
+  <!-- Tipografia -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 
 <body>
   <!-- Barra de progreso de scroll -->
-  <div id="barra-progreso" style="position:fixed;top:0;left:0;height:2px;width:0;background:var(--texto);z-index:300;transition:background .5s"></div>
+  <div id="barra-progreso" style="position:fixed;top:0;left:0;height:2px;width:0;background:var(--salix);z-index:300;border-radius:0 1px 1px 0;transition:width 0.1s linear"></div>
 
-  <!-- Canvas de partículas — fijo en el fondo de toda la página -->
-  <canvas
-    id="canvas-particulas"
-    style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;display:block"
-  ></canvas>
-
-  <!-- Contenido de la página -->
+  <!-- Contenido de la pagina -->
   <slot />
 </body>
 </html>
 
-<!-- Estilos globales -->
 <style is:global>
   @import '../styles/global.css';
 </style>
 
-<!-- Script de inicialización — se ejecuta en el cliente -->
 <script>
-  import { iniciarToggleTema, iniciarMenuMobile, iniciarBarraProgreso, iniciarNavScroll, iniciarSmoothScroll, iniciarAnimacionIconos, iniciarTypewriter } from '../scripts/utilidades.js';
+  import {
+    iniciarToggleTema,
+    iniciarMenuMobile,
+    iniciarBarraProgreso,
+    iniciarNavScroll,
+    iniciarSmoothScroll,
+    iniciarAnimacionIconos,
+    iniciarTypewriter,
+    iniciarApariciones
+  } from '../scripts/utilidades.js';
   import { iniciarParticulas } from '../scripts/particulas.js';
 
-  // Inicializar todo cuando el DOM esté listo
+  // Inicializar todo cuando el DOM este listo
   document.addEventListener('DOMContentLoaded', () => {
     iniciarToggleTema('boton-tema');
     iniciarMenuMobile('boton-hamburguesa', 'menu-mobile');
     iniciarBarraProgreso('barra-progreso');
     iniciarNavScroll('nav-principal');
     iniciarSmoothScroll();
-    iniciarAnimacionIconos('.fila-producto, .item-feature');
+    iniciarAnimacionIconos('.item-producto, .item-feature, .item-precio');
     iniciarTypewriter();
-    iniciarParticulas('canvas-particulas');
+    iniciarApariciones();
+
+    // Inicializar grids magneticos en cada seccion que los tenga
+    document.querySelectorAll('.grid-magnetico-canvas').forEach((c) => {
+      iniciarParticulas(c.id);
+    });
   });
 
-  // Animación de entrada del hero
+  // Animacion de entrada del hero
   window.addEventListener('load', () => {
-    // Agregar keyframe al documento
     const estiloAnim = document.createElement('style');
     estiloAnim.textContent = `
       @keyframes subirLinea {
@@ -141,24 +122,21 @@ const urlCanonica = Astro.url.href;
     `;
     document.head.appendChild(estiloAnim);
 
-    // Animar el badge
     const badge = document.querySelector('.hero-badge');
     if (badge) {
       badge.style.transition = 'opacity 0.6s ease';
-      badge.style.opacity    = '1';
+      badge.style.opacity = '1';
     }
 
-    // Animar líneas del título con stagger
     document.querySelectorAll('.linea-titulo').forEach((el, i) => {
-      el.style.animation = `subirLinea 0.85s ${0.2 + i * 0.13}s cubic-bezier(0.16,1,0.3,1) forwards`;
+      el.style.animation = `subirLinea 0.9s ${0.15 + i * 0.12}s cubic-bezier(0.16,1,0.3,1) forwards`;
     });
 
-    // Animar subtítulo y botones
     setTimeout(() => {
       const sub  = document.querySelector('.hero-subtitulo');
       const btns = document.querySelector('.hero-botones');
-      if (sub)  { sub.style.transition  = 'opacity 0.7s ease'; sub.style.opacity  = '1'; }
-      if (btns) { btns.style.transition = 'opacity 0.7s ease'; btns.style.opacity = '1'; }
-    }, 500);
+      if (sub)  { sub.style.transition  = 'opacity 0.8s ease'; sub.style.opacity  = '1'; }
+      if (btns) { btns.style.transition = 'opacity 0.8s ease 0.1s'; btns.style.opacity = '1'; }
+    }, 400);
   });
 </script>

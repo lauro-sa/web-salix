@@ -1,52 +1,48 @@
 ---
 // ============================================================
-// SeccionFeatures.astro — Grilla "Por qué Salix" (6 items)
-// EDITAR: array FEATURES abajo
+// SeccionFeatures.astro — Grilla "Por que Salix" (6 items)
 // ============================================================
 import IconoSVG from './ui/IconoSVG.astro';
+import GridMagnetico from './ui/GridMagnetico.astro';
 
 interface Feature {
-  numero:      string;
   titulo:      string;
   descripcion: string;
   icono:       string;
 }
 
 const FEATURES: Feature[] = [
-  { numero: '01', titulo: '100% local',            descripcion: 'Entendemos AFIP, la moneda y cómo se trabaja acá. Sin configuraciones genéricas.',     icono: 'ubicacion' },
-  { numero: '02', titulo: 'Rápido de implementar', descripcion: 'Sin meses de configuración ni consultores caros. Operativo en días.',                    icono: 'rayo'      },
-  { numero: '03', titulo: 'Productos conectados',  descripcion: 'Todos comparten la misma base. Tus datos fluyen entre herramientas sin fricción.',        icono: 'link'      },
-  { numero: '04', titulo: 'IA integrada',          descripcion: 'Automatizaciones y análisis inteligente disponibles en toda la suite.',                   icono: 'estrella'  },
-  { numero: '05', titulo: 'Mobile first',          descripcion: 'Funciona igual de bien en el celular que en la computadora. Siempre accesible.',          icono: 'celular'   },
-  { numero: '06', titulo: 'Seguro y confiable',    descripcion: 'Infraestructura cloud con backups automáticos. Siempre disponible.',                      icono: 'escudo'    },
+  { titulo: '100% local',            descripcion: 'Entendemos AFIP, la moneda y como se trabaja aca. Sin configuraciones genericas.',     icono: 'ubicacion' },
+  { titulo: 'Rapido de implementar', descripcion: 'Sin meses de configuracion ni consultores caros. Operativo en dias.',                    icono: 'rayo'      },
+  { titulo: 'Productos conectados',  descripcion: 'Todos comparten la misma base. Tus datos fluyen entre herramientas sin friccion.',        icono: 'link'      },
+  { titulo: 'IA integrada',          descripcion: 'Automatizaciones y analisis inteligente disponibles en toda la suite.',                   icono: 'ia'        },
+  { titulo: 'WhatsApp nativo',       descripcion: 'Todas las apps se integran con WhatsApp. Tus clientes y vos, siempre conectados.',       icono: 'whatsapp'  },
+  { titulo: 'Pagos con MercadoPago', descripcion: 'Links de pago automaticos. Cobra sin fricciones desde cualquier producto.',               icono: 'pago'      },
 ];
 
 const TEXTO = {
-  etiqueta:  'Por qué Salix',
-  tituloN:   'Para el negocio real.',
-  tituloG:   'Hecho en Argentina.',
-  subtitulo: 'No somos una solución genérica importada. Cada detalle de Salix está pensado para la forma en que se trabaja en Argentina.',
+  etiqueta:  'Por que Salix',
+  titulo:    'Pensado para el negocio real.',
+  subtitulo: 'No somos una solucion generica importada. Cada detalle esta diseñado para la forma en que se trabaja en Argentina.',
 };
 ---
 
-<div class="fondo-puntos">
+<GridMagnetico id="grid-features" clase="fondo-puntos">
   <div class="panel-interior">
     <section class="seccion" id="porque">
 
-      <span class="etiqueta">{TEXTO.etiqueta}</span>
-      <h2 class="titulo-dos-tonos">
-        <span class="negro">{TEXTO.tituloN}</span><br>
-        <span class="gris">{TEXTO.tituloG}</span>
-      </h2>
-      <p class="typewriter" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
+      <div class="encabezado-seccion aparecer">
+        <span class="etiqueta">{TEXTO.etiqueta}</span>
+        <h2 class="titulo-seccion">{TEXTO.titulo}</h2>
+        <p class="typewriter subtitulo" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
+      </div>
 
       <div class="grilla-features" role="list">
-        {FEATURES.map((feat) => (
-          <div class="item-feature" role="listitem">
+        {FEATURES.map((feat, indice) => (
+          <div class={`item-feature aparecer delay-${indice + 1}`} role="listitem">
             <div class="icono-contenedor feat-icono">
-              <IconoSVG nombre={feat.icono} tamaño={20} grosor={1.5} />
+              <IconoSVG nombre={feat.icono} tamaño={22} grosor={1.5} />
             </div>
-            <span class="feat-numero">{feat.numero}</span>
             <h3 class="feat-titulo">{feat.titulo}</h3>
             <p class="feat-texto">{feat.descripcion}</p>
           </div>
@@ -55,22 +51,48 @@ const TEXTO = {
 
     </section>
   </div>
-</div>
+</GridMagnetico>
 
 <style>
-  .grilla-features {
-    margin-top: 52px; display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 1px; background: var(--borde); border-radius: 18px; overflow: hidden;
-    transition: background .5s;
+  .encabezado-seccion {
+    margin-bottom: 3rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
   }
-  .item-feature { background: var(--fondo); padding: 30px 24px; display: flex; flex-direction: column; gap: 12px; transition: background .2s; }
-  .item-feature:hover { background: var(--card); }
+
+  .grilla-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--borde);
+    border-radius: var(--radio-card);
+    overflow: hidden;
+    border: 1px solid var(--borde);
+  }
+
+  .item-feature {
+    background: var(--fondo);
+    padding: clamp(1.5rem, 3vw, 2rem);
+    display: flex; flex-direction: column; gap: 0.75rem;
+    transition: background var(--transicion);
+  }
+
+  .item-feature:hover { background: var(--card-hover); }
   .item-feature:hover .feat-icono { transform: scale(1.1) rotate(-5deg); }
-  .feat-icono { transition: background .5s, transform .35s cubic-bezier(.34,1.56,.64,1); }
-  .feat-numero { font-size: 12px; font-weight: 600; color: var(--gris-titulo); letter-spacing: .05em; transition: color .5s; }
-  .feat-titulo { font-size: 16px; font-weight: 700; color: var(--texto); letter-spacing: -.2px; line-height: 1.2; transition: color .5s; }
-  .feat-texto  { font-size: 13.5px; color: var(--gris-sub); line-height: 1.65; transition: color .5s; }
+
+  .feat-icono {
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  .feat-titulo {
+    font-size: 1rem; font-weight: 700; color: var(--texto);
+    letter-spacing: -.02em; line-height: 1.3;
+  }
+
+  .feat-texto {
+    font-size: 0.85rem; color: var(--texto-secundario);
+    line-height: 1.7;
+  }
 
   @media (max-width: 1024px) { .grilla-features { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 600px)  { .grilla-features { grid-template-columns: 1fr; } }
+  @media (max-width: 640px)  { .grilla-features { grid-template-columns: 1fr; } }
 </style>

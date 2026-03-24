@@ -1,0 +1,67 @@
+---
+// ============================================================
+// book.astro — Pagina de Book by Salix (gestor de citas)
+// ============================================================
+import Plantilla         from '../layouts/Plantilla.astro';
+import Nav               from '../components/Nav.astro';
+import PlantillaProducto from '../components/PlantillaProducto.astro';
+import Footer            from '../components/Footer.astro';
+---
+
+<Plantilla
+  titulo="Book by Salix — Gestor de citas y turnos"
+  descripcion="App PWA para gestionar citas. Psicologia, estetica, consultorios. Turnos por WhatsApp, interfaz visual y pagos integrados."
+>
+  <Nav />
+  <main>
+    <PlantillaProducto
+      nombre="Book by Salix"
+      subtitulo="Citas y turnos, sin complicaciones"
+      descripcion="Para equipos de psicologia, estetica, manicura, consultorios o cualquier servicio que necesite agendar turnos. Tus clientes reservan, vos gestionas. Todo por WhatsApp y con una interfaz clara."
+      icono="agenda"
+      disponible={false}
+      color="var(--salix)"
+      features={[
+        { titulo: 'Agenda visual', descripcion: 'Ve todos los turnos del equipo en un calendario claro. Dia, semana o mes.', icono: 'calendario' },
+        { titulo: 'Reservas por WhatsApp', descripcion: 'Tus clientes reservan turno directo por WhatsApp. Sin llamadas, sin esperas.', icono: 'whatsapp' },
+        { titulo: 'Multiples profesionales', descripcion: 'Cada miembro del equipo tiene su agenda. Gestiona disponibilidad individual.', icono: 'usuarios' },
+        { titulo: 'Recordatorios automaticos', descripcion: 'Avisa al cliente 24hs antes del turno. Reduce ausencias sin esfuerzo.', icono: 'reloj' },
+        { titulo: 'Pagos y señas', descripcion: 'Cobra seña por adelantado con MercadoPago. Asegura la asistencia.', icono: 'pago' },
+        { titulo: 'Historial de pacientes', descripcion: 'Registro de citas, notas y pagos por cliente. Todo en un solo lugar.', icono: 'escudo' },
+      ]}
+      planes={[
+        {
+          nombre: 'Basico',
+          precio: 'USD $100',
+          periodo: '/mes',
+          destacado: false,
+          items: [
+            'Hasta 3 profesionales',
+            'Agenda visual',
+            'Reservas por WhatsApp (manual)',
+            'Link de MercadoPago para señas',
+            'Soporte por email',
+          ],
+          textoBoton: 'Elegir Basico',
+        },
+        {
+          nombre: 'Equipo',
+          precio: 'USD $140',
+          periodo: '/mes',
+          destacado: true,
+          items: [
+            'Profesionales ilimitados',
+            'WhatsApp API automatizado',
+            'Recordatorios automaticos',
+            'MercadoPago integrado',
+            'Historial completo',
+            'IA para optimizar agenda',
+            'Soporte prioritario',
+          ],
+          textoBoton: 'Elegir Equipo',
+        },
+      ]}
+    />
+  </main>
+  <Footer />
+</Plantilla>

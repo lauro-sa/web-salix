@@ -1,42 +1,58 @@
 ---
 // ============================================================
-// SeccionTestimonios.astro — Grilla de testimonios de clientes
-// EDITAR: array TESTIMONIOS abajo
+// SeccionTestimonios.astro — Testimonios de clientes
 // ============================================================
 
 interface Testimonio {
-  texto:   string;
-  nombre:  string;
-  empresa: string;
+  texto:     string;
+  nombre:    string;
+  empresa:   string;
   iniciales: string;
 }
 
 const TESTIMONIOS: Testimonio[] = [
   {
-    texto:    '"Desde que migramos a Salix CRM la gestión del consorcio es otra cosa. Todo más ordenado, los presupuestos se hacen en minutos."',
-    nombre:   'Marcela Rodríguez',        // ← EDITAR
-    empresa:  'Administradora de consorcios', // ← EDITAR
+    texto:     'Desde que migramos a Flux la gestion del consorcio es otra cosa. Todo mas ordenado, los presupuestos se hacen en minutos.',
+    nombre:    'Marcela Rodriguez',
+    empresa:   'Administradora de consorcios',
     iniciales: 'MR',
   },
   {
-    texto:    '"Le pedimos la web a Salix y nos sorprendió la calidad. Rápida, moderna y en tiempo récord. Se nota que entienden el negocio."',
-    nombre:   'Juan Pablo Ferreira',      // ← EDITAR
-    empresa:  'Ferreira Inmobiliaria',    // ← EDITAR
+    texto:     'Le pedimos la web a Salix y nos sorprendio la calidad. Rapida, moderna y en tiempo record. Se nota que entienden el negocio.',
+    nombre:    'Juan Pablo Ferreira',
+    empresa:   'Ferreira Inmobiliaria',
     iniciales: 'JP',
   },
   {
-    texto:    '"El soporte es excelente. No es un ticket y esperar días — te responden rápido y resuelven. Eso para nosotros vale mucho."',
-    nombre:   'Valentina López',          // ← EDITAR
-    empresa:  'LogiCenter SA',            // ← EDITAR
+    texto:     'El soporte es excelente. No es un ticket y esperar dias — te responden rapido y resuelven. Eso para nosotros vale mucho.',
+    nombre:    'Valentina Lopez',
+    empresa:   'LogiCenter SA',
     iniciales: 'VL',
+  },
+  {
+    texto:     'Con Flux facturamos y hacemos seguimiento de clientes desde el celular. Es como tener la oficina en el bolsillo.',
+    nombre:    'Ricardo Menendez',
+    empresa:   'Menendez & Asociados',
+    iniciales: 'RM',
+  },
+  {
+    texto:     'La integracion con WhatsApp cambio todo. Nuestros clientes ahora reciben presupuestos al instante y responden ahi mismo.',
+    nombre:    'Carolina Duarte',
+    empresa:   'Estudio Duarte Arquitectura',
+    iniciales: 'CD',
+  },
+  {
+    texto:     'Probamos varias soluciones y Salix fue la unica que no nos hizo perder una semana configurando. En dos dias estabamos operativos.',
+    nombre:    'Tomas Aguirre',
+    empresa:   'AguirreNet Soluciones IT',
+    iniciales: 'TA',
   },
 ];
 
 const TEXTO = {
   etiqueta:  'Clientes',
-  tituloN:   'Lo que dicen',
-  tituloG:   'quienes ya usan Salix.',
-  subtitulo: 'Empresas argentinas de distintos rubros ya confían en Salix para gestionar su operación diaria.',
+  titulo:    'Lo que dicen quienes usan Salix.',
+  subtitulo: 'Empresas argentinas de distintos rubros ya confian en Salix para gestionar su operacion diaria.',
 };
 ---
 
@@ -44,17 +60,22 @@ const TEXTO = {
   <div class="panel-interior">
     <section class="seccion" id="testimonios">
 
-      <span class="etiqueta">{TEXTO.etiqueta}</span>
-      <h2 class="titulo-dos-tonos">
-        <span class="negro">{TEXTO.tituloN}</span><br>
-        <span class="gris">{TEXTO.tituloG}</span>
-      </h2>
-      <p class="typewriter" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
+      <div class="encabezado-seccion aparecer">
+        <span class="etiqueta">{TEXTO.etiqueta}</span>
+        <h2 class="titulo-seccion">{TEXTO.titulo}</h2>
+        <p class="typewriter subtitulo" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
+      </div>
 
       <div class="grilla-testimonios" role="list">
-        {TESTIMONIOS.map((t) => (
-          <article class="tarjeta-testimonio" role="listitem">
-            <p class="texto-testimonio">{t.texto}</p>
+        {TESTIMONIOS.map((t, indice) => (
+          <article class={`tarjeta-testimonio aparecer delay-${(indice % 3) + 1}`} role="listitem">
+            <!-- Estrellas decorativas -->
+            <div class="estrellas" aria-hidden="true">
+              {[...Array(5)].map(() => (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--salix)" stroke="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg>
+              ))}
+            </div>
+            <p class="texto-testimonio">&ldquo;{t.texto}&rdquo;</p>
             <div class="autor-testimonio">
               <div class="avatar-testimonio" aria-hidden="true">{t.iniciales}</div>
               <div>
@@ -71,26 +92,51 @@ const TEXTO = {
 </div>
 
 <style>
-  .grilla-testimonios { margin-top: 52px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .encabezado-seccion {
+    margin-bottom: 3rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
+  }
+
+  .grilla-testimonios {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
 
   .tarjeta-testimonio {
-    border: 1px solid var(--borde); border-radius: 16px; padding: 26px; background: var(--fondo);
-    display: flex; flex-direction: column; gap: 18px;
-    transition: transform .35s, box-shadow .35s, background .5s, border-color .5s;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    background: var(--card);
+    display: flex; flex-direction: column; gap: 1rem;
+    transition: all var(--transicion);
   }
-  .tarjeta-testimonio:hover { transform: translateY(-3px); box-shadow: 0 14px 44px rgba(0,0,0,.08); }
 
-  .texto-testimonio  { font-size: 14px; color: var(--gris-sub); line-height: 1.75; flex: 1; transition: color .5s; }
-  .autor-testimonio  { display: flex; align-items: center; gap: 11px; }
-  .avatar-testimonio {
-    width: 34px; height: 34px; border-radius: 50%; background: var(--card);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: var(--gris-sub); flex-shrink: 0;
-    transition: background .5s, color .5s;
+  .tarjeta-testimonio:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    border-color: var(--salix-borde);
   }
-  .nombre-autor  { font-size: 13.5px; font-weight: 700; color: var(--texto); transition: color .5s; }
-  .empresa-autor { font-size: 12.5px; color: var(--gris-sub); transition: color .5s; }
+
+  .estrellas { display: flex; gap: 2px; }
+
+  .texto-testimonio {
+    font-size: 0.9rem; color: var(--texto-secundario);
+    line-height: 1.75; flex: 1;
+  }
+
+  .autor-testimonio { display: flex; align-items: center; gap: 10px; }
+
+  .avatar-testimonio {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--salix-suave); color: var(--salix);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+
+  .nombre-autor  { font-size: 0.85rem; font-weight: 700; color: var(--texto); }
+  .empresa-autor { font-size: 0.78rem; color: var(--texto-terciario); }
 
   @media (max-width: 1024px) { .grilla-testimonios { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 600px)  { .grilla-testimonios { grid-template-columns: 1fr; } }
+  @media (max-width: 640px)  { .grilla-testimonios { grid-template-columns: 1fr; } }
 </style>

@@ -1,0 +1,47 @@
+---
+// ============================================================
+// GridMagnetico.astro — Grid de puntos magnetico por seccion
+//
+// Envuelve el contenido de una seccion con el efecto de grid.
+// El canvas se posiciona absolute dentro del contenedor.
+//
+// Props:
+//   id    — id unico para el canvas (obligatorio)
+//   clase — clases CSS adicionales para el wrapper
+// ============================================================
+
+interface Props {
+  id:     string;
+  clase?: string;
+}
+
+const { id, clase = '' } = Astro.props;
+---
+
+<div class={`grid-magnetico-wrapper ${clase}`}>
+  <canvas class="grid-magnetico-canvas" id={id}></canvas>
+  <div class="grid-magnetico-contenido">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .grid-magnetico-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grid-magnetico-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 0;
+    /* width/height se setean desde JS para respetar el DPR */
+  }
+
+  .grid-magnetico-contenido {
+    position: relative;
+    z-index: 1;
+  }
+</style>

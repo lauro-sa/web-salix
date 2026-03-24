@@ -1,0 +1,67 @@
+---
+// ============================================================
+// go.astro — Pagina de Go by Salix (delivery de comidas)
+// ============================================================
+import Plantilla         from '../layouts/Plantilla.astro';
+import Nav               from '../components/Nav.astro';
+import PlantillaProducto from '../components/PlantillaProducto.astro';
+import Footer            from '../components/Footer.astro';
+---
+
+<Plantilla
+  titulo="Go by Salix — Delivery de comidas para locales"
+  descripcion="App PWA de delivery. El cliente elige, pide por WhatsApp, el local recibe la orden, genera el link de MercadoPago y envia la comida."
+>
+  <Nav />
+  <main>
+    <PlantillaProducto
+      nombre="Go by Salix"
+      subtitulo="Delivery directo, sin intermediarios"
+      descripcion="Tu cliente ve el menu, elige y pide. La orden llega al local por WhatsApp, generas el link de MercadoPago para cobrar, confirmas y envias. Sin comisiones de apps de terceros."
+      icono="delivery"
+      disponible={false}
+      color="var(--salix)"
+      features={[
+        { titulo: 'Menu digital', descripcion: 'Tu menu online siempre actualizado. Fotos, precios, categorias y opciones.', icono: 'sitio' },
+        { titulo: 'Pedidos por WhatsApp', descripcion: 'La orden llega directamente a tu WhatsApp. Sin apps intermediarias.', icono: 'whatsapp' },
+        { titulo: 'Cobro con MercadoPago', descripcion: 'Genera links de pago automaticos. El cliente paga antes de que salga el pedido.', icono: 'pago' },
+        { titulo: 'Confirmacion en tiempo real', descripcion: 'Confirma el pedido, avisa al cliente y coordina el envio. Todo desde el celular.', icono: 'check' },
+        { titulo: 'Sin comisiones', descripcion: 'No pagamos porcentaje por pedido. Tu margen es tuyo.', icono: 'dinero' },
+        { titulo: 'PWA instalable', descripcion: 'Tus clientes la instalan como una app. Sin pasar por el App Store.', icono: 'celular' },
+      ]}
+      planes={[
+        {
+          nombre: 'Basico',
+          precio: 'USD $100',
+          periodo: '/mes',
+          destacado: false,
+          items: [
+            '1 local',
+            'Menu digital completo',
+            'Pedidos por WhatsApp (manual)',
+            'Link de MercadoPago por pedido',
+            'Soporte por email',
+          ],
+          textoBoton: 'Elegir Basico',
+        },
+        {
+          nombre: 'Completo',
+          precio: 'USD $150',
+          periodo: '/mes',
+          destacado: true,
+          items: [
+            'Locales ilimitados',
+            'WhatsApp API automatizado',
+            'MercadoPago automatico',
+            'Notificaciones al cliente',
+            'Estadisticas de pedidos',
+            'IA para sugerencias de menu',
+            'Soporte prioritario',
+          ],
+          textoBoton: 'Elegir Completo',
+        },
+      ]}
+    />
+  </main>
+  <Footer />
+</Plantilla>

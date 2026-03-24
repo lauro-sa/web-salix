@@ -1,0 +1,67 @@
+---
+// ============================================================
+// play.astro — Pagina de Play by Salix (canchas de padel)
+// ============================================================
+import Plantilla         from '../layouts/Plantilla.astro';
+import Nav               from '../components/Nav.astro';
+import PlantillaProducto from '../components/PlantillaProducto.astro';
+import Footer            from '../components/Footer.astro';
+---
+
+<Plantilla
+  titulo="Play by Salix — Gestion de canchas de padel"
+  descripcion="App PWA para gestionar turnos y pagos de canchas de padel. Turnos fijos mensuales, links de MercadoPago y control visual."
+>
+  <Nav />
+  <main>
+    <PlantillaProducto
+      nombre="Play by Salix"
+      subtitulo="Gestion de canchas, simple y visual"
+      descripcion="Tus jugadores tienen canchas fijas al mes y es tedioso recibir 4 pagos por cancha. Play genera los links para que paguen de a uno o todos juntos. Facil para el club, visual para todos."
+      icono="cancha"
+      disponible={false}
+      color="var(--salix)"
+      features={[
+        { titulo: 'Turnos fijos mensuales', descripcion: 'Asigna canchas fijas a jugadores. El sistema recuerda horarios y frecuencias.', icono: 'calendario' },
+        { titulo: 'Pagos individuales', descripcion: 'Cada jugador paga su parte. Links de MercadoPago individuales por turno.', icono: 'pago' },
+        { titulo: 'Vista del club', descripcion: 'Panel visual con todas las canchas, horarios y estado de pagos de un vistazo.', icono: 'grafico' },
+        { titulo: 'Notificaciones WhatsApp', descripcion: 'Recordatorios automaticos de turno y de pago directo al WhatsApp del jugador.', icono: 'whatsapp' },
+        { titulo: 'Historial completo', descripcion: 'Registro de turnos, pagos y asistencia. Exporta informes mensuales.', icono: 'reloj' },
+        { titulo: 'Multi-cancha', descripcion: 'Gestiona padel, tenis, futbol o cualquier tipo de cancha desde el mismo panel.', icono: 'cancha' },
+      ]}
+      planes={[
+        {
+          nombre: 'Basico',
+          precio: 'USD $80',
+          periodo: '/mes',
+          destacado: false,
+          items: [
+            'Hasta 4 canchas',
+            'Turnos fijos mensuales',
+            'Links de pago manuales',
+            'WhatsApp (envio manual)',
+            'Soporte por email',
+          ],
+          textoBoton: 'Elegir Basico',
+        },
+        {
+          nombre: 'Club',
+          precio: 'USD $120',
+          periodo: '/mes',
+          destacado: true,
+          items: [
+            'Canchas ilimitadas',
+            'WhatsApp API automatizado',
+            'MercadoPago automatico',
+            'Recordatorios de pago',
+            'Informes mensuales',
+            'IA para optimizar horarios',
+            'Soporte prioritario',
+          ],
+          textoBoton: 'Elegir Club',
+        },
+      ]}
+    />
+  </main>
+  <Footer />
+</Plantilla>

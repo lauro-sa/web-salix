@@ -1,0 +1,37 @@
+---
+// ============================================================
+// sites.astro — Pagina de Sites by Salix
+// ============================================================
+import Plantilla         from '../layouts/Plantilla.astro';
+import Nav               from '../components/Nav.astro';
+import PlantillaProducto from '../components/PlantillaProducto.astro';
+import Footer            from '../components/Footer.astro';
+---
+
+<Plantilla
+  titulo="Sites by Salix — Sitios web profesionales"
+  descripcion="Sitios web a medida con tecnologia Salix. Rapidos, con SEO completo, diseño moderno y optimizados para convertir."
+>
+  <Nav />
+  <main>
+    <PlantillaProducto
+      nombre="Sites by Salix"
+      subtitulo="Sitios web que convierten"
+      descripcion="Diseñamos y desarrollamos tu sitio web con tecnologia moderna. Ultra rapido, SEO optimizado y con un diseño que representa tu marca. Listo en dias, no en meses."
+      icono="sitio"
+      disponible={true}
+      color="var(--salix)"
+      sinPrecio={true}
+      textoSinPrecio="Cada proyecto es distinto: landing page, sitio institucional, PWA, e-commerce. Contanos tu idea y te armamos un presupuesto a medida sin compromiso."
+      features={[
+        { titulo: 'Diseño a medida', descripcion: 'Cada sitio es unico. Diseñamos segun tu marca, tu rubro y tus objetivos.', icono: 'diamante' },
+        { titulo: 'Ultra rapido', descripcion: 'Construido con Astro. Carga instantanea, 100/100 en PageSpeed.', icono: 'rayo' },
+        { titulo: 'SEO completo', descripcion: 'Metadata, Schema.org, sitemap y todas las buenas practicas desde el dia uno.', icono: 'estrella' },
+        { titulo: 'Responsive', descripcion: 'Se ve perfecto en celular, tablet y escritorio. Mobile first siempre.', icono: 'celular' },
+        { titulo: 'Modo claro/oscuro', descripcion: 'Toggle de tema automatico. Tu web se adapta a la preferencia del usuario.', icono: 'escudo' },
+        { titulo: 'Animaciones elegantes', descripcion: 'Apariciones al scroll, iconos animados y transiciones suaves.', icono: 'codigo' },
+      ]}
+    />
+  </main>
+  <Footer />
+</Plantilla>

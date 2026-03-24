@@ -1,167 +1,189 @@
 ---
 // ============================================================
-// SeccionProductos.astro — Lista de productos Salix
-//
-// EDITAR: Modificar el array PRODUCTOS para cambiar
-// nombre, descripción, estado y url de cada producto.
+// SeccionProductos.astro — Grilla de productos con cards
+// Cada producto tiene su pagina individual
 // ============================================================
 import IconoSVG from './ui/IconoSVG.astro';
 
-// Definición de tipos
 interface Producto {
-  numero:      string;
   nombre:      string;
   descripcion: string;
   icono:       string;
   disponible:  boolean;
-  url?:        string;
+  url:         string;
+  color:       string;
 }
 
-// ---- Lista de productos — EDITAR ----
+// Lista de productos — EDITAR
 const PRODUCTOS: Producto[] = [
   {
-    numero:      '01',
-    nombre:      'Salix CRM',
-    descripcion: 'Gestión de consorcios, contactos, presupuestos y comunicaciones.',
-    icono:       'edificio',
+    nombre:      'Flux by Salix',
+    descripcion: 'Gestion integral multiempresa. Marketing, correos, WhatsApp, contactos, presupuestos, informes y facturas.',
+    icono:       'flujo',
     disponible:  true,
-    url:         '#',
+    url:         '/flux',
+    color:       'var(--salix)',
   },
   {
-    numero:      '02',
     nombre:      'Sites by Salix',
-    descripcion: 'Páginas web a medida con tecnología Salix. Rápidas y con SEO completo.',
-    icono:       'ventana',
+    descripcion: 'Sitios web a medida con tecnologia Salix. Rapidos, con SEO completo y diseño profesional.',
+    icono:       'sitio',
     disponible:  true,
-    url:         '#',
+    url:         '/sites',
+    color:       'var(--salix)',
   },
   {
-    numero:      '03',
     nombre:      'Go by Salix',
-    descripcion: 'Plataforma de delivery para pymes. Pedidos, repartidores y clientes en tiempo real.',
-    icono:       'ubicacion',
+    descripcion: 'Delivery de comidas. El cliente elige, pide por WhatsApp, paga con MercadoPago y recibe en su puerta.',
+    icono:       'delivery',
     disponible:  false,
+    url:         '/go',
+    color:       'var(--salix)',
   },
   {
-    numero:      '04',
-    nombre:      'Court by Salix',
-    descripcion: 'Reservas online para canchas de pádel, tenis y polideportivos.',
-    icono:       'diamante',
+    nombre:      'Play by Salix',
+    descripcion: 'Gestion de canchas de padel. Turnos fijos, pagos mensuales con links de MercadoPago y control visual.',
+    icono:       'cancha',
     disponible:  false,
+    url:         '/play',
+    color:       'var(--salix)',
   },
   {
-    numero:      '05',
-    nombre:      'Turno by Salix',
-    descripcion: 'Agenda y turnos online para profesionales, consultorios y servicios.',
-    icono:       'calendario',
+    nombre:      'Book by Salix',
+    descripcion: 'Gestor de citas para equipos. Psicologia, estetica, consultorios. Turnos por WhatsApp e interfaz simple.',
+    icono:       'agenda',
     disponible:  false,
+    url:         '/book',
+    color:       'var(--salix)',
+  },
+  {
+    nombre:      'Integraciones',
+    descripcion: 'Servicio de consultoria e implementacion. Te ayudamos a configurar, integrar y personalizar. Sesiones de 1 hora.',
+    icono:       'link',
+    disponible:  true,
+    url:         '/integraciones',
+    color:       'var(--salix)',
   },
 ];
 
-// Texto de la sección — EDITAR
 const TEXTO = {
-  etiqueta:   'Disponibles ahora y próximamente',
-  tituloN:    'Una suite completa.',
-  tituloG:    'Un solo respaldo.',
-  subtitulo:  'Cada producto resuelve un problema específico, con la calidad y el respaldo de Salix. Todos conectados, todos pensados para Argentina.',
+  etiqueta:  'Productos y servicios',
+  titulo:    'Una suite completa.',
+  subtitulo: 'Cada producto es una PWA independiente, pensada para resolver un problema especifico. Todas conectadas, todas con WhatsApp y MercadoPago.',
 };
 ---
 
-<div class="fondo-puntos">
-  <div class="panel-interior">
-    <section class="seccion" id="productos">
+<section class="seccion" id="productos">
 
-      <!-- Encabezado de la sección -->
-      <span class="etiqueta">{TEXTO.etiqueta}</span>
-      <h2 class="titulo-dos-tonos">
-        <span class="negro">{TEXTO.tituloN}</span><br>
-        <span class="gris">{TEXTO.tituloG}</span>
-      </h2>
-
-      <!-- Párrafo con efecto typewriter -->
-      <p
-        class="typewriter"
-        data-texto={TEXTO.subtitulo}
-        aria-label={TEXTO.subtitulo}
-      ></p>
-
-      <!-- Lista de productos -->
-      <div class="lista-productos" role="list">
-        {PRODUCTOS.map((producto) => (
-          <div class="fila-producto" role="listitem">
-
-            <!-- Izquierda: número + ícono + info -->
-            <div class="fila-izquierda">
-              <span class="numero-producto">{producto.numero}</span>
-
-              <div class="icono-contenedor">
-                <IconoSVG nombre={producto.icono} tamaño={20} />
-              </div>
-
-              <div class="info-producto">
-                <span class="nombre-producto">{producto.nombre}</span>
-                <span class="desc-producto">{producto.descripcion}</span>
-              </div>
-            </div>
-
-            <!-- Derecha: badge de estado -->
-            <span class={producto.disponible ? 'badge-disponible' : 'badge-pronto'}>
-              {producto.disponible ? 'Disponible' : 'Próximamente'}
-            </span>
-
-          </div>
-        ))}
-      </div>
-
-    </section>
+  <div class="encabezado-seccion aparecer">
+    <span class="etiqueta">
+      <span class="punto-estado" style="background:var(--salix)"></span>
+      {TEXTO.etiqueta}
+    </span>
+    <h2 class="titulo-seccion">{TEXTO.titulo}</h2>
+    <p class="typewriter subtitulo" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
   </div>
-</div>
+
+  <!-- Grilla de productos -->
+  <div class="grilla-productos">
+    {PRODUCTOS.map((producto, indice) => (
+      <a href={producto.url} class={`card-producto aparecer delay-${indice + 1}`}>
+        <div class="card-producto-cabecera">
+          <div class="icono-contenedor item-producto">
+            <IconoSVG nombre={producto.icono} tamaño={22} grosor={1.5} />
+          </div>
+          <span class={`etiqueta-estado ${producto.disponible ? 'disponible' : 'proximamente'}`}>
+            <span class="punto-estado"></span>
+            {producto.disponible ? 'Disponible' : 'Proximamente'}
+          </span>
+        </div>
+        <h3 class="card-producto-nombre">{producto.nombre}</h3>
+        <p class="card-producto-desc">{producto.descripcion}</p>
+        <span class="card-producto-link">
+          Conocer mas
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
+      </a>
+    ))}
+  </div>
+
+</section>
 
 <style>
-  /* ---- Lista ---- */
-  .lista-productos {
-    margin-top: 52px; border-radius: 18px; overflow: hidden;
-    border: 1px solid var(--borde); display: flex; flex-direction: column;
-    transition: border-color .5s;
+  .encabezado-seccion {
+    margin-bottom: 3rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
   }
 
-  /* ---- Fila de producto ---- */
-  .fila-producto {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; padding: 22px 28px; background: var(--fondo);
-    border-bottom: 1px solid var(--borde);
-    transition: background .2s, border-color .5s;
+  .grilla-productos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
   }
-  .fila-producto:last-child { border-bottom: none; }
-  .fila-producto:hover { background: var(--card); }
 
-  /* El ícono rota un poco al hover de la fila */
-  .fila-producto:hover .icono-contenedor { transform: scale(1.1) rotate(-5deg); }
-
-  .fila-izquierda { display: flex; align-items: center; gap: 18px; }
-
-  .numero-producto { font-size: 12px; color: var(--gris-titulo); font-weight: 600; min-width: 20px; transition: color .5s; }
-
-  .info-producto { display: flex; flex-direction: column; gap: 2px; }
-  .nombre-producto { font-size: 17px; font-weight: 700; color: var(--texto); letter-spacing: -.2px; transition: color .5s; }
-  .desc-producto   { font-size: 13.5px; color: var(--gris-sub); line-height: 1.5; transition: color .5s; }
-
-  /* ---- Badges ---- */
-  .badge-disponible {
-    font-size: 12px; font-weight: 600; padding: 5px 13px; border-radius: 100px;
-    flex-shrink: 0; white-space: nowrap;
-    background: #eaf5ee; color: #1a6b47;
-  }
-  .badge-pronto {
-    font-size: 12px; font-weight: 600; padding: 5px 13px; border-radius: 100px;
-    flex-shrink: 0; white-space: nowrap;
-    background: var(--ghost-fondo); color: var(--gris-sub);
+  /* Card de cada producto */
+  .card-producto {
+    background: var(--card);
     border: 1px solid var(--borde);
-    transition: background .5s, color .5s;
+    border-radius: var(--radio-card);
+    padding: clamp(1.5rem, 3vw, 2rem);
+    display: flex; flex-direction: column; gap: 1rem;
+    transition: all var(--transicion);
+    text-decoration: none; color: inherit;
+    position: relative; overflow: hidden;
   }
 
-  /* ---- Responsive ---- */
-  @media (max-width: 600px) {
-    .fila-producto { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .card-producto::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--salix);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-producto:hover {
+    border-color: var(--salix-borde);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+
+  .card-producto:hover::before { transform: scaleX(1); }
+  .card-producto:hover .icono-contenedor { transform: scale(1.1) rotate(-5deg); }
+  .card-producto:hover .card-producto-link { color: var(--salix); }
+
+  .card-producto-cabecera {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .card-producto-nombre {
+    font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em;
+    color: var(--texto);
+  }
+
+  .card-producto-desc {
+    font-size: 0.875rem; color: var(--texto-secundario);
+    line-height: 1.7; flex: 1;
+  }
+
+  .card-producto-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--texto-terciario);
+    transition: color var(--transicion);
+    margin-top: auto;
+  }
+
+  /* Primera fila: 3 columnas. Segunda fila: 2 centradas */
+  .card-producto:nth-child(4),
+  .card-producto:nth-child(5) {
+    max-width: none;
+  }
+
+  @media (max-width: 1024px) {
+    .grilla-productos { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .grilla-productos { grid-template-columns: 1fr; }
   }
 </style>
