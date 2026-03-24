@@ -1,0 +1,76 @@
+---
+// ============================================================
+// SeccionFeatures.astro — Grilla "Por qué Salix" (6 items)
+// EDITAR: array FEATURES abajo
+// ============================================================
+import IconoSVG from './ui/IconoSVG.astro';
+
+interface Feature {
+  numero:      string;
+  titulo:      string;
+  descripcion: string;
+  icono:       string;
+}
+
+const FEATURES: Feature[] = [
+  { numero: '01', titulo: '100% local',            descripcion: 'Entendemos AFIP, la moneda y cómo se trabaja acá. Sin configuraciones genéricas.',     icono: 'ubicacion' },
+  { numero: '02', titulo: 'Rápido de implementar', descripcion: 'Sin meses de configuración ni consultores caros. Operativo en días.',                    icono: 'rayo'      },
+  { numero: '03', titulo: 'Productos conectados',  descripcion: 'Todos comparten la misma base. Tus datos fluyen entre herramientas sin fricción.',        icono: 'link'      },
+  { numero: '04', titulo: 'IA integrada',          descripcion: 'Automatizaciones y análisis inteligente disponibles en toda la suite.',                   icono: 'estrella'  },
+  { numero: '05', titulo: 'Mobile first',          descripcion: 'Funciona igual de bien en el celular que en la computadora. Siempre accesible.',          icono: 'celular'   },
+  { numero: '06', titulo: 'Seguro y confiable',    descripcion: 'Infraestructura cloud con backups automáticos. Siempre disponible.',                      icono: 'escudo'    },
+];
+
+const TEXTO = {
+  etiqueta:  'Por qué Salix',
+  tituloN:   'Para el negocio real.',
+  tituloG:   'Hecho en Argentina.',
+  subtitulo: 'No somos una solución genérica importada. Cada detalle de Salix está pensado para la forma en que se trabaja en Argentina.',
+};
+---
+
+<div class="fondo-puntos">
+  <div class="panel-interior">
+    <section class="seccion" id="porque">
+
+      <span class="etiqueta">{TEXTO.etiqueta}</span>
+      <h2 class="titulo-dos-tonos">
+        <span class="negro">{TEXTO.tituloN}</span><br>
+        <span class="gris">{TEXTO.tituloG}</span>
+      </h2>
+      <p class="typewriter" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
+
+      <div class="grilla-features" role="list">
+        {FEATURES.map((feat) => (
+          <div class="item-feature" role="listitem">
+            <div class="icono-contenedor feat-icono">
+              <IconoSVG nombre={feat.icono} tamaño={20} grosor={1.5} />
+            </div>
+            <span class="feat-numero">{feat.numero}</span>
+            <h3 class="feat-titulo">{feat.titulo}</h3>
+            <p class="feat-texto">{feat.descripcion}</p>
+          </div>
+        ))}
+      </div>
+
+    </section>
+  </div>
+</div>
+
+<style>
+  .grilla-features {
+    margin-top: 52px; display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--borde); border-radius: 18px; overflow: hidden;
+    transition: background .5s;
+  }
+  .item-feature { background: var(--fondo); padding: 30px 24px; display: flex; flex-direction: column; gap: 12px; transition: background .2s; }
+  .item-feature:hover { background: var(--card); }
+  .item-feature:hover .feat-icono { transform: scale(1.1) rotate(-5deg); }
+  .feat-icono { transition: background .5s, transform .35s cubic-bezier(.34,1.56,.64,1); }
+  .feat-numero { font-size: 12px; font-weight: 600; color: var(--gris-titulo); letter-spacing: .05em; transition: color .5s; }
+  .feat-titulo { font-size: 16px; font-weight: 700; color: var(--texto); letter-spacing: -.2px; line-height: 1.2; transition: color .5s; }
+  .feat-texto  { font-size: 13.5px; color: var(--gris-sub); line-height: 1.65; transition: color .5s; }
+
+  @media (max-width: 1024px) { .grilla-features { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px)  { .grilla-features { grid-template-columns: 1fr; } }
+</style>

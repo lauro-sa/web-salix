@@ -1,0 +1,116 @@
+---
+// ============================================================
+// Hero.astro — Sección principal / primera pantalla
+//
+// Para editar el contenido del hero, cambiar los valores de
+// las constantes de abajo o las props.
+// ============================================================
+
+// Contenido editable del hero
+// EDITAR: Cambiar estos textos para personalizar el hero
+const CONTENIDO = {
+  badge:       'Suite de software · Argentina',        // ← EDITAR
+  lineaNegra:  'Software que',                          // ← EDITAR
+  lineaGris:   'simplifica lo que importa.',            // ← EDITAR
+  botonPrimario:   'Ver productos',                     // ← EDITAR
+  botonSecundario: 'Hablar con nosotros',               // ← EDITAR
+  linkPrimario:    '#productos',                        // ← EDITAR
+  linkSecundario:  '#contacto',                         // ← EDITAR
+};
+---
+
+<section class="hero" id="inicio" aria-label="Inicio">
+
+  <!-- Logo centrado sobre el título (como en antigravity.google) -->
+  <div class="hero-marca" aria-hidden="true">
+    <!-- REEMPLAZAR con logo final de Salix -->
+    <svg class="hero-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0c-1.5673 0-2.9376.8395-3.6855 2.0938l7.369.0019C14.9357.8402 13.5676 0 12 0zm0 2.7676c-2.3692 0-4.291 1.9188-4.291 4.287h8.5781c0-2.3682-1.9191-4.287-4.2871-4.287zm-4.9531.209c-2.2507 0-4.0762 1.8241-4.0762 4.0742h4.0762V2.9766zm9.9043.002v4.0722l4.0722.002c0-2.2501-1.8234-4.0743-4.0722-4.0743zM7.0469 7.709c-2.3698 0-4.289 1.9224-4.289 4.291 0 2.368 1.9189 4.2871 4.289 4.2871V7.709zm9.9043 0v8.5781c2.3682 0 4.291-1.9191 4.291-4.2871 0-2.3686-1.9228-4.291-4.291-4.291zm-4.9551.002C9.6278 7.711 7.709 9.6316 7.709 12c0 2.3686 1.9188 4.2871 4.287 4.2871 2.3684 0 4.2892-1.9185 4.2892-4.2871 0-2.3683-1.9208-4.289-4.2891-4.289zm-9.9004.6035C.8399 9.062 0 10.4327 0 12c0 1.5666.8398 2.9364 2.0938 3.6855l.0019-7.371zm19.8086 0 .002 7.371C23.1595 14.9364 24 13.5666 24 12c0-1.5673-.8402-2.9379-2.0957-3.6855zM7.0469 16.9492l-4.0742.002c0 2.2491 1.8222 4.0703 4.0742 4.0703v-4.0723zm9.9043 0v4.0703c2.2485 0 4.0722-1.8189 4.0722-4.0683l-4.0722-.002zm-9.2422.002c0 2.3692 1.9218 4.289 4.291 4.289 2.368 0 4.2871-1.9198 4.2871-4.289H7.709zm.5488 4.9531C9.0061 23.1592 10.3755 24 11.9434 24c1.5672 0 2.9366-.8408 3.6855-2.0957H8.258z"/>
+    </svg>
+    <span class="hero-nombre-marca">Salix</span>
+  </div>
+
+  <!-- Badge de estado — con punto pulsante verde -->
+  <div class="hero-badge" style="opacity:0" aria-hidden="true">
+    <span class="punto-pulso"></span>
+    {CONTENIDO.badge}
+  </div>
+
+  <!-- Título principal — dos líneas animadas -->
+  <h1 class="hero-titulo" aria-label={`${CONTENIDO.lineaNegra} ${CONTENIDO.lineaGris}`}>
+    <span class="linea-contenedor">
+      <span class="linea-titulo negro">{CONTENIDO.lineaNegra}</span>
+    </span>
+    <span class="linea-contenedor">
+      <span class="linea-titulo gris">{CONTENIDO.lineaGris}</span>
+    </span>
+  </h1>
+
+  <!-- Botones -->
+  <div class="hero-botones" style="opacity:0">
+    <a href={CONTENIDO.linkPrimario} class="boton-oscuro">
+      {CONTENIDO.botonPrimario}
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+    <a href={CONTENIDO.linkSecundario} class="boton-fantasma">
+      {CONTENIDO.botonSecundario}
+    </a>
+  </div>
+
+</section>
+
+<style>
+  .hero {
+    min-height: 100svh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 100px 24px 80px;
+    position: relative; z-index: 2;
+  }
+
+  /* Logo centrado */
+  .hero-marca { display: flex; align-items: center; gap: 11px; margin-bottom: 32px; }
+  .hero-logo  { height: 30px; width: auto; transition: color .5s; }
+  [data-tema="claro"]  .hero-logo path { fill: #0a0a0a; }
+  [data-tema="oscuro"] .hero-logo path { fill: #efefef; }
+  .hero-nombre-marca { font-size: 19px; font-weight: 700; color: var(--texto); letter-spacing: -.3px; transition: color .5s; }
+
+  /* Badge */
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--card); border: 1px solid var(--borde);
+    color: var(--gris-sub); font-size: 13px; font-weight: 500;
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 28px;
+    transition: background .5s, border-color .5s;
+  }
+
+  /* Punto pulsante verde */
+  .punto-pulso {
+    width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+    animation: pulso 2s infinite; flex-shrink: 0;
+  }
+  @keyframes pulso { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+
+  /* Título */
+  .hero-titulo {
+    font-size: clamp(40px, 9.5vw, 100px);
+    font-weight: 500; line-height: 1.0; letter-spacing: -3px; margin-bottom: 40px;
+  }
+  .linea-contenedor { overflow: hidden; display: block; }
+  .linea-titulo      { display: block; }
+  .linea-titulo.negro { color: var(--texto); transition: color .5s; }
+  .linea-titulo.gris  { color: var(--gris-titulo); transition: color .5s; }
+
+  /* Botones */
+  .hero-botones { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .hero-titulo { letter-spacing: -2.5px; }
+    .hero-botones { width: 100%; }
+    .hero-botones .boton-oscuro,
+    .hero-botones .boton-fantasma { justify-content: center; }
+  }
+</style>

@@ -1,0 +1,161 @@
+---
+// ============================================================
+// Nav.astro — Barra de navegación principal
+// Se vuelve opaca con blur al hacer scroll.
+// Incluye toggle de tema claro/oscuro y menú mobile.
+// ============================================================
+---
+
+<!-- Navegación principal -->
+<nav id="nav-principal" class="nav">
+
+  <!-- Logo — REEMPLAZAR el SVG con el logo final de Salix -->
+  <a href="/" class="logo" aria-label="Salix inicio">
+    <svg class="logo-svg" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 0c-1.5673 0-2.9376.8395-3.6855 2.0938l7.369.0019C14.9357.8402 13.5676 0 12 0zm0 2.7676c-2.3692 0-4.291 1.9188-4.291 4.287h8.5781c0-2.3682-1.9191-4.287-4.2871-4.287zm-4.9531.209c-2.2507 0-4.0762 1.8241-4.0762 4.0742h4.0762V2.9766zm9.9043.002v4.0722l4.0722.002c0-2.2501-1.8234-4.0743-4.0722-4.0743zM7.0469 7.709c-2.3698 0-4.289 1.9224-4.289 4.291 0 2.368 1.9189 4.2871 4.289 4.2871V7.709zm9.9043 0v8.5781c2.3682 0 4.291-1.9191 4.291-4.2871 0-2.3686-1.9228-4.291-4.291-4.291zm-4.9551.002C9.6278 7.711 7.709 9.6316 7.709 12c0 2.3686 1.9188 4.2871 4.287 4.2871 2.3684 0 4.2892-1.9185 4.2892-4.2871 0-2.3683-1.9208-4.289-4.2891-4.289zm-9.9004.6035C.8399 9.062 0 10.4327 0 12c0 1.5666.8398 2.9364 2.0938 3.6855l.0019-7.371zm19.8086 0 .002 7.371C23.1595 14.9364 24 13.5666 24 12c0-1.5673-.8402-2.9379-2.0957-3.6855zM7.0469 16.9492l-4.0742.002c0 2.2491 1.8222 4.0703 4.0742 4.0703v-4.0723zm9.9043 0v4.0703c2.2485 0 4.0722-1.8189 4.0722-4.0683l-4.0722-.002zm-9.2422.002c0 2.3692 1.9218 4.289 4.291 4.289 2.368 0 4.2871-1.9198 4.2871-4.289H7.709zm.5488 4.9531C9.0061 23.1592 10.3755 24 11.9434 24c1.5672 0 2.9366-.8408 3.6855-2.0957H8.258z"/>
+    </svg>
+    <span class="logo-nombre">Salix</span>
+  </a>
+
+  <!-- Links de navegación — desktop -->
+  <ul class="nav-links" role="list">
+    <li><a href="#productos">Productos</a></li>
+    <li><a href="#porque">Por qué Salix</a></li>
+    <li><a href="#planes">Planes</a></li>
+    <li><a href="#testimonios">Clientes</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+
+  <!-- Controles de la derecha -->
+  <div class="nav-derecha">
+    <!-- Botón toggle claro/oscuro -->
+    <button id="boton-tema" class="boton-tema" aria-label="Cambiar tema" title="Cambiar tema">
+      <!-- Sol — visible en tema oscuro para volver al claro -->
+      <svg class="icono-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1"    x2="12" y2="3"/>
+        <line x1="12" y1="21"   x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22"   x2="5.64"  y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1"  y1="12" x2="3"  y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36"/>
+        <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+      </svg>
+      <!-- Luna — visible en tema claro para pasar al oscuro -->
+      <svg class="icono-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+
+    <!-- Botón hamburguesa — solo visible en mobile -->
+    <button
+      id="boton-hamburguesa"
+      class="hamburguesa"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Menú mobile — fullscreen overlay -->
+<div id="menu-mobile" class="menu-mobile" role="dialog" aria-label="Menú de navegación">
+  <a href="#productos"    class="link-menu">Productos</a>
+  <a href="#porque"       class="link-menu">Por qué Salix</a>
+  <a href="#planes"       class="link-menu">Planes</a>
+  <a href="#testimonios"  class="link-menu">Clientes</a>
+  <a href="#contacto"     class="link-menu">Contacto</a>
+</div>
+
+<style>
+  /* ---- Nav ---- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 36px;
+    transition: background .4s, border-bottom .4s;
+  }
+
+  /* Fondo semitransparente al hacer scroll */
+  .nav.fijo {
+    background: color-mix(in srgb, var(--fondo) 88%, transparent);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--borde);
+  }
+
+  /* ---- Logo ---- */
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--texto); }
+  .logo-svg { height: 26px; width: auto; transition: color .5s; }
+  [data-tema="claro"]  .logo-svg path { fill: #0a0a0a; }
+  [data-tema="oscuro"] .logo-svg path { fill: #efefef; }
+  .logo-nombre { font-size: 16px; font-weight: 700; letter-spacing: -.2px; transition: color .5s; }
+
+  /* ---- Links desktop ---- */
+  .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
+  .nav-links a {
+    text-decoration: none; font-size: 14px; font-weight: 500; color: var(--gris-sub);
+    padding: 8px 14px; border-radius: 8px; transition: color .2s, background .2s;
+  }
+  .nav-links a:hover { color: var(--texto); background: var(--ghost-fondo); }
+
+  /* ---- Controles derecha ---- */
+  .nav-derecha { display: flex; align-items: center; gap: 8px; }
+
+  /* Toggle tema */
+  .boton-tema {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--ghost-fondo); border: 1px solid var(--borde);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; transition: background .2s;
+  }
+  .boton-tema:hover { background: var(--borde); }
+  .boton-tema svg {
+    width: 14px; height: 14px; color: var(--texto);
+    position: absolute; transition: opacity .3s, transform .3s;
+  }
+  [data-tema="claro"]  .icono-sol  { opacity: 0; transform: scale(.5) rotate(90deg); }
+  [data-tema="claro"]  .icono-luna { opacity: 1; transform: scale(1); }
+  [data-tema="oscuro"] .icono-sol  { opacity: 1; transform: scale(1); }
+  [data-tema="oscuro"] .icono-luna { opacity: 0; transform: scale(.5) rotate(-90deg); }
+
+  /* ---- Hamburguesa ---- */
+  .hamburguesa {
+    display: none; flex-direction: column; gap: 5px;
+    background: none; border: none; cursor: pointer; padding: 4px;
+  }
+  .hamburguesa span {
+    display: block; width: 20px; height: 1.5px;
+    background: var(--texto); border-radius: 2px;
+    transition: transform .4s ease, opacity .4s, background .5s;
+  }
+  .hamburguesa.on span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .hamburguesa.on span:nth-child(2) { opacity: 0; }
+  .hamburguesa.on span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* ---- Menú mobile ---- */
+  .menu-mobile {
+    position: fixed; inset: 0; z-index: 199;
+    background: var(--fondo);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .4s ease, background .5s;
+  }
+  .menu-mobile.on { opacity: 1; pointer-events: all; }
+  .menu-mobile .link-menu {
+    font-size: clamp(36px, 9vw, 58px); font-weight: 700; letter-spacing: -1.5px;
+    color: var(--texto); text-decoration: none; transition: color .2s;
+  }
+  .menu-mobile .link-menu:hover { color: var(--gris-sub); }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 1024px) {
+    .nav-links { display: none; }
+    .hamburguesa { display: flex; }
+    .nav { padding: 16px 20px; }
+  }
+</style>

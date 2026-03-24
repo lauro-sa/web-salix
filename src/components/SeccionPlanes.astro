@@ -1,0 +1,137 @@
+---
+// ============================================================
+// SeccionPlanes.astro — Dos paneles con particle morphing
+//
+// Al hacer hover en el panel izquierdo → partículas forman { }
+// Al hacer hover en el panel derecho  → partículas forman anillos
+//
+// EDITAR: contenido de cada panel en PANELES abajo
+// ============================================================
+
+const PANELES = {
+  izquierdo: {
+    etiqueta:    'Disponible ahora',
+    tituloN:     'Para tu empresa',
+    tituloG:     'Empezá hoy mismo.',
+    descripcion: 'Salix CRM y Sites by Salix ya disponibles. Sin configuración larga, operativo en días.',
+    textoBoton:  'Empezar gratis',
+    linkBoton:   '#contacto',
+  },
+  derecho: {
+    etiqueta:    'Próximamente',
+    tituloN:     'Para organizaciones',
+    tituloG:     'Toda tu operación.',
+    descripcion: 'Go, Court y Turno by Salix en camino. Anotate para ser de los primeros.',
+    textoBoton:  'Avisame cuando esté',
+    linkBoton:   '#',
+  },
+};
+---
+
+<div class="planes-contenedor fondo-puntos" id="planes">
+  <div class="planes-grilla">
+
+    <!-- Panel izquierdo — partículas forman llaves { } -->
+    <div class="plan-panel" id="panel-izq">
+      <!-- Canvas de partículas de este panel (position: absolute) -->
+      <canvas class="panel-canvas" id="canvas-izq"></canvas>
+
+      <div class="panel-contenido">
+        <span class="etiqueta" style="background:transparent">{PANELES.izquierdo.etiqueta}</span>
+        <h2 class="plan-titulo">
+          <span class="negro">{PANELES.izquierdo.tituloN}</span><br>
+          <span class="gris">{PANELES.izquierdo.tituloG}</span>
+        </h2>
+        <p class="plan-descripcion">{PANELES.izquierdo.descripcion}</p>
+        <a href={PANELES.izquierdo.linkBoton} class="boton-oscuro plan-boton">
+          {PANELES.izquierdo.textoBoton}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Panel derecho — partículas forman anillos -->
+    <div class="plan-panel" id="panel-der">
+      <canvas class="panel-canvas" id="canvas-der"></canvas>
+
+      <div class="panel-contenido">
+        <span class="etiqueta" style="background:transparent">{PANELES.derecho.etiqueta}</span>
+        <h2 class="plan-titulo">
+          <span class="negro">{PANELES.derecho.tituloN}</span><br>
+          <span class="gris">{PANELES.derecho.tituloG}</span>
+        </h2>
+        <p class="plan-descripcion">{PANELES.derecho.descripcion}</p>
+        <button class="boton-fantasma plan-boton" id="boton-avisame">
+          {PANELES.derecho.textoBoton}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .planes-contenedor {
+    position: relative; z-index: 2;
+  }
+
+  .planes-grilla {
+    display: grid; grid-template-columns: 1fr 1fr; min-height: 72vh;
+  }
+
+  .plan-panel {
+    position: relative; overflow: hidden;
+    padding: clamp(60px, 8vw, 100px) clamp(48px, 7vw, 96px);
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 20px;
+  }
+
+  .panel-canvas {
+    position: absolute; inset: 0; z-index: 0; display: block;
+  }
+
+  .panel-contenido {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: 16px; max-width: 440px;
+  }
+
+  /* Separador entre paneles */
+  .plan-panel:first-child { border-right: 1px solid var(--borde); transition: border-color .5s; }
+
+  .plan-titulo {
+    font-size: clamp(26px, 4vw, 50px); font-weight: 700; line-height: 1.05; letter-spacing: -1.5px;
+  }
+  .plan-titulo .negro { color: var(--texto); transition: color .5s; }
+  .plan-titulo .gris  { color: var(--gris-titulo); transition: color .5s; }
+
+  .plan-descripcion { font-size: 15px; color: var(--gris-sub); line-height: 1.7; transition: color .5s; }
+
+  .plan-boton { align-self: flex-start; margin-top: 8px; }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .planes-grilla { grid-template-columns: 1fr; }
+    .plan-panel:first-child { border-right: none; border-bottom: 1px solid var(--borde); }
+  }
+  @media (max-width: 600px) {
+    .plan-panel { padding: 60px 24px; }
+  }
+</style>
+
+<!-- Inicializar el morphing cuando carga la página -->
+<script>
+  import { iniciarMorphing } from '../scripts/morphing.js';
+
+  // Botón de "Avisame" — mostrar feedback
+  document.getElementById('boton-avisame')?.addEventListener('click', () => {
+    alert('¡Anotado! Te avisamos cuando esté listo.');
+  });
+
+  // Inicializar morphing en ambos paneles
+  // Primer parámetro: id del canvas, segundo: id del panel, tercero: tipo de figura
+  window.addEventListener('load', () => {
+    iniciarMorphing('canvas-izq', 'panel-izq', 'llaves');
+    iniciarMorphing('canvas-der', 'panel-der', 'anillos');
+  });
+</script>

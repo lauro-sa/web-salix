@@ -1,0 +1,160 @@
+---
+// ============================================================
+// CarruselTecnologias.astro — Franja con íconos del stack tech
+//
+// Las burbujas flotan y se mueven infinitamente.
+// Al hover de la franja el scroll se pausa.
+// La animación de flotación se aplica desde el script.
+//
+// EDITAR: Agregar o quitar tecnologías del array TECNOLOGIAS
+// ============================================================
+import IconoSVG from './ui/IconoSVG.astro';
+
+// Lista de tecnologías — EDITAR para agregar/quitar
+// nombre: texto del tooltip (title)
+// icono:  clave del ícono en IconoSVG.astro
+const TECNOLOGIAS = [
+  { nombre: 'React',      icono: 'react'      },
+  { nombre: 'Next.js',    icono: 'nextjs'     },
+  { nombre: 'TypeScript', icono: 'typescript' },
+  { nombre: 'Vite',       icono: 'vite'       },
+  { nombre: 'Astro',      icono: 'astro'      },
+  { nombre: 'Tailwind',   icono: 'tailwind'   },
+  { nombre: 'Firebase',   icono: 'firebase'   },
+  { nombre: 'Node.js',    icono: 'cubo'       },
+  { nombre: 'GSAP',       icono: 'rayo'       },
+  { nombre: 'Claude AI',  icono: 'estrella'   },
+  { nombre: 'Meta API',   icono: 'link'       },
+  { nombre: 'Vercel',     icono: 'vercel'     },
+  { nombre: 'OpenAI',     icono: 'openai'     },
+  { nombre: 'Twilio',     icono: 'twilio'     },
+];
+
+// SVGs especiales que no están en el diccionario de IconoSVG
+// Se definen inline acá
+const SVGS_ESPECIALES: Record<string, string> = {
+  react: `<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>`,
+  nextjs: `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm-2 13.5v-7l6 7H10Z"/>`,
+  typescript: `<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 11h10M11 11v7M15 15h2a2 2 0 0 1 0 4h-2" fill="none" stroke="currentColor" stroke-linecap="round"/>`,
+  vite: `<path d="M12 2 2 7l10 15L22 7l-10-5Z"/><path d="M7 7l5 10 5-10"/>`,
+  astro: `<path d="M12 3 9 17l3-2 3 2-3-14Z"/><path d="M9 17c0 2 1.3 3 3 3s3-1 3-3"/>`,
+  tailwind: `<path d="M6.5 9c1-3 3-4.5 6-4.5 4.5 0 5 3 7.5 3.5-2.5 3-4.5 4.5-7.5 4.5-4.5 0-5-2.5-6-3.5Z"/><path d="M2 14c1-3 3-4.5 6-4.5 4.5 0 5 3 7.5 3.5-2.5 3-4.5 4.5-7.5 4.5-4.5 0-5-2.5-6-3.5Z"/>`,
+  firebase: `<path d="M6 20 9.5 5l4 6.5-2.5 3L17 20H6Z"/><path d="M9.5 5l7.5 15"/>`,
+  vercel: `<path d="M12 4 22 20H2L12 4Z"/>`,
+  openai: `<circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8" stroke-linecap="round"/>`,
+  twilio: `<circle cx="12" cy="12" r="9"/><circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="currentColor" stroke="none"/>`,
+};
+---
+
+<!-- Franja del carrusel -->
+<div class="carrusel-tech" aria-label="Stack tecnológico" aria-hidden="true">
+  <!-- Track que se mueve — duplicado por JS para scroll infinito -->
+  <div class="carrusel-track" id="carrusel-track">
+    {TECNOLOGIAS.map((tech) => (
+      <div class="burbuja-tech" title={tech.nombre}>
+        <!-- SVG especial o ícono del diccionario -->
+        {SVGS_ESPECIALES[tech.icono]
+          ? (
+            <svg
+              width="28" height="28"
+              viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.4"
+              stroke-linecap="round" stroke-linejoin="round"
+              set:html={SVGS_ESPECIALES[tech.icono]}
+            />
+          ) : (
+            <IconoSVG nombre={tech.icono} tamaño={28} />
+          )
+        }
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* ---- Franja contenedora ---- */
+  .carrusel-tech {
+    position: relative; z-index: 2; overflow: hidden;
+    padding: clamp(44px, 5vw, 72px) 0;
+    border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde);
+    background: var(--fondo); transition: background .5s, border-color .5s;
+  }
+
+  /* Fade en los bordes laterales */
+  .carrusel-tech::before,
+  .carrusel-tech::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 100px; z-index: 1; pointer-events: none;
+  }
+  .carrusel-tech::before { left: 0;  background: linear-gradient(to right, var(--fondo), transparent); }
+  .carrusel-tech::after  { right: 0; background: linear-gradient(to left,  var(--fondo), transparent); }
+
+  /* Track — se mueve con CSS animation */
+  .carrusel-track {
+    display: flex; align-items: center; gap: 20px;
+    width: max-content;
+    animation: desplazar 32s linear infinite;
+  }
+
+  /* Pausar al hover de la franja */
+  .carrusel-tech:hover .carrusel-track { animation-play-state: paused; }
+
+  @keyframes desplazar {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ---- Burbuja individual ---- */
+  .burbuja-tech {
+    width: 68px; height: 68px; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--borde);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; cursor: default; color: var(--texto);
+    transition: background .5s, border-color .5s, box-shadow .3s, transform .3s;
+  }
+
+  .burbuja-tech:hover {
+    background: var(--fondo); border-color: var(--texto);
+    box-shadow: 0 6px 24px rgba(0,0,0,.1);
+  }
+
+  /* Animación de flotación — activada por JS (ver script abajo) */
+  .burbuja-tech.flotando {
+    animation-name: flotar;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+  /* La flotación se combina con el scroll del track.
+     El :hover pausa la flotación individual. */
+  .burbuja-tech:hover {
+    animation-play-state: paused;
+    transform: scale(1.1);
+  }
+
+  @keyframes flotar {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-9px); }
+  }
+</style>
+
+<!-- Script — duplica el track y activa la flotación -->
+<script>
+  const track = document.getElementById('carrusel-track');
+  if (track) {
+    // Clonar las burbujas originales para el scroll infinito seamless
+    const burbujas = Array.from(track.querySelectorAll('.burbuja-tech'));
+    burbujas.forEach((b) => track.appendChild(b.cloneNode(true)));
+
+    // Aplicar animación de flotación con distinto ritmo a cada burbuja
+    Array.from(track.querySelectorAll('.burbuja-tech')).forEach((burbuja, indice) => {
+      // Duración entre 2.5s y 4.4s — varía por posición
+      const duracion = 2.5 + (indice % 7) * 0.27;
+      // Delay negativo — empieza en mitad del ciclo para que sea natural
+      const delay    = -((indice * 0.3) % duracion);
+
+      burbuja.style.animationDuration = duracion + 's';
+      burbuja.style.animationDelay    = delay + 's';
+      burbuja.classList.add('flotando');
+    });
+  }
+</script>

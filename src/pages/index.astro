@@ -1,0 +1,78 @@
+---
+// ============================================================
+// index.astro — Página principal de salixweb.com
+//
+// Acá se ensamblan todos los componentes.
+// Para reordenar secciones, mover los componentes acá.
+// Para agregar una sección nueva, crear el componente
+// en /src/components/ e importarlo acá.
+// ============================================================
+import Plantilla           from '../layouts/Plantilla.astro';
+import Nav                 from '../components/Nav.astro';
+import Hero                from '../components/Hero.astro';
+import CarruselTecnologias from '../components/CarruselTecnologias.astro';
+import SeccionProductos    from '../components/SeccionProductos.astro';
+import SeccionPlanes       from '../components/SeccionPlanes.astro';
+import SeccionFeatures     from '../components/SeccionFeatures.astro';
+import BannerCTA           from '../components/BannerCTA.astro';
+import SeccionTestimonios  from '../components/SeccionTestimonios.astro';
+import Footer              from '../components/Footer.astro';
+
+// Sección de contacto — simple CTA al final
+// Si necesitás un formulario completo, crear SeccionContacto.astro aparte
+---
+
+<Plantilla
+  titulo="Salix — Software que simplifica lo que importa"
+  descripcion="Salix es una suite de productos de software diseñada para que las empresas argentinas gestionen mejor su tiempo, sus clientes y sus operaciones."
+>
+  <!-- Navegación fija -->
+  <Nav />
+
+  <!-- Secciones de la página — reordenar a gusto -->
+  <main>
+    <Hero />
+
+    <!-- Franja de tecnologías debajo del hero -->
+    <CarruselTecnologias />
+
+    <!-- Sección de productos (CRM, Sites, Go, Court, Turno) -->
+    <SeccionProductos />
+
+    <!-- Paneles de planes con particle morphing -->
+    <SeccionPlanes />
+
+    <!-- Grilla de features "Por qué Salix" -->
+    <SeccionFeatures />
+
+    <!-- Banner CTA intermedio -->
+    <BannerCTA />
+
+    <!-- Testimonios de clientes -->
+    <SeccionTestimonios />
+
+    <!-- Contacto — sección final con dot grid -->
+    <div class="fondo-puntos" id="contacto">
+      <div class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px">
+        <span class="etiqueta">Contacto</span>
+        <h2 class="titulo-dos-tonos">
+          <span class="negro">Hablemos.</span><br>
+          <span class="gris">Sin compromiso.</span>
+        </h2>
+        <p class="typewriter" data-texto="Contanos qué necesitás y te decimos cómo Salix puede ayudarte." style="text-align:center;max-width:380px"></p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <!-- EDITAR: cambiar el email y número -->
+          <a href="mailto:hola@salixweb.com" class="boton-oscuro">
+            Escribirnos
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="https://wa.me/5491100000000" class="boton-fantasma" target="_blank" rel="noopener noreferrer">
+            WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Plantilla>

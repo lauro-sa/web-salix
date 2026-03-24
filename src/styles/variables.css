@@ -1,0 +1,60 @@
+/* ============================================================
+   variables.css — Tokens de diseño de Salix
+   Cambiar estos valores para ajustar el look & feel global
+   ============================================================ */
+
+/* Tema Claro */
+[data-tema="claro"] {
+  --fondo:          #ffffff;
+  --fondo-alt:      #fafafa;
+  --texto:          #0a0a0a;
+  --gris-titulo:    #b8b8b8;   /* Segunda línea de títulos grandes */
+  --gris-sub:       #6b6b6b;   /* Textos secundarios y descripciones */
+  --borde:          #e5e5e5;
+  --card:           #f4f4f4;
+  --btn-fondo:      #0a0a0a;
+  --btn-texto:      #ffffff;
+  --ghost-fondo:    #f0f0f0;
+  --ghost-texto:    #6b6b6b;
+  --ico-color:      #0a0a0a;
+  --punto-grid:     rgba(0, 0, 0, 0.08);
+  --ruido-opacidad: 0.02;
+
+  /* Colores de marca — EDITAR para cambiar acento de Salix */
+  --verde-salix:        #1a6b47;
+  --verde-salix-claro:  #eaf5ee;
+}
+
+/* Tema Oscuro */
+[data-tema="oscuro"] {
+  --fondo:          #0a0a0a;
+  --fondo-alt:      #111111;
+  --texto:          #efefef;
+  --gris-titulo:    #333333;
+  --gris-sub:       #888888;
+  --borde:          #1f1f1f;
+  --card:           #161616;
+  --btn-fondo:      #efefef;
+  --btn-texto:      #0a0a0a;
+  --ghost-fondo:    #1a1a1a;
+  --ghost-texto:    #888888;
+  --ico-color:      #efefef;
+  --punto-grid:     rgba(255, 255, 255, 0.06);
+  --ruido-opacidad: 0.035;
+
+  --verde-salix:        #22c55e;
+  --verde-salix-claro:  rgba(34, 197, 94, 0.1);
+}
+
+/* Tipografías */
+:root {
+  --fuente-principal: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Espaciados base */
+  --radio-pill:   100px;
+  --radio-card:   18px;
+  --radio-icono:  10px;
+
+  /* Transición estándar */
+  --transicion: 0.5s ease;
+}

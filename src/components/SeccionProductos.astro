@@ -1,0 +1,167 @@
+---
+// ============================================================
+// SeccionProductos.astro — Lista de productos Salix
+//
+// EDITAR: Modificar el array PRODUCTOS para cambiar
+// nombre, descripción, estado y url de cada producto.
+// ============================================================
+import IconoSVG from './ui/IconoSVG.astro';
+
+// Definición de tipos
+interface Producto {
+  numero:      string;
+  nombre:      string;
+  descripcion: string;
+  icono:       string;
+  disponible:  boolean;
+  url?:        string;
+}
+
+// ---- Lista de productos — EDITAR ----
+const PRODUCTOS: Producto[] = [
+  {
+    numero:      '01',
+    nombre:      'Salix CRM',
+    descripcion: 'Gestión de consorcios, contactos, presupuestos y comunicaciones.',
+    icono:       'edificio',
+    disponible:  true,
+    url:         '#',
+  },
+  {
+    numero:      '02',
+    nombre:      'Sites by Salix',
+    descripcion: 'Páginas web a medida con tecnología Salix. Rápidas y con SEO completo.',
+    icono:       'ventana',
+    disponible:  true,
+    url:         '#',
+  },
+  {
+    numero:      '03',
+    nombre:      'Go by Salix',
+    descripcion: 'Plataforma de delivery para pymes. Pedidos, repartidores y clientes en tiempo real.',
+    icono:       'ubicacion',
+    disponible:  false,
+  },
+  {
+    numero:      '04',
+    nombre:      'Court by Salix',
+    descripcion: 'Reservas online para canchas de pádel, tenis y polideportivos.',
+    icono:       'diamante',
+    disponible:  false,
+  },
+  {
+    numero:      '05',
+    nombre:      'Turno by Salix',
+    descripcion: 'Agenda y turnos online para profesionales, consultorios y servicios.',
+    icono:       'calendario',
+    disponible:  false,
+  },
+];
+
+// Texto de la sección — EDITAR
+const TEXTO = {
+  etiqueta:   'Disponibles ahora y próximamente',
+  tituloN:    'Una suite completa.',
+  tituloG:    'Un solo respaldo.',
+  subtitulo:  'Cada producto resuelve un problema específico, con la calidad y el respaldo de Salix. Todos conectados, todos pensados para Argentina.',
+};
+---
+
+<div class="fondo-puntos">
+  <div class="panel-interior">
+    <section class="seccion" id="productos">
+
+      <!-- Encabezado de la sección -->
+      <span class="etiqueta">{TEXTO.etiqueta}</span>
+      <h2 class="titulo-dos-tonos">
+        <span class="negro">{TEXTO.tituloN}</span><br>
+        <span class="gris">{TEXTO.tituloG}</span>
+      </h2>
+
+      <!-- Párrafo con efecto typewriter -->
+      <p
+        class="typewriter"
+        data-texto={TEXTO.subtitulo}
+        aria-label={TEXTO.subtitulo}
+      ></p>
+
+      <!-- Lista de productos -->
+      <div class="lista-productos" role="list">
+        {PRODUCTOS.map((producto) => (
+          <div class="fila-producto" role="listitem">
+
+            <!-- Izquierda: número + ícono + info -->
+            <div class="fila-izquierda">
+              <span class="numero-producto">{producto.numero}</span>
+
+              <div class="icono-contenedor">
+                <IconoSVG nombre={producto.icono} tamaño={20} />
+              </div>
+
+              <div class="info-producto">
+                <span class="nombre-producto">{producto.nombre}</span>
+                <span class="desc-producto">{producto.descripcion}</span>
+              </div>
+            </div>
+
+            <!-- Derecha: badge de estado -->
+            <span class={producto.disponible ? 'badge-disponible' : 'badge-pronto'}>
+              {producto.disponible ? 'Disponible' : 'Próximamente'}
+            </span>
+
+          </div>
+        ))}
+      </div>
+
+    </section>
+  </div>
+</div>
+
+<style>
+  /* ---- Lista ---- */
+  .lista-productos {
+    margin-top: 52px; border-radius: 18px; overflow: hidden;
+    border: 1px solid var(--borde); display: flex; flex-direction: column;
+    transition: border-color .5s;
+  }
+
+  /* ---- Fila de producto ---- */
+  .fila-producto {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 22px 28px; background: var(--fondo);
+    border-bottom: 1px solid var(--borde);
+    transition: background .2s, border-color .5s;
+  }
+  .fila-producto:last-child { border-bottom: none; }
+  .fila-producto:hover { background: var(--card); }
+
+  /* El ícono rota un poco al hover de la fila */
+  .fila-producto:hover .icono-contenedor { transform: scale(1.1) rotate(-5deg); }
+
+  .fila-izquierda { display: flex; align-items: center; gap: 18px; }
+
+  .numero-producto { font-size: 12px; color: var(--gris-titulo); font-weight: 600; min-width: 20px; transition: color .5s; }
+
+  .info-producto { display: flex; flex-direction: column; gap: 2px; }
+  .nombre-producto { font-size: 17px; font-weight: 700; color: var(--texto); letter-spacing: -.2px; transition: color .5s; }
+  .desc-producto   { font-size: 13.5px; color: var(--gris-sub); line-height: 1.5; transition: color .5s; }
+
+  /* ---- Badges ---- */
+  .badge-disponible {
+    font-size: 12px; font-weight: 600; padding: 5px 13px; border-radius: 100px;
+    flex-shrink: 0; white-space: nowrap;
+    background: #eaf5ee; color: #1a6b47;
+  }
+  .badge-pronto {
+    font-size: 12px; font-weight: 600; padding: 5px 13px; border-radius: 100px;
+    flex-shrink: 0; white-space: nowrap;
+    background: var(--ghost-fondo); color: var(--gris-sub);
+    border: 1px solid var(--borde);
+    transition: background .5s, color .5s;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 600px) {
+    .fila-producto { flex-direction: column; align-items: flex-start; gap: 14px; }
+  }
+</style>
