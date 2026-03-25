@@ -63,7 +63,8 @@
   .nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 200;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 32px;
+    padding: calc(14px + env(safe-area-inset-top)) 32px 14px 32px;
+    background: var(--fondo);
     transition: background .4s, border-bottom .4s, backdrop-filter .4s;
   }
 
@@ -150,6 +151,6 @@
     .nav-links { display: none; }
     .nav-cta { display: none; }
     .hamburguesa { display: flex; }
-    .nav { padding: 14px 20px; }
+    .nav { padding: calc(14px + env(safe-area-inset-top)) 20px 14px 20px; }
   }
 </style>
