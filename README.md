@@ -56,3 +56,20 @@ npm run dev
 - **Canvas 2D** — Partículas y morphing en JavaScript puro
 - **IntersectionObserver** — Animaciones al scroll
 - **stroke-dashoffset** — Técnica para íconos que se "dibujan"
+
+## Archivos de verificación — `public/.well-known/` (NO borrar)
+
+`public/.well-known/apple-app-site-association` es el archivo que Apple lee en
+`https://salixweb.com/.well-known/apple-app-site-association` para autorizar las
+**llaves de acceso (passkeys)** de la app Flux iOS: el RP ID de WebAuthn de la
+familia es `salixweb.com` (el dominio padre), así que la verificación vive acá,
+en la landing — no en la app. Sin este archivo, la ceremonia de passkey FALLA en
+el iPhone aunque todo lo demás esté bien.
+
+- Va **sin extensión** y se sirve como `application/json` (el `.htaccess` de la
+  carpeta fuerza el tipo). No renombrar, no agregarle `.json`.
+- Todo deploy de la landing DEBE incluir la carpeta `.well-known/` (Astro copia
+  `public/` a la raíz del build automáticamente; si se sube a mano, no saltearla
+  — es una carpeta oculta y los clientes FTP suelen esconderla).
+- Contexto completo: repo Flux web → `docs/operacion/llaves-acceso-passkeys-setup.md`
+  y `docs/familia-salix/cliente-nativo-flux.md` §11.

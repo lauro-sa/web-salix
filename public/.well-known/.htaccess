@@ -1,0 +1,6 @@
+# El AASA debe servirse como application/json y SIN extensión — Apple lo lee
+# así. ForceType cubre el caso de que el server no adivine el tipo del archivo
+# sin extensión. No renombrar ni agregarle .json.
+<Files "apple-app-site-association">
+  ForceType application/json
+</Files>
