@@ -17,6 +17,14 @@ const {
 } = Astro.props;
 
 const urlCanonica = Astro.url.href;
+const schemaOrg = JSON.stringify({
+  "@context":    "https://schema.org",
+  "@type":       "Organization",
+  "name":        "Salix",
+  "url":         "https://salixweb.com",
+  "description": "Suite de productos de software para empresas argentinas",
+  "address": { "@type": "PostalAddress", "addressCountry": "AR" },
+});
 ---
 
 <!DOCTYPE html>
@@ -50,16 +58,7 @@ const urlCanonica = Astro.url.href;
   <meta name="twitter:image"       content={imagen} />
 
   <!-- Schema.org -->
-  <script type="application/ld+json">
-    {JSON.stringify({
-      "@context":    "https://schema.org",
-      "@type":       "Organization",
-      "name":        "Salix",
-      "url":         "https://salixweb.com",
-      "description": "Suite de productos de software para empresas argentinas",
-      "address": { "@type": "PostalAddress", "addressCountry": "AR" }
-    })}
-  </script>
+  <script type="application/ld+json" set:html={schemaOrg}></script>
 
   <!-- Tipografia -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
