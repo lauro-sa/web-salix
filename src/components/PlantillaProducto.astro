@@ -18,6 +18,13 @@ interface Plan {
   destacado: boolean;
   items:     string[];
   textoBoton: string;
+  url?:      string;
+  badge?:    string;
+}
+
+interface Cta {
+  texto: string;
+  href:  string;
 }
 
 interface Props {
@@ -31,6 +38,12 @@ interface Props {
   planes?:      Plan[];
   sinPrecio?:   boolean;
   textoSinPrecio?: string;
+  ctaPrincipal?: Cta;
+  ctaSecundario?: Cta;
+  planesLead?: string;
+  cierreTitulo?: string;
+  cierreSub?: string;
+  cierreCta?: Cta;
 }
 
 const {
@@ -44,7 +57,24 @@ const {
   planes,
   sinPrecio = false,
   textoSinPrecio = 'Cada proyecto es unico. Contanos tu idea y te armamos un presupuesto a medida.',
+  ctaPrincipal,
+  ctaSecundario,
+  planesLead = 'Sin costos ocultos. Cancela cuando quieras.',
+  cierreTitulo = 'Listo para probarlo?',
+  cierreSub = 'Contactanos y te ayudamos a arrancar. Sin compromiso.',
+  cierreCta,
 } = Astro.props;
+
+const primario = ctaPrincipal ?? {
+  texto: disponible ? 'Empezar ahora' : 'Avisame cuando este',
+  href: '/#contacto',
+};
+const secundario = ctaSecundario ?? {
+  texto: 'Ver todos los productos',
+  href: '/#productos',
+};
+
+const esExterno = (href: string) => href.startsWith('http');
 ---
 
 <!-- Hero del producto -->
@@ -68,17 +98,23 @@ const {
     <p class="producto-desc aparecer delay-4">{descripcion}</p>
 
     <div class="producto-botones aparecer delay-5">
-      {disponible ? (
-        <a href="/#contacto" class="boton boton-verde">
-          Empezar ahora
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      ) : (
-        <a href="/#contacto" class="boton boton-primario">
-          Avisame cuando este
-        </a>
-      )}
-      <a href="/#productos" class="boton boton-secundario">Ver todos los productos</a>
+      <a
+        href={primario.href}
+        class={`boton ${disponible ? 'boton-verde' : 'boton-primario'}`}
+        target={esExterno(primario.href) ? '_blank' : undefined}
+        rel={esExterno(primario.href) ? 'noopener noreferrer' : undefined}
+      >
+        {primario.texto}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a
+        href={secundario.href}
+        class="boton boton-secundario"
+        target={esExterno(secundario.href) ? '_blank' : undefined}
+        rel={esExterno(secundario.href) ? 'noopener noreferrer' : undefined}
+      >
+        {secundario.texto}
+      </a>
     </div>
   </div>
 </section>
@@ -111,13 +147,15 @@ const {
         <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
           <span class="etiqueta">Precios</span>
           <h2 class="titulo-seccion">Elegi tu plan.</h2>
-          <p class="subtitulo" style="text-align:center">Sin costos ocultos. Cancela cuando quieras.</p>
+          <p class="subtitulo" style="text-align:center">{planesLead}</p>
         </div>
 
         <div class={`grilla-planes grilla-planes-${planes.length}`}>
-          {planes.map((plan, indice) => (
+          {planes.map((plan, indice) => {
+            const planUrl = plan.url ?? '/#contacto';
+            return (
             <div class={`card-plan aparecer-escala delay-${indice + 1} ${plan.destacado ? 'plan-destacado' : ''}`}>
-              {plan.destacado && <span class="plan-badge-popular">Mas popular</span>}
+              {plan.destacado && <span class="plan-badge-popular">{plan.badge ?? 'Mas popular'}</span>}
               <h3 class="plan-nombre">{plan.nombre}</h3>
               <div class="plan-precio-bloque">
                 <span class="plan-monto">{plan.precio}</span>
@@ -131,11 +169,18 @@ const {
                   </li>
                 ))}
               </ul>
-              <a href="/#contacto" class={`boton ${plan.destacado ? 'boton-verde' : 'boton-secundario'}`} style="width:100%;text-align:center">
+              <a
+                href={planUrl}
+                class={`boton ${plan.destacado ? 'boton-verde' : 'boton-secundario'}`}
+                style="width:100%;text-align:center"
+                target={esExterno(planUrl) ? '_blank' : undefined}
+                rel={esExterno(planUrl) ? 'noopener noreferrer' : undefined}
+              >
                 {plan.textoBoton}
               </a>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </div>
@@ -162,13 +207,24 @@ const {
 <!-- CTA final -->
 <section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
   <h2 class="titulo-seccion aparecer">
-    <span>Listo para probarlo?</span>
+    <span>{cierreTitulo}</span>
   </h2>
   <p class="subtitulo aparecer delay-1" style="text-align:center">
-    Contactanos y te ayudamos a arrancar. Sin compromiso.
+    {cierreSub}
   </p>
   <div class="aparecer delay-2" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-    <a href="mailto:hola@salixweb.com" class="boton boton-primario">Escribirnos</a>
+    {cierreCta ? (
+      <a
+        href={cierreCta.href}
+        class="boton boton-primario"
+        target={esExterno(cierreCta.href) ? '_blank' : undefined}
+        rel={esExterno(cierreCta.href) ? 'noopener noreferrer' : undefined}
+      >
+        {cierreCta.texto}
+      </a>
+    ) : (
+      <a href="mailto:hola@salixweb.com" class="boton boton-primario">Escribirnos</a>
+    )}
     <a href="https://wa.me/5491100000000" class="boton boton-secundario" target="_blank" rel="noopener noreferrer">WhatsApp</a>
   </div>
 </section>
@@ -240,6 +296,7 @@ const {
 
   .grilla-planes-2 { grid-template-columns: repeat(2, 1fr); max-width: 700px; margin: 0 auto; }
   .grilla-planes-3 { grid-template-columns: repeat(3, 1fr); }
+  .grilla-planes-4 { grid-template-columns: repeat(4, 1fr); }
 
   .card-plan {
     background: var(--card); border: 1px solid var(--borde);
@@ -297,11 +354,13 @@ const {
 
   @media (max-width: 1024px) {
     .grilla-features-producto { grid-template-columns: repeat(2, 1fr); }
+    .grilla-planes-4 { grid-template-columns: repeat(2, 1fr); }
     .grilla-planes-3 { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
     .grilla-planes-2 { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
   }
 
   @media (max-width: 640px) {
     .grilla-features-producto { grid-template-columns: 1fr; }
+    .grilla-planes-4 { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
   }
 </style>
