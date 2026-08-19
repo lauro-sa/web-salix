@@ -1,0 +1,530 @@
+---
+// Gift card + stepper de sesiones (paridad con /planes de Flux).
+interface Props {
+  marca: string
+  codigo: string
+  titulo: string
+  texto: string
+  ctaTexto: string
+  ctaHref?: string
+  ctaModo?: 'enlace' | 'contacto'
+  nota?: string
+}
+
+const {
+  marca,
+  codigo,
+  titulo,
+  texto,
+  ctaTexto,
+  ctaHref,
+  ctaModo = 'contacto',
+  nota,
+} = Astro.props
+
+const PRIMERA = 70
+const EXTRA = 50
+const MAX = 10
+
+const NIVELES = {
+  flux: { sello: marca === 'Flux' ? 'Flux' : 'Salix', tipo: 'Tarjeta de sesión', codigo },
+  gold: { sello: 'Gold', tipo: 'Pack Gold', codigo: 'GLD' },
+  platinum: { sello: 'Platinum', tipo: 'Pack Platinum', codigo: 'PLT' },
+} as const
+
+const LINEAS: Record<number, string> = {
+  1: 'El primer paso, con calma.',
+  2: 'Arranque hoy. Seguimiento mañana.',
+  3: 'Tiempo de sobra para dejarlo andando.',
+  4: 'WhatsApp, APIs y el día a día.',
+  5: 'Media jornada. Ya es tuyo.',
+  6: 'El circuito completo, a tu medida.',
+  7: 'Equipo, sistemas y el cierre.',
+  8: 'De la idea al primer cliente.',
+  9: 'Casi un onboarding de punta a punta.',
+  10: 'Diez sesiones. El pack más alto.',
+}
+---
+
+<div
+  class="impl"
+  data-tarjeta-sesiones
+  data-marca={marca}
+  data-codigo={codigo}
+  data-primera={PRIMERA}
+  data-extra={EXTRA}
+  data-max={MAX}
+  data-modo={ctaModo}
+  data-href={ctaHref ?? ''}
+>
+  <pre hidden data-impl-lineas>{JSON.stringify(LINEAS)}</pre>
+  <pre hidden data-impl-niveles>{JSON.stringify(NIVELES)}</pre>
+
+  <article class="impl-plastica impl-plastica--flux" data-impl-card aria-hidden="true">
+    <div class="impl-particulas" aria-hidden="true">
+      {[
+        [12, 18], [22, 62], [8, 78], [38, 28], [18, 44],
+        [6, 34], [30, 72], [14, 8], [26, 52], [10, 88],
+        [34, 14], [20, 36], [4, 56], [28, 82], [16, 24],
+      ].map(([top, left], i) => (
+        <span class="impl-punto" style={`top:${top}%;left:${left}%;animation-delay:${(i * 0.28).toFixed(2)}s`} />
+      ))}
+    </div>
+    <div class="impl-foil"></div>
+    <div class="impl-cuerpo">
+      <div class="impl-top">
+        <span class="impl-chip"></span>
+        <span class="impl-sello" data-impl-sello>{NIVELES.flux.sello}</span>
+      </div>
+      <p class="impl-marca">{marca}</p>
+      <p class="impl-tipo" data-impl-tipo>{NIVELES.flux.tipo}</p>
+      <p class="impl-linea" data-impl-linea>{LINEAS[1]}</p>
+      <p class="impl-monto" data-impl-monto>US$ {PRIMERA}</p>
+      <p class="impl-pie" data-impl-pie>1 sesión · 45 min c/u</p>
+      <p class="impl-codigo" data-impl-codigo>{codigo} · •••• · 01S</p>
+    </div>
+  </article>
+
+  <div class="impl-checkout">
+    <span class="impl-eyebrow">Aparte de la suscripción</span>
+    <h3 class="impl-titulo">{titulo}</h3>
+    <p class="impl-texto">{texto}</p>
+
+    <div class="impl-carrito">
+      <div class="impl-stepper" role="group" aria-label="Sesiones de implementación">
+        <button type="button" class="impl-step" data-impl-menos aria-label="Menos sesiones" disabled>−</button>
+        <span class="impl-horas">
+          <span data-impl-etiqueta>1 sesión</span>
+          <small>45 minutos cada una</small>
+        </span>
+        <button type="button" class="impl-step" data-impl-mas aria-label="Más sesiones">+</button>
+      </div>
+      <p class="impl-total" data-impl-total>
+        <strong>US$ {PRIMERA}</strong> · primera sesión US$ {PRIMERA}
+      </p>
+      {ctaModo === 'enlace' && ctaHref ? (
+        <a class="boton boton-verde" href={ctaHref} data-impl-cta target="_blank" rel="noopener noreferrer">{ctaTexto}</a>
+      ) : (
+        <a class="boton boton-verde" href="#contacto" data-impl-cta>{ctaTexto}</a>
+      )}
+      {nota && <p class="impl-nota">{nota}</p>}
+    </div>
+  </div>
+</div>
+
+<script>
+  function nivelDe(n: number) {
+    if (n >= 6) return 'platinum'
+    if (n >= 3) return 'gold'
+    return 'flux'
+  }
+
+  function etiqueta(n: number) {
+    return n === 1 ? '1 sesión' : `${n} sesiones`
+  }
+
+  function initTarjeta(root: HTMLElement) {
+    if (root.dataset.init) return
+    root.dataset.init = '1'
+
+    const primera = Number(root.dataset.primera)
+    const extra = Number(root.dataset.extra)
+    const max = Number(root.dataset.max)
+    const marca = root.dataset.marca ?? 'Salix'
+    const codigoBase = root.dataset.codigo ?? 'SLX'
+    const modo = root.dataset.modo
+    const href = root.dataset.href
+
+    const lineas = JSON.parse(root.querySelector('[data-impl-lineas]')?.textContent || '{}') as Record<string, string>
+    const niveles = JSON.parse(root.querySelector('[data-impl-niveles]')?.textContent || '{}') as Record<string, { sello: string; tipo: string; codigo: string }>
+
+    let sesiones = 1
+    const card = root.querySelector('[data-impl-card]') as HTMLElement
+    const btnMenos = root.querySelector('[data-impl-menos]') as HTMLButtonElement
+    const btnMas = root.querySelector('[data-impl-mas]') as HTMLButtonElement
+    const cta = root.querySelector('[data-impl-cta]') as HTMLAnchorElement
+
+    function usdDe(n: number) {
+      return primera + Math.max(0, n - 1) * extra
+    }
+
+    function pintar() {
+      const usd = usdDe(sesiones)
+      const extras = Math.max(0, sesiones - 1)
+      const nivel = nivelDe(sesiones)
+      const copy = niveles[nivel]
+      const codigo = nivel === 'flux' ? codigoBase : copy.codigo
+
+      card.classList.remove('impl-plastica--flux', 'impl-plastica--gold', 'impl-plastica--platinum')
+      card.classList.add(`impl-plastica--${nivel}`)
+
+      root.querySelector('[data-impl-sello]')!.textContent = copy.sello
+      root.querySelector('[data-impl-tipo]')!.textContent = copy.tipo
+      root.querySelector('[data-impl-linea]')!.textContent = lineas[sesiones] ?? copy.tipo
+      root.querySelector('[data-impl-monto]')!.textContent = `US$ ${usd}`
+      root.querySelector('[data-impl-pie]')!.textContent = `${etiqueta(sesiones)} · 45 min c/u`
+      root.querySelector('[data-impl-codigo]')!.textContent = `${codigo} · •••• · ${String(sesiones).padStart(2, '0')}S`
+      root.querySelector('[data-impl-etiqueta]')!.textContent = etiqueta(sesiones)
+      root.querySelector('[data-impl-total]')!.innerHTML = extras > 0
+        ? `<strong>US$ ${usd}</strong> · 1ª US$ ${primera} + ${extras} extra${extras === 1 ? '' : 's'} a US$ ${extra}`
+        : `<strong>US$ ${usd}</strong> · primera sesión US$ ${primera}`
+
+      btnMenos.disabled = sesiones <= 1
+      btnMas.disabled = sesiones >= max
+
+      const mensaje = `Quiero ${etiqueta(sesiones)} de implementación (45 min). Primera US$ ${primera}, extras US$ ${extra}. Total US$ ${usd}.`
+      try {
+        sessionStorage.setItem('salix-pedido-sesiones', JSON.stringify({ sesiones, usd, marca, mensaje }))
+      } catch { /* private mode */ }
+
+      if (modo === 'enlace' && href) {
+        const url = new URL(href, window.location.origin)
+        url.searchParams.set('sesiones', String(sesiones))
+        cta.href = url.toString()
+      }
+    }
+
+    btnMenos.addEventListener('click', () => {
+      if (sesiones > 1) { sesiones -= 1; pintar() }
+    })
+    btnMas.addEventListener('click', () => {
+      if (sesiones < max) { sesiones += 1; pintar() }
+    })
+
+    if (modo === 'contacto') {
+      cta.addEventListener('click', () => {
+        const campo = document.getElementById('form-mensaje') as HTMLTextAreaElement | null
+        const prod = document.querySelector('input[name="producto"][value="Integraciones"]') as HTMLInputElement | null
+        const pedido = sessionStorage.getItem('salix-pedido-sesiones')
+        if (campo && pedido) {
+          try {
+            const data = JSON.parse(pedido) as { mensaje?: string }
+            if (data.mensaje && !campo.value.trim()) campo.value = data.mensaje
+          } catch { /* ignore */ }
+        }
+        if (prod && !prod.checked) prod.checked = true
+      })
+    }
+
+    pintar()
+  }
+
+  function init() {
+    document.querySelectorAll('[data-tarjeta-sesiones]').forEach((el) => initTarjeta(el as HTMLElement))
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init)
+  else init()
+</script>
+
+<style>
+  .impl :global(pre[hidden]) { display: none; }
+
+  .impl {
+    display: grid;
+    grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: stretch;
+    max-width: min(100%, 920px);
+    margin: 0 auto;
+  }
+
+  .impl-plastica {
+    --impl-acento-rgb: 232, 146, 42;
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+    color: #f4f4f6;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(var(--impl-acento-rgb), 0.38), transparent 55%),
+      linear-gradient(155deg, #1c1c24 0%, #0d0d12 58%, #161624 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.14) inset,
+      0 28px 56px -28px rgba(0, 0, 0, 0.72),
+      0 10px 24px -16px rgba(var(--impl-acento-rgb), 0.45);
+    transform-origin: center;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s, background 0.5s, border-color 0.5s;
+    isolation: isolate;
+  }
+
+  .impl-plastica--gold {
+    --impl-acento-rgb: 201, 162, 74;
+    color: #f7efd8;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(201, 162, 74, 0.42), transparent 55%),
+      linear-gradient(155deg, #3a2e18 0%, #16110a 55%, #2a2114 100%);
+    border-color: rgba(201, 162, 74, 0.38);
+  }
+
+  .impl-plastica--platinum {
+    --impl-acento-rgb: 196, 208, 220;
+    color: #e8eef4;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(196, 208, 220, 0.28), transparent 55%),
+      linear-gradient(155deg, #2a2e36 0%, #0b0c10 55%, #1a1d24 100%);
+    border-color: rgba(196, 208, 220, 0.32);
+  }
+
+  .impl-plastica:hover {
+    transform: perspective(900px) rotateY(-10deg) rotateX(5deg) translateY(-6px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.18) inset,
+      0 36px 70px -24px rgba(0, 0, 0, 0.8),
+      0 16px 32px -18px rgba(var(--impl-acento-rgb), 0.55);
+  }
+
+  .impl-plastica::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .impl-particulas {
+    position: absolute;
+    inset: 0 0 46% 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, #000 62%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  }
+
+  .impl-punto {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    animation: impl-brillo 4.8s ease-in-out infinite;
+  }
+  @keyframes impl-brillo {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 0.9; transform: scale(1.3); }
+  }
+
+  .impl-foil {
+    position: absolute;
+    top: 28%;
+    left: -8%;
+    right: -8%;
+    height: 38px;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 18%,
+      rgba(var(--impl-acento-rgb), 0.35) 42%,
+      rgba(255, 255, 255, 0.22) 50%,
+      rgba(var(--impl-acento-rgb), 0.28) 58%,
+      rgba(255, 255, 255, 0.05) 78%,
+      transparent 100%
+    );
+    transform: skewY(-8deg);
+    opacity: 0.85;
+  }
+
+  .impl-cuerpo {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 18px 22px 16px;
+  }
+
+  .impl-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: auto;
+  }
+
+  .impl-chip {
+    width: 42px;
+    height: 32px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(var(--impl-acento-rgb), 0.9) 42%, rgba(20, 20, 28, 0.55) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+    position: relative;
+  }
+  .impl-chip::after {
+    content: '';
+    position: absolute;
+    inset: 7px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.28);
+    border-radius: 2px;
+  }
+
+  .impl-sello {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 9px;
+    border-radius: 100px;
+    border: 1px solid rgba(var(--impl-acento-rgb), 0.45);
+    background: rgba(var(--impl-acento-rgb), 0.16);
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .impl-marca {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.78;
+    margin: 0;
+  }
+  .impl-tipo {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    opacity: 0.55;
+    margin: 3px 0 0;
+  }
+  .impl-linea {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 8px 0 0;
+    opacity: 0.88;
+    max-width: 18em;
+    line-height: 1.35;
+  }
+  .impl-monto {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 12px 0 6px;
+  }
+  .impl-pie {
+    font-size: 12.5px;
+    opacity: 0.72;
+    margin: 0;
+  }
+  .impl-codigo {
+    margin: 10px 0 0;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .impl-checkout {
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: 28px 26px;
+  }
+
+  .impl-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--salix);
+    margin-bottom: 10px;
+  }
+
+  .impl-titulo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--texto);
+    line-height: 1.25;
+  }
+
+  .impl-texto {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--texto-secundario);
+    line-height: 1.7;
+    max-width: 52ch;
+  }
+
+  .impl-carrito {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .impl-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .impl-step {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radio-pill);
+    border: 1px solid var(--borde);
+    background: var(--superficie);
+    color: var(--texto);
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+  .impl-step:disabled { opacity: 0.4; cursor: not-allowed; }
+  .impl-step:not(:disabled):hover { border-color: var(--salix-borde); }
+
+  .impl-horas {
+    min-width: 8.5rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--texto);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1.2;
+  }
+  .impl-horas small {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--texto-terciario);
+  }
+
+  .impl-total {
+    font-size: 0.88rem;
+    color: var(--texto-secundario);
+    line-height: 1.45;
+  }
+  .impl-total strong {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--texto);
+    letter-spacing: -0.02em;
+  }
+
+  .impl-carrito :global(.boton) { width: 100%; text-align: center; }
+
+  .impl-nota {
+    font-size: 0.78rem;
+    color: var(--texto-terciario);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 720px) {
+    .impl { grid-template-columns: 1fr; max-width: 420px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .impl-plastica,
+    .impl-plastica:hover { transform: none; }
+    .impl-punto { animation: none; }
+  }
+</style>

@@ -2,6 +2,8 @@
 
 Proyecto Astro para la landing page de **salixweb.com**.
 
+La puerta para cualquier chat/IA es [`AGENTS.md`](AGENTS.md) (dónde está el repo, cómo se despliega, handoff de la tanda 2026-08-19).
+
 ## Estructura
 
 ```

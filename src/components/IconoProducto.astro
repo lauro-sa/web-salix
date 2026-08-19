@@ -1,0 +1,19 @@
+---
+// Icono de producto: Flux usa su isotipo; el resto, el SVG de trazo.
+import IconoSVG from './ui/IconoSVG.astro';
+import LogoFlux from './LogoFlux.astro';
+
+interface Props {
+  nombre: string;
+  tamaño?: number;
+  grosor?: number;
+}
+
+const { nombre, tamaño = 22, grosor = 1.5 } = Astro.props;
+---
+
+{nombre === 'flux' ? (
+  <LogoFlux tamaño={tamaño} />
+) : (
+  <IconoSVG nombre={nombre} tamaño={tamaño} grosor={grosor} />
+)}

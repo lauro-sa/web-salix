@@ -1,113 +1,19 @@
 ---
-// ============================================================
-// flux.astro — Pagina de Flux by Salix
-// Copy y precios alineados a flux.salixweb.com (2026-08-18).
-// ============================================================
-import Plantilla         from '../layouts/Plantilla.astro';
-import Nav               from '../components/Nav.astro';
-import PlantillaProducto from '../components/PlantillaProducto.astro';
-import Footer            from '../components/Footer.astro';
-
-const URL_FLUX = 'https://flux.salixweb.com';
+// Pagina de Flux — paridad con flux.salixweb.com (copy, íconos, bloques).
+import Plantilla  from '../layouts/Plantilla.astro';
+import Nav        from '../components/Nav.astro';
+import PaginaFlux from '../components/PaginaFlux.astro';
+import Footer     from '../components/Footer.astro';
 ---
 
 <Plantilla
   titulo="Flux by Salix — Un solo sistema. Sin saltar de aplicación."
   descripcion="Crece desde el primer cliente hasta todo el equipo. Sin cambiar de software al escalar. WhatsApp Business, facturación ARCA, web y app iOS. 30 días de prueba, sin tarjeta."
+  keywords="CRM Argentina, ERP, facturacion electronica ARCA, WhatsApp Business, presupuestos, software gestion empresas"
 >
   <Nav />
   <main>
-    <PlantillaProducto
-      nombre="Flux by Salix"
-      subtitulo="Un solo sistema. Sin saltar de aplicación."
-      descripcion="Crece desde el primer cliente hasta todo el equipo. Sin cambiar de software al escalar."
-      icono="flujo"
-      disponible={true}
-      color="var(--salix)"
-      ctaPrincipal={{ texto: 'Probar 30 días gratis', href: `${URL_FLUX}/landing` }}
-      ctaSecundario={{ texto: 'Cómo funciona', href: `${URL_FLUX}/funciones` }}
-      planesLead="30 días de prueba en todos los planes, sin tarjeta. El anual: pagás 10 meses, usás 12. Se cobra en pesos."
-      cierreTitulo="30 días para probar Flux."
-      cierreSub="Sin tarjeta. Si no se adapta a tu operación, cancelás. Los datos se conservan."
-      cierreCta={{ texto: 'Crear cuenta', href: `${URL_FLUX}/landing` }}
-      features={[
-        { titulo: 'WhatsApp de la empresa', descripcion: 'El número permanece en el teléfono. El equipo atiende en Flux, con historial y un mismo hilo.', icono: 'whatsapp' },
-        { titulo: 'Presupuesto con aceptación', descripcion: 'PDF y enlace. El cliente acepta desde el celular. Deja de ser un archivo suelto en el chat.', icono: 'codigo' },
-        { titulo: 'Facturación ARCA', descripcion: 'Conexión directa. Comprobantes A, B o C, notas de crédito, CAE y PDF con QR.', icono: 'dinero' },
-        { titulo: 'Operación en campo', descripcion: 'El visitador registra en el celular. La empresa ve el mapa, el recorrido y el aviso de llegada.', icono: 'ubicacion' },
-        { titulo: 'Salix IA', descripcion: 'Operá Flux por conversación, con los mismos permisos que en pantalla. En la app o por WhatsApp.', icono: 'ia' },
-        { titulo: 'Sitio público en minutos', descripcion: 'Landing con SEO e imagen para compartir en WhatsApp. El formulario ingresa como contacto.', icono: 'sitio' },
-        { titulo: 'Celular y computadora', descripcion: 'Web / PWA en Windows, Mac y Android. App nativa para iPhone. Configurás en la web; operás en el celular.', icono: 'celular' },
-        { titulo: 'Multi-empresa', descripcion: 'Varias empresas desde la misma cuenta. Los datos no se mezclan. Cambiás de una a otra con un clic.', icono: 'cubo' },
-        { titulo: 'Pagos con MercadoPago', descripcion: 'Links de cobro desde el presupuesto o la factura. El cliente paga; Flux registra el cobro.', icono: 'pago' },
-      ]}
-      planes={[
-        {
-          nombre: 'Básico',
-          precio: 'USD $89',
-          periodo: '/mes · 3 usuarios',
-          destacado: false,
-          items: [
-            'Contactos, actividades y calendario',
-            'Oportunidades y embudo comercial',
-            'Productos, presupuestos y órdenes',
-            'Cobranzas por cuotas',
-            'Correo y mensajes internos',
-            'App web e iOS',
-          ],
-          textoBoton: 'Empezar prueba',
-          url: `${URL_FLUX}/landing`,
-        },
-        {
-          nombre: 'Pro',
-          precio: 'USD $199',
-          periodo: '/mes · 8 usuarios',
-          destacado: true,
-          badge: 'Más elegido',
-          items: [
-            'Todo lo de Básico',
-            'WhatsApp oficial (coexistencia)',
-            'Facturación fiscal ARCA',
-            'Visitas y recorridos con mapa',
-            'Mi Web, portal y biblioteca',
-            'Flujos e IA con tu propia API',
-          ],
-          textoBoton: 'Empezar prueba',
-          url: `${URL_FLUX}/landing`,
-        },
-        {
-          nombre: 'Max',
-          precio: 'USD $299',
-          periodo: '/mes · 20 usuarios',
-          destacado: false,
-          items: [
-            'Todo lo de Pro',
-            'Asistencias y kiosco RFID/NFC',
-            'Nóminas y finanzas',
-            'Salix IA incluida (la paga Flux)',
-            'Marketing por correo',
-            'Multi-empresa',
-          ],
-          textoBoton: 'Empezar prueba',
-          url: `${URL_FLUX}/landing`,
-        },
-        {
-          nombre: 'Personalizado',
-          precio: 'Consultar',
-          periodo: 'a medida',
-          destacado: false,
-          items: [
-            'Todo lo de Max',
-            'Más de 20 usuarios',
-            'Integraciones a medida',
-            'Onboarding dedicado y SLA',
-            'Gerente de cuenta',
-          ],
-          textoBoton: 'Hablar con nosotros',
-          url: '/#contacto',
-        },
-      ]}
-    />
+    <PaginaFlux />
   </main>
   <Footer />
 </Plantilla>

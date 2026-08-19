@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://salixweb.com/sitemap-index.xml

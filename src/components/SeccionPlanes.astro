@@ -3,7 +3,7 @@
 // SeccionPlanes.astro — Resumen de precios por producto
 // Cada card lleva a la pagina individual del producto
 // ============================================================
-import IconoSVG from './ui/IconoSVG.astro';
+import IconoProducto from './IconoProducto.astro';
 
 interface PlanProducto {
   nombre:     string;
@@ -15,12 +15,12 @@ interface PlanProducto {
 }
 
 const PRODUCTOS: PlanProducto[] = [
-  { nombre: 'Flux',           desde: 'USD $89',    detalle: '/mes · 3 planes · 30 días gratis', icono: 'flujo',    url: '/flux',           disponible: true  },
+  { nombre: 'Flux',           desde: 'USD $89',    detalle: '/mes · 3 planes · 30 días gratis', icono: 'flux',     url: '/flux',           disponible: true  },
   { nombre: 'Sites',          desde: 'A medida',   detalle: 'segun proyecto',               icono: 'sitio',    url: '/sites',          disponible: true  },
-  { nombre: 'Go',             desde: 'USD $100',   detalle: '/mes · 2 planes',              icono: 'delivery', url: '/go',             disponible: false },
-  { nombre: 'Play',           desde: 'USD $80',    detalle: '/mes · 2 planes',              icono: 'cancha',   url: '/play',           disponible: false },
-  { nombre: 'Book',           desde: 'USD $100',   detalle: '/mes · 2 planes',              icono: 'agenda',   url: '/book',           disponible: false },
-  { nombre: 'Integraciones',  desde: 'USD $70',    detalle: 'primera sesion',               icono: 'link',     url: '/integraciones',  disponible: true  },
+  { nombre: 'Go',             desde: 'USD $100',   detalle: '/mes · 2 opciones',            icono: 'delivery', url: '/go',             disponible: false },
+  { nombre: 'Play',           desde: 'USD $80',    detalle: '/mes · 2 opciones',            icono: 'cancha',   url: '/play',           disponible: false },
+  { nombre: 'Book',           desde: 'USD $100',   detalle: '/mes · 2 opciones',            icono: 'agenda',   url: '/book',           disponible: false },
+  { nombre: 'Integraciones',  desde: 'US$ 70',     detalle: 'primera sesión · 45 min',      icono: 'link',     url: '/integraciones',  disponible: true  },
 ];
 
 const TEXTO = {
@@ -43,7 +43,7 @@ const TEXTO = {
       <a href={prod.url} class={`card-precio aparecer-escala delay-${indice + 1}`}>
         <div class="precio-cabecera">
           <div class="icono-contenedor item-precio">
-            <IconoSVG nombre={prod.icono} tamaño={20} grosor={1.5} />
+            <IconoProducto nombre={prod.icono} tamaño={20} />
           </div>
           <span class={`etiqueta-estado ${prod.disponible ? 'disponible' : 'proximamente'}`}>
             <span class="punto-estado"></span>
@@ -86,6 +86,8 @@ const TEXTO = {
     text-decoration: none; color: inherit; position: relative;
   }
 
+  .card-precio { overflow: hidden; }
+
   .card-precio::before {
     content: '';
     position: absolute; top: 0; left: 0; right: 0;
@@ -104,19 +106,19 @@ const TEXTO = {
   .card-precio:hover .precio-link { color: var(--salix); }
 
   .precio-cabecera { display: flex; align-items: center; justify-content: space-between; }
-  .precio-nombre { font-size: 1.05rem; font-weight: 700; color: var(--texto); letter-spacing: -0.02em; }
+  .precio-nombre { font-size: 1.05rem; font-weight: 600; color: var(--texto); letter-spacing: -0.02em; }
   .precio-valor { display: flex; flex-direction: column; gap: 0.15rem; }
 
   .precio-monto {
     font-size: clamp(1.4rem, 2.5vw, 1.7rem);
-    font-weight: 700; color: var(--texto); letter-spacing: -0.03em;
+    font-weight: 600; color: var(--texto); letter-spacing: -0.03em;
   }
 
   .precio-periodo { font-size: 0.75rem; color: var(--texto-terciario); }
 
   .precio-link {
     display: inline-flex; align-items: center; gap: 5px;
-    font-size: 0.8rem; font-weight: 600;
+    font-size: 0.8rem; font-weight: 500;
     color: var(--texto-terciario); transition: color var(--transicion);
     margin-top: auto;
   }

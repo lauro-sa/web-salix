@@ -36,6 +36,15 @@ body::after {
   mix-blend-mode: overlay;
 }
 
+/* ─── Contenido principal (tapa el footer sticky) ─── */
+main {
+  position: relative;
+  z-index: 2;
+  background: var(--fondo);
+  transition: background var(--transicion);
+  box-shadow: 0 1px 0 var(--borde-sutil), 0 20px 60px rgba(0,0,0,0.15);
+}
+
 /* ─── Contenedores ─── */
 .contenedor {
   width: 100%;
@@ -53,14 +62,14 @@ body::after {
 /* ─── Tipografía ─── */
 .titulo-hero {
   font-size: clamp(2.8rem, 7vw, 5rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.05;
   letter-spacing: -0.03em;
 }
 
 .titulo-seccion {
   font-size: clamp(2rem, 4.5vw, 3.2rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.025em;
 }
@@ -151,7 +160,7 @@ body::after {
   padding: 0.8rem 1.75rem;
   border-radius: var(--radio-pill);
   transition: all var(--transicion);
-  white-space: nowrap;
+  min-height: 44px;
 }
 
 .boton-primario {
@@ -223,6 +232,10 @@ body::after {
 @media (max-width: 1024px) {
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-4 { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
@@ -357,7 +370,6 @@ body::after {
   max-width: 520px;
   line-height: 1.75;
   margin-top: 1rem;
-  min-height: 1.75em;
   transition: color var(--transicion);
 }
 
@@ -374,8 +386,11 @@ body::after {
 }
 
 /* ─── Scrollbar ─── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
+/* Scrollbar nativo con color-scheme */
+html { scrollbar-color: var(--borde) transparent; scrollbar-width: thin; }
+
+::-webkit-scrollbar { width: 4px; background: var(--fondo); }
+::-webkit-scrollbar-track { background: var(--fondo); }
 ::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--texto-terciario); }
 

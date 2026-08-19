@@ -1,0 +1,27 @@
+---
+// Isotipo Salix (Logo-salix-web-2.svg). Un solo archivo: public/logo-salix.svg
+// El de barras queda en public/logo-salix-barras.svg por si se vuelve.
+// Medidas alineadas a flux.salixweb.com: nav 26 · hero 28.
+interface Props {
+  clase?: string;
+  tamaño?: number;
+}
+
+const { clase = '', tamaño = 26 } = Astro.props;
+---
+
+<img
+  src="/logo-salix.svg"
+  class:list={['logo-salix', clase]}
+  alt=""
+  style={`height:${tamaño}px;width:auto`}
+/>
+
+<style>
+  .logo-salix {
+    display: block;
+  }
+  :global([data-tema="oscuro"]) .logo-salix {
+    filter: invert(1);
+  }
+</style>

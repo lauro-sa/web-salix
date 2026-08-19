@@ -4,21 +4,41 @@
 // ============================================================
 
 /**
- * Toggle de tema claro/oscuro.
- * Guarda la preferencia en localStorage.
+ * Toggle de tema: sistema → claro → oscuro → sistema.
+ * Por defecto respeta la preferencia del sistema operativo.
+ * Guarda la eleccion del usuario en localStorage.
  */
 export function iniciarToggleTema(idBoton, claveStorage = 'salix-tema') {
   const raiz  = document.documentElement;
   const boton = document.getElementById(idBoton);
   if (!boton) return;
 
-  raiz.setAttribute('data-tema', localStorage.getItem(claveStorage) || 'claro');
+  var pref = localStorage.getItem(claveStorage) || 'sistema';
 
+  function temaDelSistema() {
+    return window.matchMedia('(prefers-color-scheme:dark)').matches ? 'oscuro' : 'claro';
+  }
+
+  function aplicar(p) {
+    pref = p;
+    var tema = p === 'sistema' ? temaDelSistema() : p;
+    raiz.setAttribute('data-tema', tema);
+    raiz.setAttribute('data-pref', p);
+    raiz.style.colorScheme = tema === 'oscuro' ? 'dark' : 'light';
+  }
+
+  aplicar(pref);
+
+  // Ciclo: sistema → claro → oscuro → sistema
   boton.addEventListener('click', () => {
-    const temaActual = raiz.getAttribute('data-tema');
-    const nuevoTema  = temaActual === 'claro' ? 'oscuro' : 'claro';
-    raiz.setAttribute('data-tema', nuevoTema);
-    localStorage.setItem(claveStorage, nuevoTema);
+    var siguiente = pref === 'sistema' ? 'claro' : pref === 'claro' ? 'oscuro' : 'sistema';
+    localStorage.setItem(claveStorage, siguiente);
+    aplicar(siguiente);
+  });
+
+  // Reaccionar si cambia el tema del OS mientras esta en modo sistema
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', () => {
+    if (pref === 'sistema') aplicar('sistema');
   });
 }
 
@@ -37,7 +57,17 @@ export function iniciarMenuMobile(idBoton, idMenu, claseLinks = '.link-menu') {
     boton.classList.toggle('on', estaAbierto);
     menu.classList.toggle('on',  estaAbierto);
     boton.setAttribute('aria-expanded', estaAbierto);
-    document.body.style.overflow = estaAbierto ? 'hidden' : '';
+    const nav = document.getElementById('nav-principal');
+    if (estaAbierto) {
+      const anchoScrollbar = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = anchoScrollbar + 'px';
+      if (nav) nav.style.paddingRight = (32 + anchoScrollbar) + 'px';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      if (nav) nav.style.paddingRight = '';
+    }
   }
 
   boton.addEventListener('click', alternarMenu);
@@ -79,12 +109,17 @@ export function iniciarNavScroll(idNav, umbral = 40) {
  * Smooth scroll a secciones con offset para la nav fija.
  */
 export function iniciarSmoothScroll(offsetNav = 80) {
-  document.querySelectorAll('a[href^="#"]').forEach((enlace) => {
+  document.querySelectorAll('a[href^="#"], a[href^="/#"]').forEach((enlace) => {
     enlace.addEventListener('click', (e) => {
-      const destino = document.querySelector(enlace.getAttribute('href'));
+      let href = enlace.getAttribute('href');
+      // Manejar links tipo "/#seccion" (desde otras paginas)
+      if (href.startsWith('/#')) href = href.slice(1);
+
+      const destino = document.querySelector(href);
       if (destino) {
         e.preventDefault();
         const posicion = destino.getBoundingClientRect().top + window.scrollY - offsetNav;
+
         window.scrollTo({ top: posicion, behavior: 'smooth' });
       }
     });
@@ -113,6 +148,15 @@ export function iniciarAnimacionIconos(selector = '.item-producto, .item-feature
  * El texto completo esta en el atributo data-texto.
  */
 export function iniciarTypewriter(velocidad = 18) {
+  // Pre-reservar altura de todos los typewriters al inicio
+  document.querySelectorAll('.typewriter[data-texto]').forEach((el) => {
+    const texto = el.getAttribute('data-texto');
+    if (!texto) return;
+    el.textContent = texto;
+    el.style.minHeight = el.offsetHeight + 'px';
+    el.textContent = '';
+  });
+
   function escribir(elemento) {
     if (elemento._escrito) return;
     elemento._escrito = true;

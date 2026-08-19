@@ -1,4 +1,6 @@
 node_modules/
 dist/
+salixweb-dist/
+salixweb-dist.zip
 .astro/
 .DS_Store

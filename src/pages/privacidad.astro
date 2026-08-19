@@ -1,0 +1,109 @@
+---
+// ============================================================
+// privacidad.astro — Politica de privacidad
+// ============================================================
+import Plantilla from '../layouts/Plantilla.astro';
+import Nav       from '../components/Nav.astro';
+import Footer    from '../components/Footer.astro';
+---
+
+<Plantilla
+  titulo="Privacidad — Salix"
+  descripcion="Politica de privacidad de Salix. Como recopilamos, usamos y protegemos tu informacion personal."
+>
+  <Nav />
+  <main>
+    <div class="seccion legal">
+      <span class="etiqueta">Legal</span>
+      <h1 class="titulo-seccion" style="margin-top:1.5rem">Politica de Privacidad</h1>
+      <p class="subtitulo" style="max-width:100%;margin-top:1rem">Ultima actualizacion: Marzo 2026</p>
+
+      <div class="legal-contenido">
+        <h2>1. Informacion que recopilamos</h2>
+        <p>Recopilamos informacion que nos proporcionas directamente al usar nuestros servicios, incluyendo:</p>
+        <ul>
+          <li>Nombre y apellido</li>
+          <li>Direccion de correo electronico</li>
+          <li>Numero de telefono</li>
+          <li>Informacion de tu empresa o negocio</li>
+          <li>Datos de facturacion</li>
+        </ul>
+
+        <h2>2. Como usamos tu informacion</h2>
+        <p>Utilizamos la informacion recopilada para:</p>
+        <ul>
+          <li>Proveer, mantener y mejorar nuestros servicios</li>
+          <li>Procesar transacciones y enviar notificaciones relacionadas</li>
+          <li>Responder a tus consultas y brindar soporte tecnico</li>
+          <li>Enviarte comunicaciones sobre productos, servicios y novedades</li>
+        </ul>
+
+        <h2>3. Proteccion de datos</h2>
+        <p>Implementamos medidas de seguridad tecnicas y organizativas para proteger tu informacion personal contra acceso no autorizado, alteracion, divulgacion o destruccion. Todos los datos se transmiten mediante conexiones cifradas (HTTPS/TLS).</p>
+
+        <h2>4. Compartir informacion</h2>
+        <p>No vendemos, comercializamos ni transferimos tu informacion personal a terceros, excepto proveedores de servicios que nos asisten en la operacion del sitio (como procesadores de pago), siempre bajo acuerdos de confidencialidad.</p>
+
+        <h2>5. Cookies</h2>
+        <p>Utilizamos cookies y tecnologias similares para mejorar la experiencia de usuario, recordar preferencias (como el tema claro/oscuro) y analizar el uso del sitio.</p>
+
+        <h2>6. Tus derechos</h2>
+        <p>Podes ejercer tus derechos de acceso, rectificacion, supresion y oposicion sobre tus datos personales contactandonos a <a href="mailto:hola@salixweb.com">hola@salixweb.com</a>.</p>
+
+        <h2>7. Cambios en esta politica</h2>
+        <p>Nos reservamos el derecho de actualizar esta politica de privacidad. Cualquier cambio sera publicado en esta pagina con la fecha de actualizacion correspondiente.</p>
+
+        <h2>8. Contacto</h2>
+        <p>Si tenes preguntas sobre esta politica de privacidad, escribinos a <a href="mailto:hola@salixweb.com">hola@salixweb.com</a>.</p>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Plantilla>
+
+<style>
+  .legal {
+    padding-top: clamp(8rem, 15vw, 12rem);
+  }
+
+  .legal-contenido {
+    margin-top: 3rem;
+    max-width: 720px;
+  }
+
+  .legal-contenido h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--texto);
+  }
+
+  .legal-contenido p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--texto-secundario);
+    margin-bottom: 1rem;
+  }
+
+  .legal-contenido ul {
+    margin: 0.5rem 0 1rem 1.5rem;
+    list-style: disc;
+  }
+
+  .legal-contenido li {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--texto-secundario);
+  }
+
+  .legal-contenido a {
+    color: var(--salix);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .legal-contenido a:hover {
+    opacity: 0.8;
+  }
+</style>

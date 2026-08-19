@@ -86,6 +86,12 @@ export function iniciarParticulas(idCanvas) {
   ajustarTamaño();
   crearGrilla();
 
+  // Re-calcular después de que el layout esté completo
+  window.addEventListener('load', () => {
+    ajustarTamaño();
+    crearGrilla();
+  });
+
   // Mouse: convertir coordenadas de pagina a coordenadas del contenedor
   document.addEventListener('mousemove', (e) => {
     const rect = contenedor.getBoundingClientRect();

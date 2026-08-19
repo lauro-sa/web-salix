@@ -1,94 +1,89 @@
 ---
-// ============================================================
-// integraciones.astro — Servicio de integracion y consultoria
-// ============================================================
 import Plantilla from '../layouts/Plantilla.astro';
-import Nav       from '../components/Nav.astro';
-import Footer    from '../components/Footer.astro';
-import IconoSVG  from '../components/ui/IconoSVG.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import IconoSVG from '../components/ui/IconoSVG.astro';
+import TarjetaSesiones from '../components/TarjetaSesiones.astro';
+import FormularioContacto from '../components/FormularioContacto.astro';
+
+const SERVICIOS = [
+  { titulo: 'Configurar el producto', desc: 'Flux, Sites, Go, Play o Book: permisos, WhatsApp, módulos y el día a día de tu equipo.', icono: 'cubo' },
+  { titulo: 'Conectar sistemas', desc: 'WhatsApp, Mercado Pago, Google, planillas o una API. El dato entra una vez y viaja.', icono: 'link' },
+  { titulo: 'Sitios y landings', desc: 'Una web que carga rápido, con SEO y un formulario que llega a tu operación.', icono: 'sitio' },
+  { titulo: 'Migrar lo que ya tenés', desc: 'Excel, otro software, contactos en el teléfono. Lo traemos sin una migración masiva.', icono: 'flecha' },
+  { titulo: 'Automatizaciones', desc: 'Avisos, menús de WhatsApp, flujos al cambiar un estado. Menos trabajo repetido.', icono: 'rayo' },
+  { titulo: 'Consultoría técnica', desc: 'Arquitectura, herramientas y el recorte justo: qué conviene hacer ahora y qué después.', icono: 'ia' },
+];
+
+const PASOS = [
+  { num: '01', titulo: 'Contanos el software', desc: 'Puede ser Flux, un producto Salix o una herramienta que ya uses. WhatsApp, mail o el formulario de abajo.' },
+  { num: '02', titulo: 'Elegís las sesiones', desc: 'Cada una dura 45 minutos. Primera US$ 70. Cada extra US$ 50. Hasta 10. La tarjeta de al lado se actualiza al sumar.' },
+  { num: '03', titulo: 'Coordinamos y lo dejamos andando', desc: 'Si es Flux, también podés pagar directo en flux.salixweb.com/planes. Si no, te pasamos el link y agendamos.' },
+];
+
+const FAQ = [
+  { q: '¿Sirve para cualquier software?', a: 'Sí. Configuramos productos Salix (Flux, Sites, Go, Play, Book) y también conectamos lo que ya tengas: WhatsApp, Mercado Pago, planillas, APIs. No hace falta que sea nuestro.' },
+  { q: '¿Cuánto dura cada sesión?', a: '45 minutos de trabajo enfocado. No es una hora corrida ni una demo: es implementación.' },
+  { q: '¿Cuánto sale?', a: 'Primera sesión US$ 70. Cada extra US$ 50. Se cobra en pesos al cambio del día. Hasta 10 sesiones por pedido.' },
+  { q: '¿Está incluido en la suscripción de Flux?', a: 'No. La prueba y el plan son el producto. Esto es configuración a demanda, aparte.' },
+  { q: '¿Cómo se paga?', a: 'Si es implementación de Flux, pagás en flux.salixweb.com/planes. Para el resto, pedís las sesiones acá y te pasamos el link.' },
+];
 ---
 
 <Plantilla
-  titulo="Integraciones by Salix — Consultoria y configuracion"
-  descripcion="Servicio de integracion, configuracion y consultoria tecnica. Te ayudamos a implementar, conectar y personalizar tus herramientas."
+  titulo="Integraciones — Te lo dejamos andando"
+  descripcion="Sesiones de 45 minutos para configurar, conectar o implementar cualquier software. Primera US$ 70. Cada extra US$ 50. Flux, Sites o lo que ya uses."
+  keywords="implementacion software, configuracion WhatsApp, MercadoPago, consultoria tecnica Argentina, onboarding Flux, integracion sistemas"
 >
   <Nav />
   <main>
 
-    <!-- Hero -->
     <section class="servicio-hero">
-      <div class="servicio-hero-contenido">
-        <div class="aparecer">
-          <span class="etiqueta-estado disponible">
-            <span class="punto-estado"></span>
-            Disponible ahora
-          </span>
+      <div class="servicio-hero-inner">
+        <div class="hero-badge aparecer">
+          <span class="punto-pulso"></span>
+          Sesiones de 45 min
         </div>
-
-        <div class="aparecer delay-1">
-          <div class="icono-contenedor icono-grande item-producto">
-            <IconoSVG nombre="link" tamaño={36} grosor={1.5} />
-          </div>
-        </div>
-
-        <h1 class="titulo-hero aparecer delay-2">Integraciones</h1>
-        <p class="servicio-subtitulo aparecer delay-3">Te ayudamos a implementar y conectar todo</p>
-        <p class="servicio-desc aparecer delay-4">
-          Necesitas que te configuremos una herramienta, integremos sistemas, creemos una web o te asesoremos tecnicamente? Este servicio es para vos. Una sesion de trabajo enfocada en resolver tu necesidad.
+        <h1 class="servicio-titulo aparecer delay-1">
+          Te lo dejamos andando.<br />
+          <span>En el software que uses.</span>
+        </h1>
+        <p class="servicio-sub aparecer delay-2">
+          Configuramos Flux, Sites o lo que ya tengas. WhatsApp, Mercado Pago, una planilla, una API. No hace falta que sea nuestro.
         </p>
-
-        <div class="aparecer delay-5" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:0.5rem">
-          <a href="/#contacto" class="boton boton-verde">
-            Agendar sesion
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <div class="servicio-ctas aparecer delay-3">
+          <a href="#sesiones" class="boton boton-verde">
+            Elegir sesiones
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
           <a href="/#productos" class="boton boton-secundario">Ver productos</a>
         </div>
       </div>
     </section>
 
-    <!-- Como funciona -->
     <section class="seccion">
       <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
-        <span class="etiqueta">Como funciona</span>
-        <h2 class="titulo-seccion">Simple y directo.</h2>
+        <span class="etiqueta">Cómo funciona</span>
+        <h2 class="titulo-seccion">Tres pasos. Sin letra chica.</h2>
       </div>
-
       <div class="pasos-grilla">
-        <div class="paso-card aparecer delay-1">
-          <span class="paso-numero">01</span>
-          <h3 class="paso-titulo">Contanos que necesitas</h3>
-          <p class="paso-desc">Nos escribis por WhatsApp o email con tu necesidad. Puede ser una integracion, configuracion, web o consulta tecnica.</p>
-        </div>
-        <div class="paso-card aparecer delay-2">
-          <span class="paso-numero">02</span>
-          <h3 class="paso-titulo">Sesion de trabajo</h3>
-          <p class="paso-desc">Coordinamos una sesion de aproximadamente 1 hora donde trabajamos juntos en resolver tu necesidad.</p>
-        </div>
-        <div class="paso-card aparecer delay-3">
-          <span class="paso-numero">03</span>
-          <h3 class="paso-titulo">Resuelto</h3>
-          <p class="paso-desc">Si se resuelve en una sesion, listo. Si necesitas mas, coordinamos sesiones adicionales a un valor reducido.</p>
-        </div>
+        {PASOS.map((p, i) => (
+          <div class={`paso-card aparecer delay-${i + 1}`}>
+            <span class="paso-numero">{p.num}</span>
+            <h3 class="paso-titulo">{p.titulo}</h3>
+            <p class="paso-desc">{p.desc}</p>
+          </div>
+        ))}
       </div>
     </section>
 
-    <!-- Que incluye -->
     <section class="seccion">
       <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
-        <span class="etiqueta">Servicios</span>
-        <h2 class="titulo-seccion">En que te podemos ayudar.</h2>
+        <span class="etiqueta">En qué</span>
+        <h2 class="titulo-seccion">Cualquier sistema. El recorte justo.</h2>
       </div>
-
       <div class="servicios-grilla">
-        {[
-          { titulo: 'Integracion de sistemas', desc: 'Conectamos tus herramientas: CRM, WhatsApp, MercadoPago, Google, APIs externas.', icono: 'link' },
-          { titulo: 'Configuracion de productos', desc: 'Te ayudamos a configurar Flux, Go, Play o Book para que se adapten a tu negocio.', icono: 'cubo' },
-          { titulo: 'Creacion de sitios web', desc: 'Necesitas una landing, un sitio institucional o una PWA? Lo armamos juntos.', icono: 'sitio' },
-          { titulo: 'Consultoria tecnica', desc: 'Asesoramiento sobre tecnologia, arquitectura, herramientas y mejores practicas.', icono: 'ia' },
-          { titulo: 'Migracion de datos', desc: 'Trae tus datos desde Excel, otro CRM o cualquier sistema. Te ayudamos con la migracion.', icono: 'flecha' },
-          { titulo: 'Automatizaciones', desc: 'Configuramos flujos automaticos: emails, mensajes, reportes, alertas y mas.', icono: 'rayo' },
-        ].map((s, i) => (
+        {SERVICIOS.map((s, i) => (
           <div class={`card-servicio aparecer delay-${(i % 3) + 1}`}>
             <div class="icono-contenedor item-producto">
               <IconoSVG nombre={s.icono} tamaño={22} grosor={1.5} />
@@ -100,52 +95,50 @@ import IconoSVG  from '../components/ui/IconoSVG.astro';
       </div>
     </section>
 
-    <!-- Precios -->
-    <div class="fondo-puntos">
+    <div class="fondo-puntos" id="sesiones">
       <div class="panel-interior">
         <section class="seccion">
           <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
             <span class="etiqueta">Precios</span>
-            <h2 class="titulo-seccion">Transparente y accesible.</h2>
+            <h2 class="titulo-seccion">Elegí las sesiones. <span style="color:var(--salix)">La tarjeta cambia.</span></h2>
+            <p class="subtitulo" style="text-align:center">Primera US$ 70. Cada extra US$ 50. Hasta 10. Se cobra en pesos al cambio del día.</p>
           </div>
-
-          <div class="precios-integracion">
-            <div class="precio-card aparecer-escala delay-1">
-              <span class="precio-label">Primera sesion</span>
-              <span class="precio-tag">Consulta + gestion</span>
-              <div class="precio-valor">
-                <span class="precio-monto">USD $70</span>
-              </div>
-              <p class="precio-detalle">Una sesion de trabajo de aprox. 1 hora. Incluye diagnostico, configuracion o implementacion de lo que necesites.</p>
-              <a href="/#contacto" class="boton boton-verde" style="width:100%;text-align:center">Agendar primera sesion</a>
-            </div>
-
-            <div class="precio-card destacado aparecer-escala delay-2">
-              <span class="precio-label">Sesion adicional</span>
-              <span class="precio-tag">Para lo que falte</span>
-              <div class="precio-valor">
-                <span class="precio-monto">USD $40</span>
-                <span class="precio-periodo">por sesion</span>
-              </div>
-              <p class="precio-detalle">Si tu necesidad requiere mas de una sesion, cada sesion adicional tiene un valor reducido. Misma dinamica: ~1 hora de trabajo enfocado.</p>
-              <a href="/#contacto" class="boton boton-secundario" style="width:100%;text-align:center">Consultar</a>
-            </div>
-          </div>
+          <TarjetaSesiones
+            marca="Salix"
+            codigo="SLX"
+            titulo="¿Necesitás que te configuremos el sistema?"
+            texto="Cada sesión dura 45 minutos. Te ayudamos a cargar datos, conectar WhatsApp, permisos y los módulos que uses — en Flux o en otra herramienta. Primera sesión US$ 70. Cada extra US$ 50."
+            ctaTexto="Pedir estas sesiones"
+            ctaModo="contacto"
+            nota="Si es implementación de Flux, también podés pagar directo en flux.salixweb.com/planes."
+          />
         </section>
       </div>
     </div>
 
-    <!-- CTA final -->
-    <section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
-      <h2 class="titulo-seccion aparecer">Necesitas ayuda?</h2>
-      <p class="subtitulo aparecer delay-1" style="text-align:center">
-        Escribinos y te ayudamos a resolver. Sin compromiso.
-      </p>
-      <div class="aparecer delay-2" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-        <a href="mailto:hola@salixweb.com" class="boton boton-primario">Escribirnos</a>
-        <a href="https://wa.me/5491100000000" class="boton boton-secundario" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    <section class="seccion">
+      <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+        <span class="etiqueta">Preguntas</span>
+        <h2 class="titulo-seccion">Antes de escribirnos.</h2>
+      </div>
+      <div class="faq-lista">
+        {FAQ.map((item, i) => (
+          <details class={`faq-item aparecer delay-${(i % 3) + 1}`}>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
       </div>
     </section>
+
+    <section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
+      <h2 class="titulo-seccion aparecer">Contanos qué hay que dejar andando.</h2>
+      <p class="subtitulo aparecer delay-1" style="text-align:center">
+        Flux, Sites o una herramienta que ya uses. Sin compromiso.
+      </p>
+    </section>
+
+    <FormularioContacto productoPreseleccionado="Integraciones" />
 
   </main>
   <Footer />
@@ -153,115 +146,107 @@ import IconoSVG  from '../components/ui/IconoSVG.astro';
 
 <style>
   .servicio-hero {
-    min-height: 70vh;
+    min-height: 78vh;
     display: flex; align-items: center; justify-content: center;
-    padding: 120px 24px 80px;
+    padding: 120px 24px 72px;
     background: var(--gradiente-hero);
-    position: relative; z-index: 2;
   }
-
-  .servicio-hero-contenido {
-    max-width: 700px; text-align: center;
+  .servicio-hero-inner {
+    max-width: 720px; text-align: center;
     display: flex; flex-direction: column; align-items: center; gap: 1rem;
   }
-
-  .icono-grande { width: 72px; height: 72px; border-radius: 18px; }
-
-  .servicio-subtitulo {
-    font-size: clamp(1.1rem, 2vw, 1.3rem);
-    color: var(--salix); font-weight: 600;
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--borde);
+    color: var(--texto-secundario); font-size: 13px; font-weight: 500;
+    padding: 6px 16px; border-radius: 100px;
   }
-
-  .servicio-desc {
-    font-size: clamp(1rem, 1.4vw, 1.1rem);
+  .punto-pulso {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--salix);
+  }
+  .servicio-titulo {
+    font-size: clamp(2rem, 5vw, 3.15rem);
+    font-weight: 600; line-height: 1.08; letter-spacing: -0.04em; color: var(--texto);
+    max-width: 100%;
+  }
+  .servicio-titulo span {
+    display: block;
+    font-size: clamp(1.2rem, 2.8vw, 1.85rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-top: 0.18em;
+    color: color-mix(in srgb, var(--salix) 55%, var(--gris-titulo));
+    white-space: nowrap;
+  }
+  @media (max-width: 520px) {
+    .servicio-titulo span { white-space: normal; }
+  }
+  .servicio-sub {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
     color: var(--texto-secundario); line-height: 1.7; max-width: 520px;
   }
+  .servicio-ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 0.25rem; }
 
   .encabezado-seccion {
     margin-bottom: 3rem;
     display: flex; flex-direction: column; gap: 0.75rem;
   }
 
-  /* Pasos */
   .pasos-grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-
   .paso-card {
     background: var(--card); border: 1px solid var(--borde);
     border-radius: var(--radio-card);
     padding: clamp(1.5rem, 3vw, 2rem);
     display: flex; flex-direction: column; gap: 0.75rem;
-    transition: all var(--transicion);
+    transition: border-color var(--transicion), transform var(--transicion);
   }
-
   .paso-card:hover { border-color: var(--salix-borde); transform: translateY(-2px); }
-
   .paso-numero {
-    font-size: 2rem; font-weight: 700; color: var(--salix);
+    font-size: 2rem; font-weight: 600; color: var(--salix);
     letter-spacing: -0.03em; line-height: 1;
   }
-
-  .paso-titulo { font-size: 1.05rem; font-weight: 700; color: var(--texto); }
+  .paso-titulo { font-size: 1.05rem; font-weight: 600; color: var(--texto); }
   .paso-desc { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; }
 
-  /* Servicios */
   .servicios-grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-
   .card-servicio {
     background: var(--card); border: 1px solid var(--borde);
     border-radius: var(--radio-card);
     padding: clamp(1.25rem, 2.5vw, 1.75rem);
     display: flex; flex-direction: column; gap: 0.75rem;
-    transition: all var(--transicion);
+    transition: border-color var(--transicion), transform var(--transicion);
   }
-
   .card-servicio:hover {
     border-color: var(--salix-borde); transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
   }
-
-  .card-servicio:hover .icono-contenedor { transform: scale(1.1) rotate(-5deg); }
-
-  .servicio-nombre { font-size: 1rem; font-weight: 700; color: var(--texto); }
+  .card-servicio:hover :global(.icono-contenedor) { transform: scale(1.08) rotate(-4deg); }
+  .servicio-nombre { font-size: 1rem; font-weight: 600; color: var(--texto); }
   .servicio-texto { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; }
 
-  /* Precios integracion */
-  .precios-integracion {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem; max-width: 700px; margin: 0 auto;
+  .faq-lista {
+    max-width: 720px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 8px;
   }
-
-  .precio-card {
+  .faq-item {
     background: var(--card); border: 1px solid var(--borde);
-    border-radius: var(--radio-card);
-    padding: clamp(1.5rem, 3vw, 2rem);
-    display: flex; flex-direction: column; gap: 1rem;
-    transition: all var(--transicion);
+    border-radius: 14px; padding: 0 1.25rem;
   }
-
-  .precio-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
-
-  .precio-card.destacado {
-    border-color: var(--salix-borde);
-    background: var(--gradiente-card), var(--card);
+  .faq-item summary {
+    cursor: pointer; list-style: none;
+    font-size: 1rem; font-weight: 600; color: var(--texto);
+    padding: 1.1rem 0;
   }
-
-  .precio-label { font-size: 1.1rem; font-weight: 700; color: var(--texto); }
-  .precio-tag { font-size: 0.8rem; color: var(--salix); font-weight: 500; }
-
-  .precio-valor { display: flex; align-items: baseline; gap: 0.4rem; }
-  .precio-monto {
-    font-size: clamp(1.8rem, 3vw, 2.2rem); font-weight: 700;
-    color: var(--texto); letter-spacing: -0.03em;
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item p {
+    font-size: 0.9rem; color: var(--texto-secundario); line-height: 1.7;
+    padding: 0 0 1.15rem; margin: 0;
   }
-  .precio-periodo { font-size: 0.8rem; color: var(--texto-terciario); }
-  .precio-detalle { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; flex: 1; }
 
   @media (max-width: 1024px) {
     .pasos-grilla { grid-template-columns: 1fr; }
     .servicios-grilla { grid-template-columns: repeat(2, 1fr); }
-    .precios-integracion { grid-template-columns: 1fr; }
   }
-
   @media (max-width: 640px) {
     .servicios-grilla { grid-template-columns: 1fr; }
   }

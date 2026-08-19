@@ -1,0 +1,662 @@
+---
+// ============================================================
+// FormularioContacto.astro — Formulario de contacto por pasos
+// Paso 1: Elegir producto (se salta si viene productoPreseleccionado)
+// Paso 2: Datos de contacto
+// Paso 3: Mensaje
+// Paso 4: Confirmacion con celebracion
+// ============================================================
+import NombreMarca from './NombreMarca.astro';
+import LogoFlux from './LogoFlux.astro';
+
+interface Props {
+  productoPreseleccionado?: string;
+}
+
+const { productoPreseleccionado } = Astro.props;
+---
+
+<section class="seccion" id="contacto">
+  <div class="form-encabezado aparecer">
+    <span class="etiqueta">Contacto</span>
+    <h2 class="titulo-seccion">Hablemos.</h2>
+    {productoPreseleccionado ? (
+      <p class="form-sub">Consulta sobre <strong style="color:var(--salix)"><NombreMarca nombre={productoPreseleccionado} /></strong>. Completá tus datos y te respondemos rapido.</p>
+    ) : (
+      <p class="form-sub">Contanos que necesitas y te decimos como Salix puede ayudarte.</p>
+    )}
+  </div>
+
+  <div class="form-contenedor aparecer delay-2" data-producto-pre={productoPreseleccionado || ''}>
+    <!-- Indicador de pasos -->
+    <div class="form-indicador">
+      <div class="form-indicador-barra">
+        <div class="form-indicador-progreso"></div>
+      </div>
+      <div class="form-indicador-pasos">
+        <button class="form-dot activo actual" data-paso="1"><span>1</span></button>
+        <button class="form-dot" data-paso="2"><span>2</span></button>
+        <button class="form-dot" data-paso="3"><span>3</span></button>
+        <button class="form-dot" data-paso="4"><span>4</span></button>
+      </div>
+    </div>
+
+    <!-- Contenedor de pasos -->
+    <div class="form-cuerpo">
+
+      <!-- Paso 1: Elegir producto -->
+      <div class="form-paso visible" data-form-paso="1">
+        <p class="form-pregunta">Que producto te interesa?</p>
+        <div class="form-productos">
+          <label class="form-prod">
+            <input type="radio" name="producto" value="Flux" />
+            <div class="form-prod-inner">
+              <LogoFlux tamaño={18} clase="form-prod-logo" />
+              <strong>Flux</strong><span>Un solo sistema</span>
+            </div>
+          </label>
+          <label class="form-prod">
+            <input type="radio" name="producto" value="Sites" />
+            <div class="form-prod-inner">
+              <strong>Sites</strong><span>Sitios web</span>
+            </div>
+          </label>
+          <label class="form-prod">
+            <input type="radio" name="producto" value="Go" />
+            <div class="form-prod-inner">
+              <strong>Go</strong><span>Delivery</span>
+            </div>
+          </label>
+          <label class="form-prod">
+            <input type="radio" name="producto" value="Play" />
+            <div class="form-prod-inner">
+              <strong>Play</strong><span>Canchas</span>
+            </div>
+          </label>
+          <label class="form-prod">
+            <input type="radio" name="producto" value="Book" />
+            <div class="form-prod-inner">
+              <strong>Book</strong><span>Turnos</span>
+            </div>
+          </label>
+          <label class="form-prod">
+            <input type="radio" name="producto" value="Integraciones" />
+            <div class="form-prod-inner">
+              <strong>Integraciones</strong><span>Sesiones 45 min</span>
+            </div>
+          </label>
+          <label class="form-prod">
+            <input type="radio" name="producto" value="No estoy seguro" />
+            <div class="form-prod-inner">
+              <strong>No se aun</strong><span>Asesorame</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Paso 2: Datos -->
+      <div class="form-paso" data-form-paso="2">
+        <p class="form-pregunta">Como te contactamos?</p>
+        <div class="form-campos">
+          <div class="form-grupo">
+            <label for="form-nombre">Nombre</label>
+            <input type="text" id="form-nombre" name="nombre" placeholder="Tu nombre o empresa" autocomplete="name" />
+          </div>
+          <div class="form-grupo">
+            <label for="form-email">Email</label>
+            <input type="email" id="form-email" name="email" placeholder="tu@email.com" autocomplete="email" />
+          </div>
+          <div class="form-grupo">
+            <label for="form-whatsapp">WhatsApp <span class="form-opc">(opcional)</span></label>
+            <input type="tel" id="form-whatsapp" name="whatsapp" placeholder="+54 11 1234-5678" autocomplete="tel" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 3: Mensaje -->
+      <div class="form-paso" data-form-paso="3">
+        <p class="form-pregunta">Contanos sobre tu proyecto</p>
+        <div class="form-campos">
+          <div class="form-grupo">
+            <label for="form-mensaje">Mensaje</label>
+            <textarea id="form-mensaje" name="mensaje" placeholder="Que necesitas? Cuantos usuarios tenes? Cualquier detalle nos ayuda..." rows="4"></textarea>
+          </div>
+          <div class="form-grupo">
+            <label>Preferencia de contacto</label>
+            <div class="form-pills">
+              <label class="form-pill"><input type="radio" name="preferencia" value="email" checked /><span>Email</span></label>
+              <label class="form-pill"><input type="radio" name="preferencia" value="whatsapp" /><span>WhatsApp</span></label>
+              <label class="form-pill"><input type="radio" name="preferencia" value="cualquiera" /><span>Cualquiera</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 4: Confirmacion -->
+      <div class="form-paso" data-form-paso="4">
+        <div class="form-exito">
+          <!-- Canvas de confetti -->
+          <canvas class="form-confetti" id="confetti-canvas"></canvas>
+          <!-- Check animado -->
+          <div class="form-check">
+            <svg viewBox="0 0 52 52" fill="none">
+              <circle class="check-circ" cx="26" cy="26" r="24" stroke="var(--salix)" stroke-width="2"/>
+              <path class="check-tick" d="M15 27l7 7 15-15" stroke="var(--salix)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="form-exito-titulo">Mensaje enviado!</h3>
+          <p class="form-exito-sub">Te respondemos en menos de 24 horas.</p>
+          <div class="form-resumen">
+            <div class="form-res-fila"><span>Producto</span><span id="res-prod">—</span></div>
+            <div class="form-res-fila"><span>Nombre</span><span id="res-nombre">—</span></div>
+            <div class="form-res-fila"><span>Contacto</span><span id="res-email">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegacion -->
+    <div class="form-nav">
+      <button class="form-btn-atras boton boton-secundario" disabled>Atras</button>
+      <button class="form-btn-sig boton boton-primario">
+        Siguiente
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initForm() {
+    const c = document.querySelector('.form-contenedor');
+    if (!c || c.dataset.init) return;
+    c.dataset.init = '1';
+
+    let paso = 1;
+    const dots = c.querySelectorAll('.form-dot');
+    const progreso = c.querySelector('.form-indicador-progreso');
+    const btnSig = c.querySelector('.form-btn-sig');
+    const btnAtras = c.querySelector('.form-btn-atras');
+
+    function irA(n) {
+      const dir = n > paso ? 1 : -1;
+      const viejo = c.querySelector(`[data-form-paso="${paso}"]`);
+      const nuevo = c.querySelector(`[data-form-paso="${n}"]`);
+      if (!viejo || !nuevo) return;
+
+      viejo.style.transform = `translateX(${-25 * dir}px)`;
+      viejo.style.opacity = '0';
+      viejo.style.filter = 'blur(4px)';
+
+      setTimeout(() => {
+        viejo.classList.remove('visible');
+        viejo.style.cssText = '';
+        nuevo.style.transform = `translateX(${25 * dir}px)`;
+        nuevo.style.opacity = '0';
+        nuevo.style.filter = 'blur(4px)';
+        nuevo.classList.add('visible');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          nuevo.style.transform = 'translateX(0)';
+          nuevo.style.opacity = '1';
+          nuevo.style.filter = 'blur(0)';
+        }));
+      }, 280);
+
+      paso = n;
+
+      // Dots
+      dots.forEach((d, i) => {
+        d.classList.toggle('activo', i + 1 <= paso);
+        d.classList.toggle('actual', i + 1 === paso);
+      });
+
+      // Barra de progreso
+      progreso.style.width = `${((paso - 1) / 3) * 100}%`;
+
+      // Botones
+      btnAtras.disabled = paso === 1;
+      if (paso === 4) {
+        btnSig.style.display = 'none';
+        btnAtras.style.display = 'none';
+        llenarResumen();
+        lanzarConfetti();
+      } else if (paso === 3) {
+        btnSig.innerHTML = 'Enviar <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+      } else {
+        btnSig.innerHTML = 'Siguiente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        btnSig.style.display = '';
+        btnAtras.style.display = '';
+      }
+    }
+
+    function validar() {
+      if (paso === 1) {
+        if (!c.querySelector('input[name="producto"]:checked')) {
+          c.querySelectorAll('.form-prod').forEach(p => {
+            p.classList.add('sacudir');
+            setTimeout(() => p.classList.remove('sacudir'), 500);
+          });
+          return false;
+        }
+      }
+      if (paso === 2) {
+        const n = document.getElementById('form-nombre');
+        const e = document.getElementById('form-email');
+        let ok = true;
+        [n, e].forEach(inp => {
+          if (!inp.value.trim()) {
+            inp.classList.add('form-error');
+            setTimeout(() => inp.classList.remove('form-error'), 1500);
+            ok = false;
+          }
+        });
+        if (ok && (!e.value.includes('@') || !e.value.includes('.'))) {
+          e.classList.add('form-error');
+          setTimeout(() => e.classList.remove('form-error'), 1500);
+          ok = false;
+        }
+        return ok;
+      }
+      return true;
+    }
+
+    function llenarResumen() {
+      const prod = c.querySelector('input[name="producto"]:checked');
+      document.getElementById('res-prod').textContent = prod ? prod.value : '—';
+      document.getElementById('res-nombre').textContent = document.getElementById('form-nombre').value || '—';
+      document.getElementById('res-email').textContent = document.getElementById('form-email').value || '—';
+    }
+
+    // Confetti elegante
+    function lanzarConfetti() {
+      const canvas = c.querySelector('.form-confetti');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const exito = c.querySelector('.form-exito');
+      const rect = exito.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.scale(dpr, dpr);
+
+      const W = rect.width, H = rect.height;
+      const colores = ['#c2710c', '#e8922a', '#f0c674', '#d4a55a', '#fff3d6'];
+      const piezas = [];
+
+      for (let i = 0; i < 60; i++) {
+        piezas.push({
+          x: W / 2 + (Math.random() - 0.5) * 40,
+          y: H * 0.35,
+          vx: (Math.random() - 0.5) * 8,
+          vy: -Math.random() * 10 - 4,
+          size: Math.random() * 5 + 3,
+          color: colores[Math.floor(Math.random() * colores.length)],
+          rot: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 12,
+          opacity: 1,
+          gravity: 0.18 + Math.random() * 0.08,
+          tipo: Math.random() > 0.5 ? 'rect' : 'circle',
+        });
+      }
+
+      let frame = 0;
+      function animar() {
+        ctx.clearRect(0, 0, W, H);
+        let activos = 0;
+        piezas.forEach(p => {
+          p.vy += p.gravity;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          p.vx *= 0.99;
+          if (frame > 30) p.opacity -= 0.015;
+          if (p.opacity <= 0) return;
+          activos++;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.fillStyle = p.color;
+
+          if (p.tipo === 'rect') {
+            ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        });
+        frame++;
+        if (activos > 0 && frame < 200) requestAnimationFrame(animar);
+      }
+      requestAnimationFrame(animar);
+    }
+
+    btnSig.addEventListener('click', () => { if (validar() && paso < 4) irA(paso + 1); });
+    btnAtras.addEventListener('click', () => { if (paso > 1) irA(paso - 1); });
+
+    dots.forEach(d => d.addEventListener('click', () => {
+      const n = parseInt(d.dataset.paso);
+      if (n < paso) irA(n);
+    }));
+
+    // Auto-avanzar al elegir producto
+    c.querySelectorAll('input[name="producto"]').forEach(r => {
+      r.addEventListener('change', () => setTimeout(() => irA(2), 350));
+    });
+
+    // Preseleccion desde pagina de producto
+    const pre = c.dataset.productoPre;
+    if (pre) {
+      const match = c.querySelector(`input[name="producto"][value="${pre}"]`);
+      if (match) { match.checked = true; setTimeout(() => irA(2), 100); }
+    }
+
+    try {
+      const pedido = sessionStorage.getItem('salix-pedido-sesiones');
+      if (pedido) {
+        const data = JSON.parse(pedido);
+        const campo = document.getElementById('form-mensaje');
+        if (campo && data.mensaje && !campo.value.trim()) campo.value = data.mensaje;
+      }
+    } catch { /* private mode */ }
+  }
+
+  // Iniciar cuando el DOM esté listo o ya lo esté
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initForm);
+  } else {
+    initForm();
+  }
+</script>
+
+<style>
+  /* ─── Encabezado ─── */
+  .form-encabezado {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-sub {
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.7;
+    color: var(--texto-secundario);
+    max-width: 480px;
+  }
+
+  /* ─── Contenedor ─── */
+  .form-contenedor {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: clamp(1.5rem, 4vw, 2rem);
+    transition: border-color var(--transicion);
+  }
+
+  /* ─── Indicador ─── */
+  .form-indicador {
+    position: relative;
+    margin-bottom: 1.75rem;
+  }
+
+  .form-indicador-barra {
+    position: absolute;
+    top: 11px; left: 24px; right: 24px;
+    height: 1px;
+    background: var(--borde-sutil);
+    border-radius: 1px;
+    z-index: 0;
+  }
+
+  .form-indicador-progreso {
+    height: 100%; width: 0;
+    background: color-mix(in srgb, var(--salix) 40%, transparent);
+    border-radius: 1px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .form-indicador-pasos {
+    display: flex; justify-content: space-between;
+    position: relative; z-index: 1;
+  }
+
+  .form-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600;
+    background: var(--superficie);
+    color: var(--texto-terciario);
+    border: 1px solid var(--borde-sutil);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 0;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.6;
+  }
+
+  .form-dot.activo {
+    background: color-mix(in srgb, var(--salix) 80%, transparent);
+    color: #fff;
+    border-color: transparent;
+    opacity: 1;
+  }
+
+  .form-dot.actual {
+    box-shadow: 0 0 0 3px var(--salix-suave);
+    transform: scale(1.08);
+    opacity: 1;
+  }
+
+  /* ─── Cuerpo ─── */
+  .form-cuerpo { min-height: 220px; }
+
+  .form-paso {
+    display: none;
+    transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
+  }
+
+  .form-paso.visible { display: block; }
+
+  .form-pregunta {
+    font-size: 15px; font-weight: 600; color: var(--texto);
+    margin-bottom: 1rem; letter-spacing: -0.02em;
+  }
+
+  /* ─── Productos ─── */
+  .form-productos {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+
+  .form-prod { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .form-prod input { display: none; }
+
+  .form-prod-inner {
+    padding: 12px 8px;
+    border: 1.5px solid var(--borde);
+    border-radius: 10px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: var(--fondo);
+  }
+
+  .form-prod-inner :global(.form-prod-logo) {
+    margin-bottom: 4px;
+  }
+
+  .form-prod-inner strong { font-size: 13px; color: var(--texto); }
+  .form-prod-inner span { font-size: 10.5px; color: var(--texto-terciario); }
+
+  .form-prod input:checked + .form-prod-inner {
+    border-color: var(--salix);
+    background: var(--salix-suave);
+    transform: scale(1.04);
+    box-shadow: 0 0 0 3px var(--salix-suave);
+  }
+
+  .form-prod-inner:hover {
+    border-color: var(--texto-terciario);
+    transform: translateY(-2px);
+  }
+
+  .sacudir .form-prod-inner {
+    animation: sacudir 0.4s ease;
+    border-color: #e74c3c;
+  }
+
+  @keyframes sacudir {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  /* ─── Campos ─── */
+  .form-campos { display: flex; flex-direction: column; gap: 14px; }
+
+  .form-grupo { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-grupo label {
+    font-size: 11.5px; font-weight: 600;
+    color: var(--texto-secundario);
+  }
+
+  .form-opc { font-weight: 400; color: var(--texto-terciario); }
+
+  .form-grupo input,
+  .form-grupo textarea {
+    font-family: var(--fuente-principal);
+    font-size: 13.5px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--borde);
+    border-radius: 10px;
+    background: var(--fondo);
+    color: var(--texto);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none; resize: vertical;
+  }
+
+  .form-grupo input::placeholder,
+  .form-grupo textarea::placeholder { color: var(--texto-terciario); }
+
+  .form-grupo input:focus,
+  .form-grupo textarea:focus {
+    border-color: var(--salix);
+    box-shadow: 0 0 0 3px var(--salix-suave);
+  }
+
+  .form-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15) !important;
+    animation: sacudir 0.4s ease;
+  }
+
+  /* Pills */
+  .form-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .form-pill { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .form-pill input { display: none; }
+
+  .form-pill span {
+    display: inline-flex; padding: 6px 14px;
+    font-size: 12px; font-weight: 500;
+    border: 1.5px solid var(--borde);
+    border-radius: var(--radio-pill);
+    color: var(--texto-secundario);
+    background: var(--fondo);
+    transition: all 0.3s;
+  }
+
+  .form-pill input:checked + span {
+    border-color: var(--salix); color: var(--salix);
+    background: var(--salix-suave);
+  }
+
+  .form-pill span:hover { border-color: var(--texto-terciario); }
+
+  /* ─── Confirmacion ─── */
+  .form-exito {
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 1.5rem 0 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .form-confetti {
+    position: absolute; inset: 0;
+    pointer-events: none; z-index: 2;
+  }
+
+  .form-check { position: relative; z-index: 3; }
+
+  .form-check svg { width: 52px; height: 52px; }
+
+  .check-circ {
+    stroke-dasharray: 160; stroke-dashoffset: 160; fill: none;
+  }
+
+  .check-tick {
+    stroke-dasharray: 50; stroke-dashoffset: 50; fill: none;
+  }
+
+  .form-paso.visible .check-circ {
+    animation: dibujar 0.6s ease forwards 0.3s;
+  }
+
+  .form-paso.visible .check-tick {
+    animation: dibujar 0.4s ease forwards 0.8s;
+  }
+
+  @keyframes dibujar { to { stroke-dashoffset: 0; } }
+
+  .form-exito-titulo {
+    font-size: 16px; font-weight: 600; color: var(--texto);
+    position: relative; z-index: 3;
+  }
+
+  .form-exito-sub {
+    font-size: 13px; color: var(--texto-secundario);
+    position: relative; z-index: 3;
+  }
+
+  .form-resumen {
+    width: 100%; max-width: 280px;
+    margin-top: 6px;
+    position: relative; z-index: 3;
+  }
+
+  .form-res-fila {
+    display: flex; justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--borde-sutil);
+    font-size: 12px;
+  }
+
+  .form-res-fila:last-child { border-bottom: none; }
+  .form-res-fila span:first-child { color: var(--texto-terciario); font-weight: 500; }
+  .form-res-fila span:last-child { color: var(--texto); font-weight: 500; }
+
+  /* ─── Navegacion ─── */
+  .form-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 1.25rem; padding-top: 1rem;
+    border-top: 1px solid var(--borde-sutil);
+  }
+
+  .form-btn-atras { font-size: 13px !important; padding: 8px 18px !important; }
+  .form-btn-atras:disabled { opacity: 0.25; pointer-events: none; }
+  .form-btn-sig { font-size: 13px !important; padding: 8px 18px !important; margin-left: auto; }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 480px) {
+    .form-productos { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

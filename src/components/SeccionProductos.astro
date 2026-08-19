@@ -3,7 +3,8 @@
 // SeccionProductos.astro — Grilla de productos con cards
 // Cada producto tiene su pagina individual
 // ============================================================
-import IconoSVG from './ui/IconoSVG.astro';
+import IconoProducto from './IconoProducto.astro';
+import NombreMarca from './NombreMarca.astro';
 
 interface Producto {
   nombre:      string;
@@ -19,13 +20,13 @@ const PRODUCTOS: Producto[] = [
   {
     nombre:      'Flux by Salix',
     descripcion: 'Un solo sistema. Crece desde el primer cliente hasta todo el equipo, sin cambiar de software al escalar.',
-    icono:       'flujo',
+    icono:       'flux',
     disponible:  true,
     url:         '/flux',
     color:       'var(--salix)',
   },
   {
-    nombre:      'Sites by Salix',
+    nombre:      'Sites',
     descripcion: 'Sitios web a medida con tecnologia Salix. Rapidos, con SEO completo y diseño profesional.',
     icono:       'sitio',
     disponible:  true,
@@ -33,7 +34,7 @@ const PRODUCTOS: Producto[] = [
     color:       'var(--salix)',
   },
   {
-    nombre:      'Go by Salix',
+    nombre:      'Go',
     descripcion: 'Delivery de comidas. El cliente elige, pide por WhatsApp, paga con MercadoPago y recibe en su puerta.',
     icono:       'delivery',
     disponible:  false,
@@ -41,7 +42,7 @@ const PRODUCTOS: Producto[] = [
     color:       'var(--salix)',
   },
   {
-    nombre:      'Play by Salix',
+    nombre:      'Play',
     descripcion: 'Gestion de canchas de padel. Turnos fijos, pagos mensuales con links de MercadoPago y control visual.',
     icono:       'cancha',
     disponible:  false,
@@ -49,7 +50,7 @@ const PRODUCTOS: Producto[] = [
     color:       'var(--salix)',
   },
   {
-    nombre:      'Book by Salix',
+    nombre:      'Book',
     descripcion: 'Gestor de citas para equipos. Psicologia, estetica, consultorios. Turnos por WhatsApp e interfaz simple.',
     icono:       'agenda',
     disponible:  false,
@@ -58,7 +59,7 @@ const PRODUCTOS: Producto[] = [
   },
   {
     nombre:      'Integraciones',
-    descripcion: 'Servicio de consultoria e implementacion. Te ayudamos a configurar, integrar y personalizar. Sesiones de 1 hora.',
+    descripcion: 'Te lo dejamos andando. En Flux, Sites o el software que ya uses. Sesiones de 45 minutos.',
     icono:       'link',
     disponible:  true,
     url:         '/integraciones',
@@ -90,14 +91,14 @@ const TEXTO = {
       <a href={producto.url} class={`card-producto aparecer delay-${indice + 1}`}>
         <div class="card-producto-cabecera">
           <div class="icono-contenedor item-producto">
-            <IconoSVG nombre={producto.icono} tamaño={22} grosor={1.5} />
+            <IconoProducto nombre={producto.icono} tamaño={22} />
           </div>
           <span class={`etiqueta-estado ${producto.disponible ? 'disponible' : 'proximamente'}`}>
             <span class="punto-estado"></span>
             {producto.disponible ? 'Disponible' : 'Proximamente'}
           </span>
         </div>
-        <h3 class="card-producto-nombre">{producto.nombre}</h3>
+        <h3 class="card-producto-nombre"><NombreMarca nombre={producto.nombre} /></h3>
         <p class="card-producto-desc">{producto.descripcion}</p>
         <span class="card-producto-link">
           Conocer mas
@@ -156,7 +157,7 @@ const TEXTO = {
   }
 
   .card-producto-nombre {
-    font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em;
+    font-size: 1.15rem; font-weight: 600; letter-spacing: -0.02em;
     color: var(--texto);
   }
 
@@ -167,7 +168,7 @@ const TEXTO = {
 
   .card-producto-link {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.85rem; font-weight: 600;
+    font-size: 0.85rem; font-weight: 500;
     color: var(--texto-terciario);
     transition: color var(--transicion);
     margin-top: auto;

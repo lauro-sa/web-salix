@@ -1,0 +1,111 @@
+---
+// ============================================================
+// terminos.astro — Terminos y condiciones
+// ============================================================
+import Plantilla from '../layouts/Plantilla.astro';
+import Nav       from '../components/Nav.astro';
+import Footer    from '../components/Footer.astro';
+---
+
+<Plantilla
+  titulo="Terminos y Condiciones — Salix"
+  descripcion="Terminos y condiciones de uso de los servicios de Salix. Lee nuestras condiciones antes de usar la plataforma."
+>
+  <Nav />
+  <main>
+    <div class="seccion legal">
+      <span class="etiqueta">Legal</span>
+      <h1 class="titulo-seccion" style="margin-top:1.5rem">Terminos y Condiciones</h1>
+      <p class="subtitulo" style="max-width:100%;margin-top:1rem">Ultima actualizacion: Marzo 2026</p>
+
+      <div class="legal-contenido">
+        <h2>1. Aceptacion de los terminos</h2>
+        <p>Al acceder y utilizar los servicios de Salix, aceptas estos terminos y condiciones en su totalidad. Si no estas de acuerdo con alguna parte de estos terminos, no deberias utilizar nuestros servicios.</p>
+
+        <h2>2. Descripcion del servicio</h2>
+        <p>Salix proporciona una suite de aplicaciones web progresivas (PWA) para la gestion empresarial, incluyendo pero no limitado a: gestion de contactos, facturacion, delivery, turnos online, gestion de canchas y creacion de sitios web.</p>
+
+        <h2>3. Cuentas de usuario</h2>
+        <p>Para acceder a ciertos servicios, deberas crear una cuenta proporcionando informacion precisa y completa. Sos responsable de mantener la confidencialidad de tus credenciales de acceso y de todas las actividades que ocurran bajo tu cuenta.</p>
+
+        <h2>4. Uso aceptable</h2>
+        <p>Te comprometes a utilizar los servicios de Salix unicamente para fines legales y de acuerdo con estos terminos. No debes:</p>
+        <ul>
+          <li>Usar los servicios para actividades ilegales o no autorizadas</li>
+          <li>Intentar acceder a sistemas o datos sin autorizacion</li>
+          <li>Transmitir virus, malware o codigo malicioso</li>
+          <li>Interferir con el funcionamiento normal de los servicios</li>
+        </ul>
+
+        <h2>5. Pagos y facturacion</h2>
+        <p>Los planes de pago se facturan de forma mensual o anual segun el plan elegido. Los precios pueden modificarse con un aviso previo de 30 dias. Los pagos se procesan a traves de MercadoPago y otros procesadores de pago autorizados.</p>
+
+        <h2>6. Propiedad intelectual</h2>
+        <p>Todo el contenido, diseño, codigo y funcionalidades de Salix son propiedad exclusiva de Salix y estan protegidos por las leyes de propiedad intelectual aplicables. No se otorga ningun derecho de propiedad sobre el software.</p>
+
+        <h2>7. Limitacion de responsabilidad</h2>
+        <p>Salix no sera responsable por daños indirectos, incidentales, especiales o consecuentes que resulten del uso o la imposibilidad de uso de los servicios. Nuestra responsabilidad total no excedera el monto pagado por el usuario en los ultimos 12 meses.</p>
+
+        <h2>8. Cancelacion</h2>
+        <p>Podes cancelar tu suscripcion en cualquier momento. La cancelacion sera efectiva al final del periodo de facturacion vigente. No se realizan reembolsos por periodos parciales.</p>
+
+        <h2>9. Modificaciones</h2>
+        <p>Nos reservamos el derecho de modificar estos terminos en cualquier momento. Los cambios seran notificados por email y publicados en esta pagina. El uso continuado de los servicios despues de los cambios constituye aceptacion de los nuevos terminos.</p>
+
+        <h2>10. Ley aplicable</h2>
+        <p>Estos terminos se rigen por las leyes de la Republica Argentina. Cualquier disputa sera sometida a la jurisdiccion de los tribunales ordinarios de la Ciudad Autonoma de Buenos Aires.</p>
+
+        <h2>11. Contacto</h2>
+        <p>Para consultas sobre estos terminos, escribinos a <a href="mailto:hola@salixweb.com">hola@salixweb.com</a>.</p>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Plantilla>
+
+<style>
+  .legal {
+    padding-top: clamp(8rem, 15vw, 12rem);
+  }
+
+  .legal-contenido {
+    margin-top: 3rem;
+    max-width: 720px;
+  }
+
+  .legal-contenido h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--texto);
+  }
+
+  .legal-contenido p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--texto-secundario);
+    margin-bottom: 1rem;
+  }
+
+  .legal-contenido ul {
+    margin: 0.5rem 0 1rem 1.5rem;
+    list-style: disc;
+  }
+
+  .legal-contenido li {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--texto-secundario);
+  }
+
+  .legal-contenido a {
+    color: var(--salix);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .legal-contenido a:hover {
+    opacity: 0.8;
+  }
+</style>

@@ -1,0 +1,447 @@
+---
+// Pagina de Flux en la casa Salix — misma copy e íconos que flux.salixweb.com.
+import LogoFlux from './LogoFlux.astro';
+import IconoSVG from './ui/IconoSVG.astro';
+import IconoModuloFlux from './IconoModuloFlux.astro';
+import FormularioContacto from './FormularioContacto.astro';
+import TarjetaSesiones from './TarjetaSesiones.astro';
+
+const URL_FLUX = 'https://flux.salixweb.com';
+
+const BENEFICIOS = [
+  'WhatsApp Business en coexistencia',
+  'Facturación electrónica ARCA',
+  'En el celular y en la computadora',
+  'Salix IA con control de permisos',
+];
+
+const PROBLEMA = [
+  { num: '01', titulo: 'Información dispersa', desc: 'Clientes en WhatsApp, precios en una planilla, presupuestos en PDF sueltos, visitas en papel. Nadie reconstruye el hilo.' },
+  { num: '02', titulo: 'Las ventas se detienen', desc: 'Un presupuesto sin seguimiento y un mensaje sin responsable. Cada caso que se pierde es un ingreso que no se concreta.' },
+  { num: '03', titulo: 'El trabajo en campo queda fuera del sistema', desc: 'Un CRM de marketing no factura ARCA. Un facturador no arma el recorrido. Flux cubre ambas capas, con el equipo en el celular.' },
+];
+
+const PASOS = [
+  { num: '01', titulo: 'Incorporá lo que ya usás', desc: 'Alta de la empresa, el correo corporativo y —si corresponde— el WhatsApp Business actual. Los contactos dejan de vivir solo en el teléfono.' },
+  { num: '02', titulo: 'Activá únicamente lo necesario', desc: 'El plan habilita. La empresa instala módulos. Un taller no ve nóminas el primer día. Cuando hace falta, se suma.' },
+  { num: '03', titulo: 'Cierre, cobro y visibilidad', desc: 'Presupuesto con aceptación en el celular, factura, visita y fichaje. Inicio muestra la jornada; Métricas, el desempeño del negocio.' },
+];
+
+const DIFERENCIALES = [
+  { icono: 'whatsapp', titulo: 'WhatsApp de la empresa', picada: 'El número permanece en el teléfono. El equipo atiende en Flux.', desc: 'API oficial de Meta, en coexistencia con WhatsApp Business. Historial, asignación y un mismo hilo para todo el equipo.' },
+  { icono: 'presupuestos', titulo: 'Presupuesto con aceptación', picada: 'PDF y enlace. El cliente acepta desde el celular.', desc: 'Plantillas, visita vinculada al cotizar y cobro en cuotas. Deja de ser un archivo suelto en el chat.' },
+  { icono: 'facturacion', titulo: 'Facturación ARCA', picada: 'Conexión directa. Desde el presupuesto completo o un pago puntual.', desc: 'Comprobantes A, B o C, notas de crédito, CAE y PDF con QR. Sin intermediario de certificado.' },
+  { icono: 'visitas', titulo: 'Operación en campo', picada: 'El visitador registra en el celular. La empresa ve el mapa.', desc: 'Planificación de recorridos, aviso de llegada y relevamiento vinculado al presupuesto.' },
+  { icono: 'salix-ia', titulo: 'Salix IA', picada: 'Operá Flux por conversación, con los mismos permisos que en pantalla.', desc: 'En la aplicación o por WhatsApp. El agente que atiende clientes es un producto aparte, sobre el mismo número.' },
+  { icono: 'mi-web', titulo: 'Sitio público en minutos', picada: 'Landing con SEO e imagen para compartir en WhatsApp.', desc: 'Cuatro plantillas, asistente de contenidos e IA. El formulario ingresa como contacto.' },
+];
+
+const ALCANCE = [
+  { ancla: 'piso', eyebrow: 'Base del producto', titulo: 'Incluido en todos los planes', lead: 'La capa con la que se trabaja el primer día: acceso, correo y agenda.' },
+  { ancla: 'ventas', eyebrow: 'Ventas y clientes', titulo: 'Del primer contacto a la aceptación', lead: 'WhatsApp, ficha del cliente, negociación y presupuesto con firma digital.' },
+  { ancla: 'calle', eyebrow: 'Operaciones en campo', titulo: 'El equipo en terreno, visible en el sistema', lead: 'Visitas con mapa, órdenes de trabajo y documentación en el dispositivo.' },
+  { ancla: 'finanzas', eyebrow: 'Facturación y finanzas', titulo: 'Comprobantes, tesorería e indicadores', lead: 'Factura electrónica ARCA, movimiento de fondos y lectura del negocio.' },
+  { ancla: 'equipo', eyebrow: 'Personas', titulo: 'Asistencia, liquidación y accesos', lead: 'Control de jornada, recibos de sueldo y matriz de permisos.' },
+  { ancla: 'automatizar', eyebrow: 'Automatización', titulo: 'IA, flujos y presencia digital', lead: 'Salix opera con los permisos de cada persona. Flujos ante eventos. Sitio web y marketing por correo.' },
+];
+
+const PLANES = [
+  {
+    nombre: 'Básico',
+    descripcion: 'Agendá y vendé tu día a día.',
+    precio: 'US$ 89',
+    periodo: '/mes · 3 usuarios',
+    destacado: false,
+    items: ['Hasta 3 usuarios', 'Contactos, actividades y calendario', 'Oportunidades (embudo comercial)', 'Productos, presupuestos y órdenes', 'Cobranzas por cuotas', 'Correo y mensajes internos', 'App móvil e iOS'],
+    cta: 'Empezar prueba',
+    url: `${URL_FLUX}/landing`,
+  },
+  {
+    nombre: 'Pro',
+    descripcion: 'Vendé, comunicá y facturá.',
+    precio: 'US$ 199',
+    periodo: '/mes · 8 usuarios',
+    destacado: true,
+    badge: 'Más elegido',
+    items: ['Todo lo de Básico', 'Hasta 8 usuarios', 'WhatsApp oficial (coexistencia)', 'Facturación fiscal ARCA', 'Visitas y recorridos con mapa', 'Mi Web, portal y biblioteca', 'Flujos y menú automático de WhatsApp', 'IA con tu propia API'],
+    cta: 'Empezar prueba',
+    url: `${URL_FLUX}/landing`,
+  },
+  {
+    nombre: 'Max',
+    descripcion: 'Operación completa, con IA incluida.',
+    precio: 'US$ 299',
+    periodo: '/mes · 20 usuarios',
+    destacado: false,
+    items: ['Todo lo de Pro', 'Hasta 20 usuarios', 'Asistencias + Kiosco RFID/NFC', 'Nóminas y finanzas', 'Salix IA incluida (la paga Flux)', 'Marketing por correo y analítica web', 'Multi-empresa'],
+    cta: 'Empezar prueba',
+    url: `${URL_FLUX}/landing`,
+  },
+  {
+    nombre: 'A medida',
+    descripcion: 'Sin precio de lista. Todo Max, más lo que tu operación pide.',
+    precio: 'A medida',
+    periodo: 'sin precio de lista',
+    destacado: false,
+    items: [
+      'Todo lo de Max',
+      'Usuarios a solicitud',
+      'Creación de módulos a medida',
+      'Modificaciones del sistema',
+      'Integraciones a medida',
+      'Onboarding dedicado y SLA',
+      'Gerente de cuenta',
+    ],
+    cta: 'Hablar con nosotros',
+    url: '#contacto',
+  },
+];
+---
+
+<section class="flux-hero">
+  <div class="flux-hero-inner">
+    <div class="flux-marca aparecer">
+      <LogoFlux tamaño={28} />
+      <span>Flux</span>
+    </div>
+    <div class="hero-badge aparecer delay-1">
+      <span class="punto-pulso"></span>
+      Un solo sistema
+    </div>
+    <h1 class="flux-titulo aparecer delay-2">
+      Un solo sistema.<br />
+      <span>Sin saltar de aplicación.</span>
+    </h1>
+    <p class="flux-sub aparecer delay-3">Crece desde el primer cliente hasta todo el equipo. Sin cambiar de software al escalar.</p>
+    <div class="flux-ctas aparecer delay-4">
+      <a href={`${URL_FLUX}/landing`} class="boton boton-verde" target="_blank" rel="noopener noreferrer">
+        Probar 30 días gratis
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href={`${URL_FLUX}/funciones`} class="boton boton-secundario" target="_blank" rel="noopener noreferrer">Cómo funciona</a>
+    </div>
+    <p class="flux-nota aparecer delay-5">30 días, sin tarjeta</p>
+  </div>
+</section>
+
+<section class="flux-beneficios" aria-label="Capacidades">
+  <ul>
+    {BENEFICIOS.map((b) => (
+      <li>
+        <IconoSVG nombre="check" tamaño={15} grosor={2.4} />
+        {b}
+      </li>
+    ))}
+  </ul>
+</section>
+
+<section class="seccion">
+  <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+    <span class="etiqueta">El problema</span>
+    <h2 class="titulo-seccion">Hoy la operación está fragmentada entre chats, planillas y memoria.</h2>
+  </div>
+  <div class="grilla-pasos">
+    {PROBLEMA.map((p, i) => (
+      <div class={`paso aparecer delay-${i + 1}`}>
+        <span class="paso-num">{p.num}</span>
+        <h3>{p.titulo}</h3>
+        <p>{p.desc}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+    <span class="etiqueta">Cómo comenzar</span>
+    <h2 class="titulo-seccion">De la cuenta al día a día, sin una migración masiva</h2>
+  </div>
+  <div class="grilla-pasos">
+    {PASOS.map((p, i) => (
+      <div class={`paso aparecer delay-${i + 1}`}>
+        <span class="paso-num">{p.num}</span>
+        <h3>{p.titulo}</h3>
+        <p>{p.desc}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+    <span class="etiqueta">Diferenciales</span>
+    <h2 class="titulo-seccion">Lo que distingue a Flux</h2>
+  </div>
+  <div class="grilla-dif">
+    {DIFERENCIALES.map((f, i) => (
+      <article class={`dif aparecer delay-${(i % 3) + 1}`}>
+        <div class="dif-top">
+          <h3>{f.titulo}</h3>
+          <IconoModuloFlux nombre={f.icono} tamaño={22} />
+        </div>
+        <p class="dif-picada">{f.picada}</p>
+        <p class="dif-desc">{f.desc}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+    <span class="etiqueta">Funciones</span>
+    <h2 class="titulo-seccion">Alcance del sistema</h2>
+    <p class="subtitulo" style="text-align:center">Seis áreas de trabajo. Se activan las que la operación requiere. El detalle de cada módulo está en Funciones.</p>
+  </div>
+  <div class="grilla-alcance">
+    {ALCANCE.map((g, i) => (
+      <a href={`${URL_FLUX}/funciones#${g.ancla}`} class={`card-alcance aparecer delay-${(i % 3) + 1}`} target="_blank" rel="noopener noreferrer">
+        <span class="etiqueta">{g.eyebrow}</span>
+        <h3>{g.titulo}</h3>
+        <p>{g.lead}</p>
+        <span class="alcance-ir">Ver módulos →</span>
+      </a>
+    ))}
+  </div>
+</section>
+
+<div class="fondo-puntos">
+  <div class="panel-interior">
+    <section class="seccion">
+      <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+        <span class="etiqueta">Planes</span>
+        <h2 class="titulo-seccion">Planes para cada tamaño. <span style="color:var(--salix)">30 días de prueba, sin tarjeta.</span></h2>
+        <p class="subtitulo" style="text-align:center">El anual: pagás 10 meses, usás 12. Se cobra en pesos.</p>
+      </div>
+      <div class="grilla-planes">
+        {PLANES.map((plan, i) => (
+          <div class={`card-plan aparecer-escala delay-${i + 1} ${plan.destacado ? 'destacado' : ''}`}>
+            {plan.destacado && <span class="plan-badge">{plan.badge}</span>}
+            <h3>{plan.nombre}</h3>
+            <p class="plan-desc">{plan.descripcion}</p>
+            <div class="plan-precio">
+              <span class="plan-monto">{plan.precio}</span>
+              <span class="plan-periodo">{plan.periodo}</span>
+            </div>
+            <ul>
+              {plan.items.map((item) => (
+                <li>
+                  <IconoSVG nombre="check" tamaño={15} grosor={2.5} clase="plan-check" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a
+              href={plan.url}
+              class={`boton ${plan.destacado ? 'boton-verde' : 'boton-secundario'}`}
+              style="width:100%;text-align:center"
+              target={plan.url.startsWith('http') ? '_blank' : undefined}
+              rel={plan.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+            >
+              {plan.cta}
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="fondo-puntos" id="implementacion">
+  <div class="panel-interior">
+    <section class="seccion">
+      <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
+        <span class="etiqueta">Implementación</span>
+        <h2 class="titulo-seccion">¿Necesitás que te configuremos Flux?</h2>
+        <p class="subtitulo" style="text-align:center">Sesiones de 45 minutos. Primera US$ 70. Cada extra US$ 50. Hasta 10.</p>
+      </div>
+      <TarjetaSesiones
+        marca="Flux"
+        codigo="FLX"
+        titulo="¿Necesitás que te configuremos Flux?"
+        texto="Cada sesión dura 45 minutos. Te ayudamos a cargar datos, WhatsApp, permisos y los módulos que uses. Primera sesión US$ 70. Cada extra US$ 50. Se cobra en pesos al cambio del día — no está en la suscripción."
+        ctaTexto="Pagar en Flux"
+        ctaModo="enlace"
+        ctaHref={`${URL_FLUX}/planes`}
+        nota="El pago se cierra en flux.salixweb.com/planes, con Mercado Pago."
+      />
+    </section>
+  </div>
+</div>
+
+<section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
+  <h2 class="titulo-seccion aparecer">30 días para probar Flux. <span style="color:var(--salix)">Sin tarjeta.</span></h2>
+  <p class="subtitulo aparecer delay-1" style="text-align:center">Si no se adapta a tu operación, cancelás. Los datos se conservan.</p>
+  <div class="aparecer delay-2" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+    <a href={`${URL_FLUX}/landing`} class="boton boton-primario" target="_blank" rel="noopener noreferrer">Crear cuenta</a>
+    <a href="https://wa.me/5491100000000" class="boton boton-secundario" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+  </div>
+</section>
+
+<FormularioContacto productoPreseleccionado="Flux" />
+
+<style>
+  .flux-hero {
+    min-height: 70vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 120px 24px 64px;
+    background: var(--gradiente-hero);
+  }
+  .flux-hero-inner {
+    max-width: 720px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  }
+  .flux-marca {
+    display: flex; align-items: center; gap: 11px;
+    font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--texto);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--borde);
+    color: var(--texto-secundario); font-size: 13px; font-weight: 500;
+    padding: 6px 16px; border-radius: 100px;
+  }
+  .punto-pulso {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--salix);
+  }
+  .flux-titulo {
+    font-size: clamp(2rem, 5vw, 3.15rem);
+    font-weight: 600; line-height: 1.08; letter-spacing: -0.03em; color: var(--texto);
+    max-width: 100%;
+  }
+  .flux-titulo span {
+    display: block;
+    font-size: clamp(1.2rem, 2.8vw, 1.85rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-top: 0.18em;
+    color: color-mix(in srgb, var(--salix) 55%, var(--gris-titulo));
+    white-space: nowrap;
+  }
+  @media (max-width: 520px) {
+    .flux-titulo span { white-space: normal; }
+  }
+  .flux-sub {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: var(--texto-secundario); line-height: 1.7; max-width: 520px;
+  }
+  .flux-ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 0.25rem; }
+  .flux-nota { font-size: 0.82rem; color: var(--texto-terciario); }
+
+  .flux-beneficios {
+    border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde);
+    padding: 1.25rem 24px;
+  }
+  .flux-beneficios ul {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px;
+    list-style: none; padding: 0;
+  }
+  .flux-beneficios li {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.88rem; color: var(--texto-secundario);
+  }
+  .flux-beneficios :global(.icono-svg) { stroke: var(--salix); flex-shrink: 0; }
+
+  .encabezado-seccion {
+    margin-bottom: 3rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
+  }
+
+  .grilla-pasos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 1.5rem;
+    row-gap: 2rem;
+  }
+  .paso {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    align-items: start;
+  }
+  .paso-num {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--salix); display: block; margin-bottom: 0.6rem;
+  }
+  .paso h3 {
+    font-size: 1.05rem; font-weight: 600; margin: 0 0 0.5rem;
+    color: var(--texto); line-height: 1.3;
+  }
+  .paso p { font-size: 0.88rem; color: var(--texto-secundario); line-height: 1.7; margin: 0; }
+
+  .grilla-dif {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 3rem;
+    row-gap: 2.5rem;
+  }
+  .dif {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    align-items: start;
+  }
+  .dif-top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    padding-bottom: 16px; margin-bottom: 16px;
+    border-bottom: 1px solid var(--borde-sutil);
+  }
+  .dif-top h3 { font-size: 1.05rem; font-weight: 600; color: var(--texto); line-height: 1.3; }
+  .dif-top :global(.icono-svg) { stroke: var(--salix); }
+  .dif-picada { font-size: 0.92rem; font-weight: 600; color: var(--texto); line-height: 1.5; margin: 0 0 0.4rem; }
+  .dif-desc { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; margin: 0; }
+
+  .grilla-alcance {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .card-alcance {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 4;
+    background: var(--card); border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    text-decoration: none; color: inherit;
+    align-items: start;
+    row-gap: 0.6rem;
+    transition: border-color var(--transicion), transform var(--transicion);
+  }
+  .card-alcance:hover { border-color: var(--salix-borde); transform: translateY(-2px); }
+  .card-alcance h3 { font-size: 1.05rem; font-weight: 600; }
+  .card-alcance p { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; margin: 0; }
+  .alcance-ir { font-size: 0.82rem; color: var(--salix); font-weight: 500; }
+
+  .grilla-planes {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; align-items: start;
+  }
+  .card-plan {
+    background: var(--card); border: 1px solid var(--borde);
+    border-radius: var(--radio-card); padding: 1.5rem;
+    display: flex; flex-direction: column; gap: 0.85rem; position: relative;
+  }
+  .card-plan.destacado { border-color: var(--salix); }
+  .plan-badge {
+    position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+    background: var(--salix); color: #fff; font-size: 0.7rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 100px; white-space: nowrap;
+  }
+  .card-plan h3 { font-size: 1.1rem; font-weight: 600; }
+  .plan-desc { font-size: 0.82rem; color: var(--texto-secundario); }
+  .plan-precio { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .plan-monto { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; }
+  .plan-periodo { font-size: 0.8rem; color: var(--texto-terciario); }
+  .card-plan ul { list-style: none; padding: 0; margin: 0 0 auto; display: flex; flex-direction: column; gap: 8px; }
+  .card-plan li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.82rem; color: var(--texto-secundario); }
+  .card-plan :global(.plan-check) { stroke: var(--salix) !important; flex-shrink: 0; margin-top: 2px; }
+
+  @media (max-width: 1024px) {
+    .grilla-pasos, .grilla-dif, .grilla-alcance { grid-template-columns: 1fr 1fr; }
+    .grilla-planes { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .grilla-pasos, .grilla-dif, .grilla-alcance, .grilla-planes { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,25 @@
+---
+// Parte "by Salix" más chica y suave que el nombre del producto.
+interface Props {
+  nombre: string;
+}
+
+const { nombre } = Astro.props;
+const SUFIJO = ' by Salix';
+const corte = nombre.endsWith(SUFIJO) ? nombre.length - SUFIJO.length : -1;
+---
+
+{corte >= 0 ? (
+  <>{nombre.slice(0, corte)}<span class="marca-by"> by Salix</span></>
+) : (
+  nombre
+)}
+
+<style>
+  .marca-by {
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: var(--texto-terciario);
+  }
+</style>

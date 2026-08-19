@@ -8,22 +8,28 @@ interface Props {
   titulo:      string;
   descripcion: string;
   imagen?:     string;
+  keywords?:   string;
 }
 
 const {
   titulo,
   descripcion,
-  imagen = '/og-image.jpg',
+  imagen = '/og-image.svg',
+  keywords = 'CRM Argentina, software gestion, delivery, turnos online, canchas padel, PWA',
 } = Astro.props;
 
 const urlCanonica = Astro.url.href;
+const imagenAbsoluta = new URL(imagen, Astro.site).href;
 const schemaOrg = JSON.stringify({
   "@context":    "https://schema.org",
   "@type":       "Organization",
   "name":        "Salix",
   "url":         "https://salixweb.com",
+  "logo":        "https://salixweb.com/og-image.svg",
   "description": "Suite de productos de software para empresas argentinas",
-  "address": { "@type": "PostalAddress", "addressCountry": "AR" },
+  "address":     { "@type": "PostalAddress", "addressLocality": "Buenos Aires", "addressCountry": "AR" },
+  "contactPoint": { "@type": "ContactPoint", "email": "hola@salixweb.com", "contactType": "customer service", "availableLanguage": "Spanish" },
+  "sameAs":      []
 });
 ---
 
@@ -31,31 +37,57 @@ const schemaOrg = JSON.stringify({
 <html lang="es" data-tema="claro">
 <head>
   <meta charset="UTF-8" />
+  <script is:inline>
+    (function(){
+      var d=document.documentElement;
+      function aplicar(){
+        var p=localStorage.getItem('salix-tema')||'sistema';
+        var t=p==='sistema'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'oscuro':'claro'):p;
+        d.setAttribute('data-tema',t);
+        d.setAttribute('data-pref',p);
+        d.style.colorScheme=t==='oscuro'?'dark':'light';
+      }
+      aplicar();
+      window.addEventListener('pageshow',aplicar);
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fafafa" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
   <!-- SEO Principal -->
   <title>{titulo}</title>
   <meta name="description"  content={descripcion} />
-  <meta name="keywords"     content="CRM Argentina, software gestion, delivery, turnos online, canchas padel, PWA" />
+  <meta name="keywords"     content={keywords} />
   <meta name="author"       content="Salix" />
   <meta name="robots"       content="index, follow" />
   <link rel="canonical"     href={urlCanonica} />
 
   <!-- Open Graph -->
-  <meta property="og:type"        content="website" />
-  <meta property="og:url"         content={urlCanonica} />
-  <meta property="og:title"       content={titulo} />
-  <meta property="og:description" content={descripcion} />
-  <meta property="og:image"       content={imagen} />
-  <meta property="og:locale"      content="es_AR" />
-  <meta property="og:site_name"   content="Salix" />
+  <meta property="og:type"         content="website" />
+  <meta property="og:url"          content={urlCanonica} />
+  <meta property="og:title"        content={titulo} />
+  <meta property="og:description"  content={descripcion} />
+  <meta property="og:image"        content={imagenAbsoluta} />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type"   content="image/svg+xml" />
+  <meta property="og:locale"       content="es_AR" />
+  <meta property="og:site_name"    content="Salix" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:site"        content="@salixweb" />
+  <meta name="twitter:creator"     content="@salixweb" />
   <meta name="twitter:title"       content={titulo} />
   <meta name="twitter:description" content={descripcion} />
-  <meta name="twitter:image"       content={imagen} />
+  <meta name="twitter:image"       content={imagenAbsoluta} />
+  <meta name="twitter:image:alt"   content={titulo} />
 
   <!-- Schema.org -->
   <script type="application/ld+json" set:html={schemaOrg}></script>
@@ -68,7 +100,7 @@ const schemaOrg = JSON.stringify({
 
 <body>
   <!-- Barra de progreso de scroll -->
-  <div id="barra-progreso" style="position:fixed;top:0;left:0;height:2px;width:0;background:var(--salix);z-index:300;border-radius:0 1px 1px 0;transition:width 0.1s linear"></div>
+  <div id="barra-progreso" style="position:fixed;top:0;left:0;height:2px;width:0;background:var(--salix);z-index:9999;border-radius:0 1px 1px 0;transition:width 0.1s linear"></div>
 
   <!-- Contenido de la pagina -->
   <slot />
@@ -88,9 +120,10 @@ const schemaOrg = JSON.stringify({
     iniciarSmoothScroll,
     iniciarAnimacionIconos,
     iniciarTypewriter,
-    iniciarApariciones
   } from '../scripts/utilidades.js';
   import { iniciarParticulas } from '../scripts/particulas.js';
+  import { iniciarAnimacionesScroll } from '../scripts/animaciones-scroll.js';
+  import '../firma-stian/firma-stian.js';
 
   // Inicializar todo cuando el DOM este listo
   document.addEventListener('DOMContentLoaded', () => {
@@ -98,44 +131,19 @@ const schemaOrg = JSON.stringify({
     iniciarMenuMobile('boton-hamburguesa', 'menu-mobile');
     iniciarBarraProgreso('barra-progreso');
     iniciarNavScroll('nav-principal');
-    iniciarSmoothScroll();
     iniciarAnimacionIconos('.item-producto, .item-feature, .item-precio');
     iniciarTypewriter();
-    iniciarApariciones();
 
-    // Inicializar grids magneticos en cada seccion que los tenga
+    // GSAP animaciones de scroll
+    iniciarAnimacionesScroll();
+
+    // Smooth scroll para links de ancla
+    iniciarSmoothScroll();
+
+    // Inicializar grids magneticos
     document.querySelectorAll('.grid-magnetico-canvas').forEach((c) => {
       iniciarParticulas(c.id);
     });
-  });
 
-  // Animacion de entrada del hero
-  window.addEventListener('load', () => {
-    const estiloAnim = document.createElement('style');
-    estiloAnim.textContent = `
-      @keyframes subirLinea {
-        from { opacity: 0; transform: translateY(100%); }
-        to   { opacity: 1; transform: none; }
-      }
-      .linea-titulo { opacity: 0; }
-    `;
-    document.head.appendChild(estiloAnim);
-
-    const badge = document.querySelector('.hero-badge');
-    if (badge) {
-      badge.style.transition = 'opacity 0.6s ease';
-      badge.style.opacity = '1';
-    }
-
-    document.querySelectorAll('.linea-titulo').forEach((el, i) => {
-      el.style.animation = `subirLinea 0.9s ${0.15 + i * 0.12}s cubic-bezier(0.16,1,0.3,1) forwards`;
-    });
-
-    setTimeout(() => {
-      const sub  = document.querySelector('.hero-subtitulo');
-      const btns = document.querySelector('.hero-botones');
-      if (sub)  { sub.style.transition  = 'opacity 0.8s ease'; sub.style.opacity  = '1'; }
-      if (btns) { btns.style.transition = 'opacity 0.8s ease 0.1s'; btns.style.opacity = '1'; }
-    }, 400);
   });
 </script>

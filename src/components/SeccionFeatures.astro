@@ -3,7 +3,6 @@
 // SeccionFeatures.astro — Grilla "Por que Salix" (6 items)
 // ============================================================
 import IconoSVG from './ui/IconoSVG.astro';
-import GridMagnetico from './ui/GridMagnetico.astro';
 
 interface Feature {
   titulo:      string;
@@ -27,31 +26,27 @@ const TEXTO = {
 };
 ---
 
-<GridMagnetico id="grid-features" clase="fondo-puntos">
-  <div class="panel-interior">
-    <section class="seccion" id="porque">
+<section class="seccion" id="porque">
 
-      <div class="encabezado-seccion aparecer">
-        <span class="etiqueta">{TEXTO.etiqueta}</span>
-        <h2 class="titulo-seccion">{TEXTO.titulo}</h2>
-        <p class="typewriter subtitulo" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
-      </div>
-
-      <div class="grilla-features" role="list">
-        {FEATURES.map((feat, indice) => (
-          <div class={`item-feature aparecer delay-${indice + 1}`} role="listitem">
-            <div class="icono-contenedor feat-icono">
-              <IconoSVG nombre={feat.icono} tamaño={22} grosor={1.5} />
-            </div>
-            <h3 class="feat-titulo">{feat.titulo}</h3>
-            <p class="feat-texto">{feat.descripcion}</p>
-          </div>
-        ))}
-      </div>
-
-    </section>
+  <div class="encabezado-seccion aparecer">
+    <span class="etiqueta">{TEXTO.etiqueta}</span>
+    <h2 class="titulo-seccion">{TEXTO.titulo}</h2>
+    <p class="typewriter subtitulo" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
   </div>
-</GridMagnetico>
+
+  <div class="grilla-features" role="list">
+    {FEATURES.map((feat, indice) => (
+      <div class={`item-feature aparecer delay-${indice + 1}`} role="listitem">
+        <div class="icono-contenedor feat-icono">
+          <IconoSVG nombre={feat.icono} tamaño={22} grosor={1.5} />
+        </div>
+        <h3 class="feat-titulo">{feat.titulo}</h3>
+        <p class="feat-texto">{feat.descripcion}</p>
+      </div>
+    ))}
+  </div>
+
+</section>
 
 <style>
   .encabezado-seccion {
@@ -62,19 +57,23 @@ const TEXTO = {
   .grilla-features {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--borde);
-    border-radius: var(--radio-card);
-    overflow: hidden;
-    border: 1px solid var(--borde);
+    gap: 0;
   }
 
   .item-feature {
-    background: var(--fondo);
     padding: clamp(1.5rem, 3vw, 2rem);
     display: flex; flex-direction: column; gap: 0.75rem;
     transition: background var(--transicion);
+    border: 1px solid var(--borde);
+    margin-top: -1px;
+    margin-left: -1px;
   }
+
+  /* Bordes redondeados en las esquinas */
+  .item-feature:first-child { border-top-left-radius: var(--radio-card); }
+  .item-feature:nth-child(3) { border-top-right-radius: var(--radio-card); }
+  .item-feature:nth-child(4) { border-bottom-left-radius: var(--radio-card); }
+  .item-feature:last-child { border-bottom-right-radius: var(--radio-card); }
 
   .item-feature:hover { background: var(--card-hover); }
   .item-feature:hover .feat-icono { transform: scale(1.1) rotate(-5deg); }
@@ -84,7 +83,7 @@ const TEXTO = {
   }
 
   .feat-titulo {
-    font-size: 1rem; font-weight: 700; color: var(--texto);
+    font-size: 1rem; font-weight: 600; color: var(--texto);
     letter-spacing: -.02em; line-height: 1.3;
   }
 

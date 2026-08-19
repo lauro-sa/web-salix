@@ -4,6 +4,9 @@
 // Soporta multiples planes de precio o sin precio (consultar).
 // ============================================================
 import IconoSVG from './ui/IconoSVG.astro';
+import IconoProducto from './IconoProducto.astro';
+import FormularioContacto from './FormularioContacto.astro';
+import NombreMarca from './NombreMarca.astro';
 
 interface Feature {
   titulo:      string;
@@ -40,6 +43,7 @@ interface Props {
   textoSinPrecio?: string;
   ctaPrincipal?: Cta;
   ctaSecundario?: Cta;
+  planesTitulo?: string;
   planesLead?: string;
   cierreTitulo?: string;
   cierreSub?: string;
@@ -59,6 +63,7 @@ const {
   textoSinPrecio = 'Cada proyecto es unico. Contanos tu idea y te armamos un presupuesto a medida.',
   ctaPrincipal,
   ctaSecundario,
+  planesTitulo = 'Elegi tu plan.',
   planesLead = 'Sin costos ocultos. Cancela cuando quieras.',
   cierreTitulo = 'Listo para probarlo?',
   cierreSub = 'Contactanos y te ayudamos a arrancar. Sin compromiso.',
@@ -73,9 +78,32 @@ const secundario = ctaSecundario ?? {
   texto: 'Ver todos los productos',
   href: '/#productos',
 };
-
 const esExterno = (href: string) => href.startsWith('http');
+
+// Schema.org para el producto
+const productoSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": nombre,
+  "description": descripcion,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "url": Astro.url.href,
+  "author": { "@type": "Organization", "name": "Salix", "url": "https://salixweb.com" },
+  "offers": planes && planes.length > 0
+    ? planes.filter(p => p.precio.includes('$')).map(p => ({
+        "@type": "Offer",
+        "name": p.nombre,
+        "price": p.precio.replace(/[^0-9.]/g, ''),
+        "priceCurrency": "USD",
+        "availability": disponible ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+      }))
+    : undefined,
+};
 ---
+
+<!-- Schema.org del producto -->
+<script is:inline type="application/ld+json" set:html={JSON.stringify(productoSchema)} />
 
 <!-- Hero del producto -->
 <section class="producto-hero">
@@ -89,11 +117,11 @@ const esExterno = (href: string) => href.startsWith('http');
 
     <div class="producto-icono-grande aparecer delay-1">
       <div class="icono-contenedor icono-grande item-producto">
-        <IconoSVG nombre={icono} tamaño={36} grosor={1.5} />
+        <IconoProducto nombre={icono} tamaño={36} />
       </div>
     </div>
 
-    <h1 class="titulo-hero aparecer delay-2">{nombre}</h1>
+    <h1 class="titulo-producto aparecer delay-2"><NombreMarca nombre={nombre} /></h1>
     <p class="producto-subtitulo aparecer delay-3">{subtitulo}</p>
     <p class="producto-desc aparecer delay-4">{descripcion}</p>
 
@@ -146,7 +174,7 @@ const esExterno = (href: string) => href.startsWith('http');
       <section class="seccion">
         <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
           <span class="etiqueta">Precios</span>
-          <h2 class="titulo-seccion">Elegi tu plan.</h2>
+          <h2 class="titulo-seccion">{planesTitulo}</h2>
           <p class="subtitulo" style="text-align:center">{planesLead}</p>
         </div>
 
@@ -223,11 +251,22 @@ const esExterno = (href: string) => href.startsWith('http');
         {cierreCta.texto}
       </a>
     ) : (
-      <a href="mailto:hola@salixweb.com" class="boton boton-primario">Escribirnos</a>
+      <button class="boton boton-primario abrir-form-contacto">
+        Escribirnos
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </button>
     )}
     <a href="https://wa.me/5491100000000" class="boton boton-secundario" target="_blank" rel="noopener noreferrer">WhatsApp</a>
   </div>
 </section>
+
+<!-- Modal de formulario -->
+<div class="form-modal" id="form-modal">
+  <div class="form-modal-overlay"></div>
+  <div class="form-modal-body">
+    <FormularioContacto productoPreseleccionado={nombre} />
+  </div>
+</div>
 
 <style>
   /* ─── Hero ─── */
@@ -245,20 +284,33 @@ const esExterno = (href: string) => href.startsWith('http');
     display: flex; flex-direction: column; align-items: center; gap: 1rem;
   }
 
-  .icono-grande { width: 72px; height: 72px; border-radius: 18px; }
+  .titulo-producto {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: var(--texto);
+  }
+
+  .icono-grande { width: 60px; height: 60px; border-radius: 16px; }
 
   .producto-subtitulo {
-    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    font-size: clamp(0.95rem, 1.6vw, 1.1rem);
     color: var(--salix); font-weight: 600; letter-spacing: -0.01em;
   }
 
   .producto-desc {
-    font-size: clamp(1rem, 1.4vw, 1.1rem);
-    color: var(--texto-secundario); line-height: 1.7; max-width: 520px;
+    font-size: clamp(0.9rem, 1.3vw, 1rem);
+    color: var(--texto-secundario); line-height: 1.7; max-width: 480px;
   }
 
   .producto-botones {
     display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem;
+  }
+
+  /* Titulos de seccion mas chicos en paginas de producto */
+  :global(.titulo-seccion) {
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
   }
 
   /* ─── Features ─── */
@@ -286,8 +338,8 @@ const esExterno = (href: string) => href.startsWith('http');
 
   .card-feature:hover .icono-contenedor { transform: scale(1.1) rotate(-5deg); }
 
-  .feat-nombre { font-size: 1rem; font-weight: 700; color: var(--texto); }
-  .feat-desc { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; }
+  .feat-nombre { font-size: 0.92rem; font-weight: 600; color: var(--texto); }
+  .feat-desc { font-size: 0.82rem; color: var(--texto-secundario); line-height: 1.7; }
 
   /* ─── Planes de precio ─── */
   .grilla-planes {
@@ -328,12 +380,12 @@ const esExterno = (href: string) => href.startsWith('http');
     padding: 3px 14px; border-radius: var(--radio-pill);
   }
 
-  .plan-nombre { font-size: 1.1rem; font-weight: 700; color: var(--texto); }
+  .plan-nombre { font-size: 1rem; font-weight: 600; color: var(--texto); }
 
   .plan-precio-bloque { display: flex; align-items: baseline; gap: 0.4rem; }
 
   .plan-monto {
-    font-size: clamp(1.8rem, 3vw, 2.2rem); font-weight: 700;
+    font-size: clamp(1.5rem, 2.5vw, 1.8rem); font-weight: 600;
     color: var(--texto); letter-spacing: -0.03em;
   }
 
@@ -363,4 +415,64 @@ const esExterno = (href: string) => href.startsWith('http');
     .grilla-features-producto { grid-template-columns: 1fr; }
     .grilla-planes-4 { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
   }
+
+  /* ─── Modal formulario ─── */
+  .form-modal {
+    position: fixed; inset: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+    padding: 1rem;
+  }
+
+  .form-modal.abierto {
+    opacity: 1; pointer-events: all;
+  }
+
+  .form-modal-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .form-modal-body {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .form-modal.abierto .form-modal-body {
+    transform: translateY(0) scale(1);
+  }
+
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('form-modal');
+    if (!modal) return;
+
+    const overlay = modal.querySelector('.form-modal-overlay');
+    const botones = document.querySelectorAll('.abrir-form-contacto');
+
+    function abrir() {
+      modal.classList.add('abierto');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModal() {
+      modal.classList.remove('abierto');
+      document.body.style.overflow = '';
+    }
+
+    botones.forEach(b => b.addEventListener('click', abrir));
+    overlay.addEventListener('click', cerrarModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('abierto')) cerrarModal();
+    });
+  });
+</script>
