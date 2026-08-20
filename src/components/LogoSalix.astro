@@ -1,5 +1,11 @@
 ---
-// Isotipo Salix (Logo-salix-web-2.svg). Un solo archivo: public/logo-salix.svg
+// Isotipo Salix. Un solo archivo: public/logo-salix.svg
+//
+// ⚠️ La `?v=` NO es decorativa. Los archivos de public/ se sirven con
+// `cache-control: max-age=604800` (7 dias) y el CDN de Hostinger los cachea en el
+// borde, asi que reemplazar el .svg NO cambia lo que ve la gente: sigue viendo el
+// viejo hasta que expire. Paso el 2026-08-20, con el logo cruzado en produccion.
+// Si algun dia se cambia el dibujo, SUBIR ESTE NUMERO en el mismo commit.
 // El de barras queda en public/logo-salix-barras.svg por si se vuelve.
 // Medidas alineadas a flux.salixweb.com: nav 26 · hero 28.
 interface Props {
@@ -11,7 +17,7 @@ const { clase = '', tamaño = 26 } = Astro.props;
 ---
 
 <img
-  src="/logo-salix.svg"
+  src="/logo-salix.svg?v=2"
   class:list={['logo-salix', clase]}
   alt=""
   style={`height:${tamaño}px;width:auto`}
