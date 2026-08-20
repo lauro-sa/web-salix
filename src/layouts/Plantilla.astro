@@ -14,7 +14,9 @@ interface Props {
 const {
   titulo,
   descripcion,
-  imagen = '/og-image.svg',
+  // PNG, no SVG: ninguna plataforma renderiza SVG en la vista previa de un link
+  // (WhatsApp, Facebook, Twitter/X, LinkedIn). Lo genera `npm run og`.
+  imagen = '/og-image.png',
   keywords = 'CRM Argentina, software gestion, delivery, turnos online, canchas padel, PWA',
 } = Astro.props;
 
@@ -25,7 +27,7 @@ const schemaOrg = JSON.stringify({
   "@type":       "Organization",
   "name":        "Salix",
   "url":         "https://salixweb.com",
-  "logo":        "https://salixweb.com/og-image.svg",
+  "logo":        "https://salixweb.com/og-image.png",
   "description": "Suite de productos de software para empresas argentinas",
   "address":     { "@type": "PostalAddress", "addressLocality": "Buenos Aires", "addressCountry": "AR" },
   "contactPoint": { "@type": "ContactPoint", "email": "hola@salixweb.com", "contactType": "customer service", "availableLanguage": "Spanish" },
@@ -76,7 +78,7 @@ const schemaOrg = JSON.stringify({
   <meta property="og:image"        content={imagenAbsoluta} />
   <meta property="og:image:width"  content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:type"   content="image/svg+xml" />
+  <meta property="og:image:type"   content="image/png" />
   <meta property="og:locale"       content="es_AR" />
   <meta property="og:site_name"    content="Salix" />
 
