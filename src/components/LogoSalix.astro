@@ -1,11 +1,13 @@
 ---
+import { VERSION_LOGO } from '../marca-version';
 // Isotipo Salix. Un solo archivo: public/logo-salix.svg
 //
-// ⚠️ La `?v=` NO es decorativa. Los archivos de public/ se sirven con
-// `cache-control: max-age=604800` (7 dias) y el CDN de Hostinger los cachea en el
-// borde, asi que reemplazar el .svg NO cambia lo que ve la gente: sigue viendo el
-// viejo hasta que expire. Paso el 2026-08-20, con el logo cruzado en produccion.
-// Si algun dia se cambia el dibujo, SUBIR ESTE NUMERO en el mismo commit.
+// ⚠️ La `?v=` NO es decorativa, y ya no se escribe a mano. Los archivos de public/
+// se sirven con `cache-control: max-age=604800` (7 dias) y el CDN de Hostinger los
+// cachea en el borde: reemplazar el .svg NO cambia lo que ve la gente hasta que
+// expire. Paso el 2026-08-19, con el logo cruzado en produccion.
+// `npm run marca` calcula la huella del archivo y la deja en marca-version.ts, asi
+// que cambia sola cuando cambia el dibujo. Nadie tiene que acordarse de nada.
 // El de barras queda en public/logo-salix-barras.svg por si se vuelve.
 // Medidas alineadas a flux.salixweb.com: nav 26 · hero 28.
 interface Props {
@@ -17,7 +19,7 @@ const { clase = '', tamaño = 26 } = Astro.props;
 ---
 
 <img
-  src="/logo-salix.svg?v=2"
+  src={`/logo-salix.svg?v=${VERSION_LOGO}`}
   class:list={['logo-salix', clase]}
   alt=""
   style={`height:${tamaño}px;width:auto`}

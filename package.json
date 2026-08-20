@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "og": "node scripts/og-image.mjs"
+    "marca": "node scripts/marca.mjs",
+    "publicar": "bash scripts/publicar.sh"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.1.6",

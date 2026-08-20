@@ -4,6 +4,31 @@ Proyecto Astro para la landing page de **salixweb.com**.
 
 La puerta para cualquier chat/IA es [`AGENTS.md`](AGENTS.md) (dónde está el repo, cómo se despliega, handoff de la tanda 2026-08-19).
 
+## Cambiar el logo
+
+El dibujo NO se edita acá. La fuente de la marca Salix es el repo de Flux:
+
+```
+Flux ·  src/componentes/marca/isotipo-salix.svg   ← reemplazás este archivo
+Flux ·  npm run marca                             ← escribe public/logo-salix.svg acá
+acá  ·  npm run publicar                          ← versión + imagen de compartir + build + servidor
+```
+
+`npm run publicar` hace todo lo que hay que acordarse:
+
+- calcula la huella del logo y la cuelga de la URL (`?v=`). ⚠️ Sin eso el CDN de
+  Hostinger sigue sirviendo el logo viejo **hasta 7 días** — `max-age=604800`—, así
+  que cambiás el archivo, subís el sitio, y no cambia nada. Pasó el 2026-08-19.
+- regenera `public/og-image.png`, la vista previa al compartir (con el mismo isotipo).
+  Tiene que ser PNG: ninguna plataforma renderiza SVG en la tarjeta de un link.
+- construye, **respalda lo que está publicado** en `~/respaldos-salixweb/` y sincroniza.
+
+⚠️ **Este sitio no tiene deploy automático.** Vive en Hostinger y se sube por
+SSH/rsync: un push al repositorio no cambia nada de lo que ve la gente.
+
+El destino sale de `SALIXWEB_SSH` (default: el alias `hostinger-herreelec` del
+`~/.ssh/config`) y `SALIXWEB_RUTA`. No hay nada del servidor escrito en el repo.
+
 ## Estructura
 
 ```
