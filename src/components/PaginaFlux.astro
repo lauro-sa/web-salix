@@ -50,6 +50,8 @@ const PLANES = [
     nombre: 'Básico',
     descripcion: 'Agendá y vendé tu día a día.',
     precio: 'US$ 89',
+    precioAntes: 'US$ 149',
+    promo: 'Precio de lanzamiento',
     periodo: '/mes · 1 usuario',
     destacado: false,
     items: ['1 usuario', 'Contactos, actividades y calendario', 'Oportunidades (embudo comercial)', 'Productos, presupuestos y órdenes de trabajo', 'Cobranzas por cuotas y firma digital', 'Correo y mensajes internos', 'App web e iOS'],
@@ -59,7 +61,7 @@ const PLANES = [
   {
     nombre: 'Pro',
     descripcion: 'Vendé, facturá y atendé por todos los canales.',
-    precio: 'US$ 149',
+    precio: 'US$ 199',
     periodo: '/mes · 3 usuarios',
     destacado: true,
     badge: 'Más elegido',
@@ -70,7 +72,7 @@ const PLANES = [
   {
     nombre: 'Max',
     descripcion: 'Operación completa, con IA incluida.',
-    precio: 'US$ 199',
+    precio: 'US$ 299',
     periodo: '/mes · 8 usuarios',
     destacado: false,
     items: ['Todo lo de Pro', 'Hasta 8 usuarios', 'Asistencias + Kiosco RFID/NFC', 'Nóminas con recibos y contratos', 'Salix IA incluida (la paga Flux)', 'Marketing y analítica web', 'Multi-empresa'],
@@ -219,9 +221,11 @@ const PLANES = [
             <h3>{plan.nombre}</h3>
             <p class="plan-desc">{plan.descripcion}</p>
             <div class="plan-precio">
+              {plan.precioAntes && <span class="plan-antes">{plan.precioAntes}</span>}
               <span class="plan-monto">{plan.precio}</span>
               <span class="plan-periodo">{plan.periodo}</span>
             </div>
+            {plan.promo && <span class="plan-promo">{plan.promo}</span>}
             <ul>
               {plan.items.map((item) => (
                 <li>
@@ -433,6 +437,8 @@ const PLANES = [
   .plan-precio { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
   .plan-monto { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; }
   .plan-periodo { font-size: 0.8rem; color: var(--texto-terciario); }
+  .plan-antes { font-size: 1rem; font-weight: 600; color: var(--texto-terciario); text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: 0.75; }
+  .plan-promo { display: inline-block; align-self: flex-start; margin: -6px 0 2px; padding: 2px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; color: var(--salix); background: color-mix(in srgb, var(--salix) 12%, transparent); border: 1px solid color-mix(in srgb, var(--salix) 24%, transparent); }
   .card-plan ul { list-style: none; padding: 0; margin: 0 0 auto; display: flex; flex-direction: column; gap: 8px; }
   .card-plan li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.82rem; color: var(--texto-secundario); }
   .card-plan :global(.plan-check) { stroke: var(--salix) !important; flex-shrink: 0; margin-top: 2px; }
