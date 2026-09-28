@@ -5,80 +5,14 @@
 // ============================================================
 import IconoProducto from './IconoProducto.astro';
 import NombreMarca from './NombreMarca.astro';
+import { PRODUCTOS } from '../productos';
 
-interface Producto {
-  nombre:      string;
-  descripcion: string;
-  icono:       string;
-  disponible:  boolean;
-  url:         string;
-  color:       string;
-}
-
-// Lista de productos — EDITAR
-const PRODUCTOS: Producto[] = [
-  {
-    nombre:      'Flux by Salix',
-    descripcion: 'Un solo sistema. Crece desde el primer cliente hasta todo el equipo, sin cambiar de software al escalar.',
-    icono:       'flux',
-    disponible:  true,
-    url:         '/flux',
-    color:       'var(--salix)',
-  },
-  {
-    nombre:      'Menú by Salix',
-    descripcion: 'La carta digital de tu local, con un QR que no cambia nunca. Cambiás precios, platos y fotos cuando quieras.',
-    icono:       'menu',
-    disponible:  true,
-    url:         'https://menu.salixweb.com',
-    color:       'var(--salix)',
-  },
-  {
-    nombre:      'Sites',
-    descripcion: 'Sitios web a medida con tecnologia Salix. Rapidos, con SEO completo y diseño profesional.',
-    icono:       'sitio',
-    disponible:  true,
-    url:         '/sites',
-    color:       'var(--salix)',
-  },
-  {
-    nombre:      'Go',
-    descripcion: 'Delivery de comidas. El cliente elige, pide por WhatsApp, paga con MercadoPago y recibe en su puerta.',
-    icono:       'delivery',
-    disponible:  false,
-    url:         '/go',
-    color:       'var(--salix)',
-  },
-  {
-    nombre:      'Play',
-    descripcion: 'Gestion de canchas de padel. Turnos fijos, pagos mensuales con links de MercadoPago y control visual.',
-    icono:       'cancha',
-    disponible:  false,
-    url:         '/play',
-    color:       'var(--salix)',
-  },
-  {
-    nombre:      'Book',
-    descripcion: 'Gestor de citas para equipos. Psicologia, estetica, consultorios. Turnos por WhatsApp e interfaz simple.',
-    icono:       'agenda',
-    disponible:  false,
-    url:         '/book',
-    color:       'var(--salix)',
-  },
-  {
-    nombre:      'Integraciones',
-    descripcion: 'Te lo dejamos andando. En Flux, Sites o el software que ya uses. Sesiones de 45 minutos.',
-    icono:       'link',
-    disponible:  true,
-    url:         '/integraciones',
-    color:       'var(--salix)',
-  },
-];
+// Los productos salen de src/productos.ts, la misma lista que usa el formulario de contacto.
 
 const TEXTO = {
   etiqueta:  'Productos y servicios',
   titulo:    'Una suite completa.',
-  subtitulo: 'Cada producto es una PWA independiente, pensada para resolver un problema especifico. Todas conectadas, todas con WhatsApp y MercadoPago.',
+  subtitulo: 'Cada producto es una PWA independiente, pensada para resolver un problema específico. Todas conectadas, todas con WhatsApp y MercadoPago.',
 };
 ---
 
@@ -103,13 +37,13 @@ const TEXTO = {
           </div>
           <span class={`etiqueta-estado ${producto.disponible ? 'disponible' : 'proximamente'}`}>
             <span class="punto-estado"></span>
-            {producto.disponible ? 'Disponible' : 'Proximamente'}
+            {producto.disponible ? 'Disponible' : 'Próximamente'}
           </span>
         </div>
         <h3 class="card-producto-nombre"><NombreMarca nombre={producto.nombre} /></h3>
         <p class="card-producto-desc">{producto.descripcion}</p>
         <span class="card-producto-link">
-          Conocer mas
+          Conocer más
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </span>
       </a>

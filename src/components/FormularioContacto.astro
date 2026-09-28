@@ -1,19 +1,33 @@
 ---
 // ============================================================
-// FormularioContacto.astro — Formulario de contacto por pasos
-// Paso 1: Elegir producto (se salta si viene productoPreseleccionado)
-// Paso 2: Datos de contacto
-// Paso 3: Mensaje
-// Paso 4: Confirmacion con celebracion
+// FormularioContacto.astro — el formulario de contacto, por pasos.
+//
+//   1 · Qué te interesa   (se saltea si la página ya lo sabe: productoPreseleccionado)
+//   2 · Cómo te contactamos
+//   3 · El mensaje        (la ayuda cambia según el producto elegido)
+//   4 · Listo             (solo si el servidor confirmó el envío)
+//
+// Envía a /contacto.php (public/contacto.php), que lo manda por correo a hola@salixweb.com.
+// Si el envío falla, el formulario lo dice y muestra el correo: nunca da por enviado algo
+// que no salió.
+//
+// Los productos salen de src/productos.ts, la misma lista que la grilla de Productos.
 // ============================================================
+import IconoProducto from './IconoProducto.astro';
+import IconoSVG from './ui/IconoSVG.astro';
 import NombreMarca from './NombreMarca.astro';
-import LogoFlux from './LogoFlux.astro';
+import { PRODUCTOS, SIN_DECIDIR, CORREO_CONTACTO } from '../productos';
 
 interface Props {
   productoPreseleccionado?: string;
 }
 
 const { productoPreseleccionado } = Astro.props;
+
+const disponibles = PRODUCTOS.filter((p) => p.disponible);
+const proximos = PRODUCTOS.filter((p) => !p.disponible);
+const PASOS = ['Producto', 'Contacto', 'Mensaje', 'Listo'];
+const flecha = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
 ---
 
 <section class="seccion" id="contacto">
@@ -21,357 +35,543 @@ const { productoPreseleccionado } = Astro.props;
     <span class="etiqueta">Contacto</span>
     <h2 class="titulo-seccion">Hablemos.</h2>
     {productoPreseleccionado ? (
-      <p class="form-sub">Consulta sobre <strong style="color:var(--salix)"><NombreMarca nombre={productoPreseleccionado} /></strong>. Completá tus datos y te respondemos rapido.</p>
+      <p class="form-sub">Consulta sobre <strong class="form-sub-marca"><NombreMarca nombre={productoPreseleccionado} /></strong>. Dejanos tus datos y te respondemos rápido.</p>
     ) : (
-      <p class="form-sub">Contanos que necesitas y te decimos como Salix puede ayudarte.</p>
+      <p class="form-sub">Contanos qué necesitás y te decimos cómo te puede ayudar Salix.</p>
     )}
   </div>
 
-  <div class="form-contenedor aparecer delay-2" data-producto-pre={productoPreseleccionado || ''}>
+  <form
+    class="form-contenedor aparecer delay-2"
+    data-producto-pre={productoPreseleccionado || ''}
+    novalidate
+    aria-label="Formulario de contacto"
+  >
     <!-- Indicador de pasos -->
     <div class="form-indicador">
-      <div class="form-indicador-barra">
-        <div class="form-indicador-progreso"></div>
-      </div>
-      <div class="form-indicador-pasos">
-        <button class="form-dot activo actual" data-paso="1"><span>1</span></button>
-        <button class="form-dot" data-paso="2"><span>2</span></button>
-        <button class="form-dot" data-paso="3"><span>3</span></button>
-        <button class="form-dot" data-paso="4"><span>4</span></button>
-      </div>
+      <div class="form-indicador-barra" aria-hidden="true"><div class="form-indicador-progreso"></div></div>
+      <ol class="form-indicador-pasos" aria-label="Pasos">
+        {PASOS.map((titulo, i) => (
+          <li class="form-indicador-paso">
+            <button
+              type="button"
+              class={`form-dot${i === 0 ? ' activo' : ''}`}
+              data-paso={i + 1}
+              aria-label={`Paso ${i + 1} de ${PASOS.length}: ${titulo}`}
+              aria-current={i === 0 ? 'step' : undefined}
+              disabled
+            >
+              <span class="form-dot-num">{i + 1}</span>
+              <svg class="form-dot-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+            </button>
+            <span class="form-dot-titulo" aria-hidden="true">{titulo}</span>
+          </li>
+        ))}
+      </ol>
     </div>
 
-    <!-- Contenedor de pasos -->
+    <!-- Lo elegido, a la vista mientras se completan los datos -->
+    <div class="form-eleccion" hidden>
+      <span class="form-eleccion-texto">Consulta sobre <strong class="form-eleccion-nombre"></strong></span>
+      <button type="button" class="form-eleccion-cambiar">Cambiar</button>
+    </div>
+
     <div class="form-cuerpo">
 
-      <!-- Paso 1: Elegir producto -->
-      <div class="form-paso visible" data-form-paso="1">
-        <p class="form-pregunta">Que producto te interesa?</p>
-        <div class="form-productos">
-          <label class="form-prod">
-            <input type="radio" name="producto" value="Flux" />
-            <div class="form-prod-inner">
-              <LogoFlux tamaño={18} clase="form-prod-logo" />
-              <strong>Flux</strong><span>Un solo sistema</span>
-            </div>
-          </label>
-          <label class="form-prod">
-            <input type="radio" name="producto" value="Sites" />
-            <div class="form-prod-inner">
-              <strong>Sites</strong><span>Sitios web</span>
-            </div>
-          </label>
-          <label class="form-prod">
-            <input type="radio" name="producto" value="Go" />
-            <div class="form-prod-inner">
-              <strong>Go</strong><span>Delivery</span>
-            </div>
-          </label>
-          <label class="form-prod">
-            <input type="radio" name="producto" value="Play" />
-            <div class="form-prod-inner">
-              <strong>Play</strong><span>Canchas</span>
-            </div>
-          </label>
-          <label class="form-prod">
-            <input type="radio" name="producto" value="Book" />
-            <div class="form-prod-inner">
-              <strong>Book</strong><span>Turnos</span>
-            </div>
-          </label>
-          <label class="form-prod">
-            <input type="radio" name="producto" value="Integraciones" />
-            <div class="form-prod-inner">
-              <strong>Integraciones</strong><span>Sesiones 45 min</span>
-            </div>
-          </label>
-          <label class="form-prod">
-            <input type="radio" name="producto" value="No estoy seguro" />
-            <div class="form-prod-inner">
-              <strong>No se aun</strong><span>Asesorame</span>
-            </div>
-          </label>
-        </div>
-      </div>
+      <!-- Paso 1: qué te interesa -->
+      <fieldset class="form-paso visible" data-form-paso="1">
+        <legend class="form-pregunta">¿Qué te interesa?</legend>
 
-      <!-- Paso 2: Datos -->
-      <div class="form-paso" data-form-paso="2">
-        <p class="form-pregunta">Como te contactamos?</p>
+        <div class="form-productos">
+          {disponibles.map((p, i) => (
+            <label class="form-prod" style={`--i:${i}`}>
+              <input type="radio" name="producto" value={p.id} data-corto={p.corto} data-pista={p.pista} />
+              <span class="form-prod-inner">
+                <span class="form-prod-icono"><IconoProducto nombre={p.icono} tamaño={20} /></span>
+                <span class="form-prod-texto"><strong>{p.corto}</strong><span>{p.linea}</span></span>
+                <span class="form-prod-tilde" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+              </span>
+            </label>
+          ))}
+        </div>
+
+        <p class="form-grupo-titulo" id="form-titulo-proximos">Próximamente</p>
+        <div class="form-productos form-productos--proximos" aria-describedby="form-titulo-proximos">
+          {proximos.map((p, i) => (
+            <label class="form-prod form-prod--proximo" style={`--i:${disponibles.length + i}`}>
+              <input type="radio" name="producto" value={p.id} data-corto={p.corto} data-pista={p.pista} />
+              <span class="form-prod-inner">
+                <span class="form-prod-icono"><IconoProducto nombre={p.icono} tamaño={18} /></span>
+                <span class="form-prod-texto"><strong>{p.corto}</strong><span>{p.linea}</span></span>
+                <span class="form-prod-tilde" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+              </span>
+            </label>
+          ))}
+        </div>
+
+        <label class="form-prod form-prod--ancho" style={`--i:${PRODUCTOS.length}`}>
+          <input type="radio" name="producto" value={SIN_DECIDIR.id} data-corto={SIN_DECIDIR.corto} data-pista={SIN_DECIDIR.pista} />
+          <span class="form-prod-inner">
+            <span class="form-prod-icono"><IconoSVG nombre={SIN_DECIDIR.icono} tamaño={20} /></span>
+            <span class="form-prod-texto"><strong>{SIN_DECIDIR.corto}</strong><span>{SIN_DECIDIR.linea}</span></span>
+            <span class="form-prod-tilde" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+          </span>
+        </label>
+
+        <p class="form-aviso" data-aviso="producto" role="alert"></p>
+      </fieldset>
+
+      <!-- Paso 2: cómo te contactamos -->
+      <fieldset class="form-paso" data-form-paso="2">
+        <legend class="form-pregunta">¿Cómo te contactamos?</legend>
         <div class="form-campos">
           <div class="form-grupo">
             <label for="form-nombre">Nombre</label>
-            <input type="text" id="form-nombre" name="nombre" placeholder="Tu nombre o empresa" autocomplete="name" />
+            <input type="text" id="form-nombre" name="nombre" placeholder="Tu nombre o el de tu negocio" autocomplete="name" maxlength="120" aria-describedby="aviso-nombre" />
+            <p class="form-aviso" id="aviso-nombre" data-aviso="nombre" role="alert"></p>
           </div>
           <div class="form-grupo">
-            <label for="form-email">Email</label>
-            <input type="email" id="form-email" name="email" placeholder="tu@email.com" autocomplete="email" />
+            <label for="form-email">Correo</label>
+            <input type="email" id="form-email" name="email" placeholder="tu@correo.com" autocomplete="email" inputmode="email" maxlength="200" spellcheck="false" aria-describedby="aviso-email" />
+            <p class="form-aviso" id="aviso-email" data-aviso="email" role="alert"></p>
           </div>
           <div class="form-grupo">
             <label for="form-whatsapp">WhatsApp <span class="form-opc">(opcional)</span></label>
-            <input type="tel" id="form-whatsapp" name="whatsapp" placeholder="+54 11 1234-5678" autocomplete="tel" />
+            <input type="tel" id="form-whatsapp" name="whatsapp" placeholder="+54 9 11 1234-5678" autocomplete="tel" inputmode="tel" maxlength="40" aria-describedby="aviso-whatsapp" />
+            <p class="form-aviso" id="aviso-whatsapp" data-aviso="whatsapp" role="alert"></p>
           </div>
-        </div>
-      </div>
-
-      <!-- Paso 3: Mensaje -->
-      <div class="form-paso" data-form-paso="3">
-        <p class="form-pregunta">Contanos sobre tu proyecto</p>
-        <div class="form-campos">
-          <div class="form-grupo">
-            <label for="form-mensaje">Mensaje</label>
-            <textarea id="form-mensaje" name="mensaje" placeholder="Que necesitas? Cuantos usuarios tenes? Cualquier detalle nos ayuda..." rows="4"></textarea>
-          </div>
-          <div class="form-grupo">
-            <label>Preferencia de contacto</label>
+          <div class="form-grupo" role="radiogroup" aria-labelledby="form-titulo-pref">
+            <span class="form-etiqueta" id="form-titulo-pref">¿Por dónde preferís que te respondamos?</span>
             <div class="form-pills">
-              <label class="form-pill"><input type="radio" name="preferencia" value="email" checked /><span>Email</span></label>
+              <label class="form-pill"><input type="radio" name="preferencia" value="email" checked /><span>Correo</span></label>
               <label class="form-pill"><input type="radio" name="preferencia" value="whatsapp" /><span>WhatsApp</span></label>
               <label class="form-pill"><input type="radio" name="preferencia" value="cualquiera" /><span>Cualquiera</span></label>
             </div>
           </div>
         </div>
-      </div>
+      </fieldset>
 
-      <!-- Paso 4: Confirmacion -->
+      <!-- Paso 3: el mensaje -->
+      <fieldset class="form-paso" data-form-paso="3">
+        <legend class="form-pregunta">Contanos un poco más</legend>
+        <div class="form-campos">
+          <div class="form-grupo">
+            <label for="form-mensaje">Mensaje <span class="form-opc">(opcional)</span></label>
+            <textarea id="form-mensaje" name="mensaje" rows="5" maxlength="5000" aria-describedby="form-pista"></textarea>
+            <p class="form-pista" id="form-pista"></p>
+          </div>
+        </div>
+        <!-- Trampa para robots: una persona no la ve ni la completa -->
+        <div class="form-trampa" aria-hidden="true">
+          <label>Sitio web <input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label>
+        </div>
+      </fieldset>
+
+      <!-- Paso 4: listo (solo después de que el servidor confirmó) -->
       <div class="form-paso" data-form-paso="4">
         <div class="form-exito">
-          <!-- Canvas de confetti -->
-          <canvas class="form-confetti" id="confetti-canvas"></canvas>
-          <!-- Check animado -->
-          <div class="form-check">
+          <canvas class="form-confetti" aria-hidden="true"></canvas>
+          <div class="form-check" aria-hidden="true">
             <svg viewBox="0 0 52 52" fill="none">
-              <circle class="check-circ" cx="26" cy="26" r="24" stroke="var(--salix)" stroke-width="2"/>
-              <path class="check-tick" d="M15 27l7 7 15-15" stroke="var(--salix)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle class="check-circ" cx="26" cy="26" r="24" stroke-width="2" />
+              <path class="check-tick" d="M15 27l7 7 15-15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
-          <h3 class="form-exito-titulo">Mensaje enviado!</h3>
-          <p class="form-exito-sub">Te respondemos en menos de 24 horas.</p>
-          <div class="form-resumen">
-            <div class="form-res-fila"><span>Producto</span><span id="res-prod">—</span></div>
-            <div class="form-res-fila"><span>Nombre</span><span id="res-nombre">—</span></div>
-            <div class="form-res-fila"><span>Contacto</span><span id="res-email">—</span></div>
-          </div>
+          <h3 class="form-exito-titulo" tabindex="-1">¡Listo!</h3>
+          <p class="form-exito-sub"></p>
+          <dl class="form-resumen">
+            <div class="form-res-fila"><dt>Producto</dt><dd data-res="producto">—</dd></div>
+            <div class="form-res-fila"><dt>Nombre</dt><dd data-res="nombre">—</dd></div>
+            <div class="form-res-fila"><dt>Te escribimos a</dt><dd data-res="contacto">—</dd></div>
+          </dl>
+          <button type="button" class="form-otra">Enviar otra consulta</button>
         </div>
       </div>
     </div>
 
-    <!-- Navegacion -->
+    <p class="form-error-envio" role="alert" hidden>
+      <span class="form-error-envio-texto"></span>
+      Si sigue fallando, escribinos a <span class="form-correo">{CORREO_CONTACTO}</span>.
+    </p>
+
+    <!-- Navegación -->
     <div class="form-nav">
-      <button class="form-btn-atras boton boton-secundario" disabled>Atras</button>
-      <button class="form-btn-sig boton boton-primario">
-        Siguiente
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <button type="button" class="form-btn-atras boton boton-secundario" disabled>Atrás</button>
+      <button type="submit" class="form-btn-sig boton boton-primario">
+        <span class="form-btn-texto">Siguiente</span>
+        <span class="form-btn-icono" set:html={flecha} />
+        <span class="form-btn-girador" aria-hidden="true"></span>
       </button>
     </div>
-  </div>
+  </form>
 </section>
 
 <script>
+  const PREFERENCIA_TEXTO: Record<string, string> = {
+    email: 'por correo',
+    whatsapp: 'por WhatsApp',
+    cualquiera: 'por correo o WhatsApp',
+  };
+  const DURACION_SALIDA = 160;
+
   function initForm() {
-    const c = document.querySelector('.form-contenedor');
-    if (!c || c.dataset.init) return;
-    c.dataset.init = '1';
+    const form = document.querySelector<HTMLFormElement>('form.form-contenedor');
+    if (!form || form.dataset.init) return;
+    form.dataset.init = '1';
+
+    const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const abierto = performance.now();
+    const $ = <T extends Element>(sel: string) => form.querySelector<T>(sel)!;
+    const cuerpo = $<HTMLElement>('.form-cuerpo');
+    const dots = Array.from(form.querySelectorAll<HTMLButtonElement>('.form-dot'));
+    const progreso = $<HTMLElement>('.form-indicador-progreso');
+    const btnSig = $<HTMLButtonElement>('.form-btn-sig');
+    const btnTexto = $<HTMLElement>('.form-btn-texto');
+    const btnAtras = $<HTMLButtonElement>('.form-btn-atras');
+    const eleccion = $<HTMLElement>('.form-eleccion');
+    const errorEnvio = $<HTMLElement>('.form-error-envio');
+    const campo = (nombre: string) => form.elements.namedItem(nombre) as HTMLInputElement;
+    const productoElegido = () => form.querySelector<HTMLInputElement>('input[name="producto"]:checked');
+    const preferencia = () => form.querySelector<HTMLInputElement>('input[name="preferencia"]:checked')?.value || 'email';
 
     let paso = 1;
-    const dots = c.querySelectorAll('.form-dot');
-    const progreso = c.querySelector('.form-indicador-progreso');
-    const btnSig = c.querySelector('.form-btn-sig');
-    const btnAtras = c.querySelector('.form-btn-atras');
+    let cambiando = false;
+    let enviando = false;
+    let ultimoPuntero = 0;
 
-    function irA(n) {
-      const dir = n > paso ? 1 : -1;
-      const viejo = c.querySelector(`[data-form-paso="${paso}"]`);
-      const nuevo = c.querySelector(`[data-form-paso="${n}"]`);
-      if (!viejo || !nuevo) return;
-
-      viejo.style.transform = `translateX(${-25 * dir}px)`;
-      viejo.style.opacity = '0';
-      viejo.style.filter = 'blur(4px)';
-
-      setTimeout(() => {
-        viejo.classList.remove('visible');
-        viejo.style.cssText = '';
-        nuevo.style.transform = `translateX(${25 * dir}px)`;
-        nuevo.style.opacity = '0';
-        nuevo.style.filter = 'blur(4px)';
-        nuevo.classList.add('visible');
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          nuevo.style.transform = 'translateX(0)';
-          nuevo.style.opacity = '1';
-          nuevo.style.filter = 'blur(0)';
-        }));
-      }, 280);
-
-      paso = n;
-
-      // Dots
-      dots.forEach((d, i) => {
-        d.classList.toggle('activo', i + 1 <= paso);
-        d.classList.toggle('actual', i + 1 === paso);
-      });
-
-      // Barra de progreso
-      progreso.style.width = `${((paso - 1) / 3) * 100}%`;
-
-      // Botones
-      btnAtras.disabled = paso === 1;
-      if (paso === 4) {
-        btnSig.style.display = 'none';
-        btnAtras.style.display = 'none';
-        llenarResumen();
-        lanzarConfetti();
-      } else if (paso === 3) {
-        btnSig.innerHTML = 'Enviar <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
-      } else {
-        btnSig.innerHTML = 'Siguiente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
-        btnSig.style.display = '';
-        btnAtras.style.display = '';
-      }
-    }
-
-    function validar() {
-      if (paso === 1) {
-        if (!c.querySelector('input[name="producto"]:checked')) {
-          c.querySelectorAll('.form-prod').forEach(p => {
-            p.classList.add('sacudir');
-            setTimeout(() => p.classList.remove('sacudir'), 500);
-          });
-          return false;
-        }
-      }
-      if (paso === 2) {
-        const n = document.getElementById('form-nombre');
-        const e = document.getElementById('form-email');
-        let ok = true;
-        [n, e].forEach(inp => {
-          if (!inp.value.trim()) {
-            inp.classList.add('form-error');
-            setTimeout(() => inp.classList.remove('form-error'), 1500);
-            ok = false;
-          }
+    // ── Avisos de cada campo ──
+    function avisar(clave: string, texto: string) {
+      const aviso = form.querySelector<HTMLElement>(`[data-aviso="${clave}"]`);
+      if (aviso) aviso.textContent = texto;
+      if (clave === 'producto') {
+        form.querySelectorAll<HTMLElement>('.form-prod').forEach((p) => {
+          p.classList.remove('sacudir');
+          void p.offsetWidth;
+          p.classList.add('sacudir');
         });
-        if (ok && (!e.value.includes('@') || !e.value.includes('.'))) {
-          e.classList.add('form-error');
-          setTimeout(() => e.classList.remove('form-error'), 1500);
-          ok = false;
-        }
-        return ok;
+      } else {
+        campo(clave)?.setAttribute('aria-invalid', 'true');
       }
-      return true;
+    }
+    function limpiarAviso(clave: string) {
+      const aviso = form.querySelector<HTMLElement>(`[data-aviso="${clave}"]`);
+      if (aviso) aviso.textContent = '';
+      if (clave !== 'producto') campo(clave)?.removeAttribute('aria-invalid');
+    }
+    ['nombre', 'email', 'whatsapp'].forEach((c) => campo(c).addEventListener('input', () => limpiarAviso(c)));
+
+    function validar(n: number): HTMLElement | null {
+      if (n === 1 && !productoElegido()) {
+        avisar('producto', 'Elegí una opción para seguir.');
+        return form.querySelector('input[name="producto"]');
+      }
+      if (n === 2) {
+        let primero: HTMLElement | null = null;
+        const nombre = campo('nombre');
+        const email = campo('email');
+        const whatsapp = campo('whatsapp');
+        if (!nombre.value.trim()) {
+          avisar('nombre', 'Escribí tu nombre.');
+          primero ??= nombre;
+        }
+        if (!email.value.trim()) {
+          avisar('email', 'Escribí tu correo: ahí te llega la respuesta.');
+          primero ??= email;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) {
+          avisar('email', 'Revisá el correo: le falta algo.');
+          primero ??= email;
+        }
+        const digitos = whatsapp.value.replace(/\D/g, '').length;
+        if (preferencia() === 'whatsapp' && digitos < 8) {
+          avisar('whatsapp', 'Para responderte por WhatsApp necesitamos el número.');
+          primero ??= whatsapp;
+        } else if (whatsapp.value.trim() && digitos < 8) {
+          avisar('whatsapp', 'Revisá el número: parece incompleto.');
+          primero ??= whatsapp;
+        }
+        return primero;
+      }
+      return null;
     }
 
-    function llenarResumen() {
-      const prod = c.querySelector('input[name="producto"]:checked');
-      document.getElementById('res-prod').textContent = prod ? prod.value : '—';
-      document.getElementById('res-nombre').textContent = document.getElementById('form-nombre').value || '—';
-      document.getElementById('res-email').textContent = document.getElementById('form-email').value || '—';
+    // Con «WhatsApp» elegido, el número deja de ser opcional
+    const opcionalWhatsapp = $<HTMLElement>('label[for="form-whatsapp"] .form-opc');
+    form.querySelectorAll<HTMLInputElement>('input[name="preferencia"]').forEach((r) =>
+      r.addEventListener('change', () => {
+        const obligatorio = preferencia() === 'whatsapp';
+        opcionalWhatsapp.hidden = obligatorio;
+        campo('whatsapp').required = obligatorio;
+        if (!obligatorio) limpiarAviso('whatsapp');
+      }),
+    );
+
+    // ── Lo que depende del producto elegido ──
+    function reflejarProducto() {
+      const elegido = productoElegido();
+      if (!elegido) return;
+      $<HTMLElement>('.form-eleccion-nombre').textContent = elegido.dataset.corto || elegido.value;
+      $<HTMLElement>('#form-pista').textContent = elegido.dataset.pista || '';
+      limpiarAviso('producto');
     }
 
-    // Confetti elegante
+    // ── Indicador, botones y lo elegido ──
+    function pintar(n: number) {
+      dots.forEach((d, i) => {
+        const numero = i + 1;
+        d.classList.toggle('activo', numero <= n);
+        d.classList.toggle('hecho', numero < n || n === dots.length);
+        if (numero === n) d.setAttribute('aria-current', 'step');
+        else d.removeAttribute('aria-current');
+        // Se puede volver a un paso ya hecho; después de enviar, no
+        d.disabled = !(numero < n && n < 4);
+      });
+      progreso.style.transform = `scaleX(${(n - 1) / (dots.length - 1)})`;
+      btnAtras.disabled = n === 1;
+      btnTexto.textContent = n === 3 ? 'Enviar' : 'Siguiente';
+      form.classList.toggle('form--terminado', n === 4);
+      eleccion.hidden = !(n === 2 || n === 3);
+      if (n !== 3) errorEnvio.hidden = true;
+    }
+
+    function enfocar(el: HTMLElement) {
+      const destino =
+        el.querySelector<HTMLElement>('input[name="producto"]:checked') ||
+        el.querySelector<HTMLElement>('input[type="text"], input[type="email"], textarea, input, [tabindex="-1"]');
+      destino?.focus({ preventScroll: true });
+    }
+
+    function irA(n: number, { animar = !reducir, conFoco = true } = {}) {
+      if (n === paso || cambiando) return;
+      const dir = n > paso ? 1 : -1;
+      const viejo = $<HTMLElement>(`[data-form-paso="${paso}"]`);
+      const nuevo = $<HTMLElement>(`[data-form-paso="${n}"]`);
+      paso = n;
+      pintar(n);
+
+      if (!animar) {
+        viejo.classList.remove('visible');
+        nuevo.classList.add('visible');
+        if (conFoco) enfocar(nuevo);
+        return;
+      }
+
+      // Sale el paso viejo, el cuerpo acompaña el cambio de alto y entra el nuevo desde el lado del avance
+      cambiando = true;
+      cuerpo.style.height = `${cuerpo.offsetHeight}px`;
+      form.style.setProperty('--dir', String(dir));
+      viejo.classList.add('saliendo');
+      window.setTimeout(() => {
+        viejo.classList.remove('visible', 'saliendo');
+        nuevo.classList.add('visible', 'entrando');
+        cuerpo.style.height = `${nuevo.offsetHeight}px`;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            nuevo.classList.remove('entrando');
+            if (conFoco) enfocar(nuevo);
+          }),
+        );
+        window.setTimeout(() => {
+          cuerpo.style.height = '';
+          cambiando = false;
+        }, 320);
+      }, DURACION_SALIDA);
+    }
+
+    // ── Enviar ──
+    async function enviar() {
+      if (enviando) return;
+      enviando = true;
+      errorEnvio.hidden = true;
+      btnSig.disabled = true;
+      btnAtras.disabled = true;
+      btnSig.classList.add('cargando');
+      btnTexto.textContent = 'Enviando…';
+
+      const datos = {
+        producto: productoElegido()?.value || '',
+        nombre: campo('nombre').value.trim(),
+        email: campo('email').value.trim(),
+        whatsapp: campo('whatsapp').value.trim(),
+        preferencia: preferencia(),
+        mensaje: (form.elements.namedItem('mensaje') as HTMLTextAreaElement).value.trim(),
+        sitio_web: campo('sitio_web').value,
+        pagina: location.pathname,
+        demora: Math.round(performance.now() - abierto),
+      };
+
+      const corte = new AbortController();
+      const reloj = window.setTimeout(() => corte.abort(), 15000);
+      try {
+        const r = await fetch('/contacto.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos),
+          signal: corte.signal,
+        });
+        const respuesta = await r.json().catch(() => null);
+        if (!r.ok || !respuesta?.ok) {
+          const error = new Error(respuesta?.error || String(r.status)) as Error & { campo?: string; estado?: number };
+          error.campo = respuesta?.campo;
+          error.estado = r.status;
+          throw error;
+        }
+        llenarResumen(datos);
+        try { sessionStorage.removeItem('salix-pedido-sesiones'); } catch { /* modo privado */ }
+        irA(4);
+        if (!reducir) window.setTimeout(lanzarConfetti, 350);
+      } catch (e) {
+        const error = e as Error & { campo?: string; estado?: number };
+        if (error.campo && ['nombre', 'email', 'whatsapp'].includes(error.campo)) {
+          // El servidor rechazó un dato: se vuelve al paso de contacto, marcándolo
+          irA(2);
+          avisar(error.campo, 'Revisá este dato.');
+        } else {
+          $<HTMLElement>('.form-error-envio-texto').textContent =
+            error.estado === 429
+              ? 'Recibimos varias consultas seguidas desde tu conexión. Probá de nuevo en un rato.'
+              : 'No pudimos enviar tu consulta. Probá de nuevo en un momento.';
+          errorEnvio.hidden = false;
+        }
+      } finally {
+        window.clearTimeout(reloj);
+        enviando = false;
+        btnSig.disabled = false;
+        btnSig.classList.remove('cargando');
+        if (paso !== 4) {
+          btnAtras.disabled = paso === 1;
+          btnTexto.textContent = paso === 3 ? 'Enviar' : 'Siguiente';
+        }
+      }
+    }
+
+    function llenarResumen(datos: { producto: string; nombre: string; email: string; whatsapp: string; preferencia: string }) {
+      const corto = productoElegido()?.dataset.corto || datos.producto;
+      const nombrePila = datos.nombre.split(/\s+/)[0];
+      $<HTMLElement>('.form-exito-titulo').textContent = `¡Listo, ${nombrePila}!`;
+      $<HTMLElement>('.form-exito-sub').textContent =
+        `Recibimos tu consulta. Te respondemos ${PREFERENCIA_TEXTO[datos.preferencia] || 'por correo'} en menos de 24 horas.`;
+      $<HTMLElement>('[data-res="producto"]').textContent = corto;
+      $<HTMLElement>('[data-res="nombre"]').textContent = datos.nombre;
+      $<HTMLElement>('[data-res="contacto"]').textContent =
+        datos.preferencia === 'whatsapp' ? datos.whatsapp : datos.email;
+    }
+
+    // Confeti corto en los colores de la marca, solo en el paso 4
     function lanzarConfetti() {
-      const canvas = c.querySelector('.form-confetti');
-      if (!canvas) return;
+      const canvas = $<HTMLCanvasElement>('.form-confetti');
       const ctx = canvas.getContext('2d');
-      const exito = c.querySelector('.form-exito');
-      const rect = exito.getBoundingClientRect();
+      if (!ctx) return;
+      const rect = $<HTMLElement>('.form-exito').getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
       ctx.scale(dpr, dpr);
-
       const W = rect.width, H = rect.height;
-      const colores = ['#c2710c', '#e8922a', '#f0c674', '#d4a55a', '#fff3d6'];
-      const piezas = [];
-
-      for (let i = 0; i < 60; i++) {
-        piezas.push({
-          x: W / 2 + (Math.random() - 0.5) * 40,
-          y: H * 0.35,
-          vx: (Math.random() - 0.5) * 8,
-          vy: -Math.random() * 10 - 4,
-          size: Math.random() * 5 + 3,
-          color: colores[Math.floor(Math.random() * colores.length)],
-          rot: Math.random() * 360,
-          vr: (Math.random() - 0.5) * 12,
-          opacity: 1,
-          gravity: 0.18 + Math.random() * 0.08,
-          tipo: Math.random() > 0.5 ? 'rect' : 'circle',
-        });
-      }
-
-      let frame = 0;
-      function animar() {
+      const marca = getComputedStyle(form).getPropertyValue('--salix').trim() || '#c2710c';
+      const colores = [marca, marca, '#f0c674', '#d4a55a'];
+      const piezas = Array.from({ length: 48 }, () => ({
+        x: W / 2 + (Math.random() - 0.5) * 40,
+        y: H * 0.3,
+        vx: (Math.random() - 0.5) * 7,
+        vy: -Math.random() * 8 - 4,
+        tam: Math.random() * 4 + 3,
+        color: colores[Math.floor(Math.random() * colores.length)],
+        rot: Math.random() * 360,
+        vr: (Math.random() - 0.5) * 12,
+        alfa: 1,
+        g: 0.18 + Math.random() * 0.08,
+        rect: Math.random() > 0.5,
+      }));
+      let cuadro = 0;
+      const animar = () => {
         ctx.clearRect(0, 0, W, H);
-        let activos = 0;
-        piezas.forEach(p => {
-          p.vy += p.gravity;
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.vr;
-          p.vx *= 0.99;
-          if (frame > 30) p.opacity -= 0.015;
-          if (p.opacity <= 0) return;
-          activos++;
-
+        let vivos = 0;
+        for (const p of piezas) {
+          p.vy += p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vx *= 0.99;
+          if (cuadro > 30) p.alfa -= 0.018;
+          if (p.alfa <= 0) continue;
+          vivos++;
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate((p.rot * Math.PI) / 180);
-          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.globalAlpha = p.alfa;
           ctx.fillStyle = p.color;
-
-          if (p.tipo === 'rect') {
-            ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
-          } else {
-            ctx.beginPath();
-            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
-            ctx.fill();
-          }
+          if (p.rect) ctx.fillRect(-p.tam / 2, -p.tam / 4, p.tam, p.tam / 2);
+          else { ctx.beginPath(); ctx.arc(0, 0, p.tam / 2, 0, Math.PI * 2); ctx.fill(); }
           ctx.restore();
-        });
-        frame++;
-        if (activos > 0 && frame < 200) requestAnimationFrame(animar);
-      }
+        }
+        cuadro++;
+        if (vivos > 0 && cuadro < 180) requestAnimationFrame(animar);
+        else ctx.clearRect(0, 0, W, H);
+      };
       requestAnimationFrame(animar);
     }
 
-    btnSig.addEventListener('click', () => { if (validar() && paso < 4) irA(paso + 1); });
-    btnAtras.addEventListener('click', () => { if (paso > 1) irA(paso - 1); });
-
-    dots.forEach(d => d.addEventListener('click', () => {
-      const n = parseInt(d.dataset.paso);
-      if (n < paso) irA(n);
-    }));
-
-    // Auto-avanzar al elegir producto
-    c.querySelectorAll('input[name="producto"]').forEach(r => {
-      r.addEventListener('change', () => setTimeout(() => irA(2), 350));
+    // ── Eventos ──
+    // Enter en un campo avanza; en el paso 3 envía (el botón es de tipo submit)
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (cambiando || enviando || paso === 4) return;
+      const conError = validar(paso);
+      if (conError) {
+        conError.focus();
+        return;
+      }
+      if (paso === 3) enviar();
+      else irA(paso + 1);
+    });
+    btnAtras.addEventListener('click', () => paso > 1 && paso < 4 && irA(paso - 1));
+    dots.forEach((d) => d.addEventListener('click', () => irA(Number(d.dataset.paso))));
+    $<HTMLButtonElement>('.form-eleccion-cambiar').addEventListener('click', () => irA(1));
+    $<HTMLButtonElement>('.form-otra').addEventListener('click', () => {
+      form.reset();
+      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+      opcionalWhatsapp.hidden = false;
+      campo('whatsapp').required = false;
+      irA(1);
     });
 
-    // Preseleccion desde pagina de producto
-    const pre = c.dataset.productoPre;
+    // Elegir un producto con el mouse o el dedo avanza solo; con las flechas del teclado, no:
+    // cada flecha cambia la opción, y avanzar con la primera no dejaría elegir.
+    form.addEventListener('pointerdown', () => { ultimoPuntero = performance.now(); });
+    form.querySelectorAll<HTMLInputElement>('input[name="producto"]').forEach((r) =>
+      r.addEventListener('change', () => {
+        reflejarProducto();
+        if (paso === 1 && performance.now() - ultimoPuntero < 800) window.setTimeout(() => irA(2), 260);
+      }),
+    );
+
+    // Los íconos se dibujan cuando el formulario entra en pantalla
+    new IntersectionObserver((entradas, obs) => {
+      if (!entradas.some((e) => e.isIntersecting)) return;
+      form.querySelectorAll('.form-prod-icono').forEach((i) => i.classList.add('dibujado'));
+      obs.disconnect();
+    }, { threshold: 0.2 }).observe(form);
+
+    // La página ya sabe de qué producto se trata: arranca en el paso 2, sin animar ni mover el foco
+    const pre = form.dataset.productoPre;
     if (pre) {
-      const match = c.querySelector(`input[name="producto"][value="${pre}"]`);
-      if (match) { match.checked = true; setTimeout(() => irA(2), 100); }
+      const coincide = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="producto"]')).find((r) => r.value === pre);
+      if (coincide) {
+        coincide.checked = true;
+        reflejarProducto();
+        irA(2, { animar: false, conFoco: false });
+      }
     }
 
+    // Lo que armaron en la calculadora de sesiones de Integraciones llega escrito en el mensaje
     try {
       const pedido = sessionStorage.getItem('salix-pedido-sesiones');
       if (pedido) {
         const data = JSON.parse(pedido);
-        const campo = document.getElementById('form-mensaje');
-        if (campo && data.mensaje && !campo.value.trim()) campo.value = data.mensaje;
+        const mensaje = form.elements.namedItem('mensaje') as HTMLTextAreaElement;
+        if (data.mensaje && !mensaje.value.trim()) mensaje.value = data.mensaje;
       }
-    } catch { /* private mode */ }
+    } catch { /* modo privado */ }
   }
 
-  // Iniciar cuando el DOM esté listo o ya lo esté
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initForm);
-  } else {
-    initForm();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initForm);
+  else initForm();
 </script>
 
 <style>
@@ -381,138 +581,227 @@ const { productoPreseleccionado } = Astro.props;
     text-align: center; gap: 0.75rem;
     margin-bottom: 2rem;
   }
-
   .form-sub {
     font-size: clamp(1rem, 1.4vw, 1.15rem);
     line-height: 1.7;
     color: var(--texto-secundario);
-    max-width: 480px;
+    max-width: 30rem;
+    text-wrap: balance;
   }
+  .form-sub-marca { color: var(--salix); }
 
   /* ─── Contenedor ─── */
   .form-contenedor {
-    max-width: 480px;
+    --desacelerar: cubic-bezier(0.2, 0, 0, 1);
+    max-width: 32rem;
     margin: 0 auto;
     background: var(--card);
     border: 1px solid var(--borde);
     border-radius: var(--radio-card);
-    padding: clamp(1.5rem, 4vw, 2rem);
-    transition: border-color var(--transicion);
+    padding: clamp(1.25rem, 4vw, 2rem);
   }
 
   /* ─── Indicador ─── */
-  .form-indicador {
-    position: relative;
-    margin-bottom: 1.75rem;
-  }
-
+  .form-indicador { position: relative; margin-bottom: 1.75rem; }
   .form-indicador-barra {
     position: absolute;
-    top: 11px; left: 24px; right: 24px;
-    height: 1px;
-    background: var(--borde-sutil);
+    top: 13px; left: 12.5%; right: 12.5%;
+    height: 2px;
     border-radius: 1px;
-    z-index: 0;
+    background: var(--borde);
   }
-
   .form-indicador-progreso {
-    height: 100%; width: 0;
-    background: color-mix(in srgb, var(--salix) 40%, transparent);
+    height: 100%;
     border-radius: 1px;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--salix);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.5s var(--desacelerar);
   }
-
   .form-indicador-pasos {
-    display: flex; justify-content: space-between;
-    position: relative; z-index: 1;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 0; padding: 0;
+    list-style: none;
   }
-
+  .form-indicador-paso { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
   .form-dot {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 600;
-    background: var(--superficie);
-    color: var(--texto-terciario);
-    border: 1px solid var(--borde-sutil);
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    display: grid; place-items: center;
+    width: 28px; height: 28px;
     padding: 0;
-    outline: none;
+    border: 1px solid var(--borde);
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--texto-terciario);
+    font: 600 12px/1 var(--fuente-principal);
+    font-variant-numeric: tabular-nums;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, transform 0.3s var(--desacelerar), box-shadow 0.3s;
     -webkit-tap-highlight-color: transparent;
-    opacity: 0.6;
+  }
+  .form-dot:disabled { cursor: default; }
+  .form-dot:not(:disabled) { cursor: pointer; }
+  .form-dot > * { grid-area: 1 / 1; }
+  .form-dot.activo { background: var(--salix); border-color: var(--salix); color: var(--btn-texto); }
+  .form-dot[aria-current='step'] { box-shadow: 0 0 0 4px var(--salix-suave); }
+  .form-dot:focus-visible { outline: 2px solid var(--salix); outline-offset: 3px; }
+  .form-dot-num { transition: opacity 0.2s; }
+  .form-dot-check {
+    width: 14px; height: 14px;
+    fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    opacity: 0; transform: scale(0.5);
+    transition: opacity 0.2s, transform 0.3s var(--desacelerar);
+  }
+  .form-dot.hecho .form-dot-num { opacity: 0; }
+  .form-dot.hecho .form-dot-check { opacity: 1; transform: none; }
+  @media (hover: hover) {
+    .form-dot:not(:disabled):hover { transform: scale(1.08); }
+  }
+  .form-dot-titulo { font-size: 11px; font-weight: 500; color: var(--texto-terciario); transition: color 0.3s; }
+  .form-indicador-paso:has(.activo) .form-dot-titulo { color: var(--texto-secundario); }
+  .form-indicador-paso:has([aria-current='step']) .form-dot-titulo { color: var(--texto); }
+
+  /* ─── Lo elegido ─── */
+  .form-eleccion {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding: 0.375rem 0.375rem 0.375rem 0.875rem;
+    border: 1px solid var(--salix-borde);
+    border-radius: 10px;
+    background: var(--salix-suave);
+    font-size: 13px;
+    color: var(--texto-secundario);
+  }
+  .form-eleccion[hidden] { display: none; }
+  .form-eleccion-nombre { color: var(--texto); font-weight: 600; }
+  .form-eleccion-cambiar {
+    min-height: 2.25rem;
+    padding: 0 0.75rem;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--salix);
+    font: 600 12.5px var(--fuente-principal);
+    cursor: pointer;
+  }
+  .form-eleccion-cambiar:focus-visible { outline: 2px solid var(--salix); outline-offset: 1px; }
+  @media (hover: hover) {
+    .form-eleccion-cambiar:hover { background: var(--salix-suave); }
   }
 
-  .form-dot.activo {
-    background: color-mix(in srgb, var(--salix) 80%, transparent);
-    color: #fff;
-    border-color: transparent;
-    opacity: 1;
+  /* ─── Cuerpo y pasos ─── */
+  .form-cuerpo { position: relative; transition: height 0.3s var(--desacelerar); }
+  .form-paso { display: none; margin: 0; padding: 0; border: 0; min-width: 0; }
+  .form-paso.visible {
+    display: block;
+    transition: opacity 0.28s var(--desacelerar), transform 0.28s var(--desacelerar);
   }
-
-  .form-dot.actual {
-    box-shadow: 0 0 0 3px var(--salix-suave);
-    transform: scale(1.08);
-    opacity: 1;
+  .form-paso.entrando {
+    opacity: 0;
+    transform: translateX(calc(var(--dir, 1) * 18px));
+    transition: none;
   }
-
-  /* ─── Cuerpo ─── */
-  .form-cuerpo { min-height: 220px; }
-
-  .form-paso {
-    display: none;
-    transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
+  .form-paso.saliendo {
+    opacity: 0;
+    transform: translateX(calc(var(--dir, 1) * -18px));
+    transition: opacity 0.16s ease-in, transform 0.16s ease-in;
   }
-
-  .form-paso.visible { display: block; }
 
   .form-pregunta {
-    font-size: 15px; font-weight: 600; color: var(--texto);
-    margin-bottom: 1rem; letter-spacing: -0.02em;
+    float: left; width: 100%; /* un legend no respeta el margen de abajo sin esto */
+    margin-bottom: 1rem;
+    padding: 0;
+    font-size: 15px; font-weight: 600;
+    color: var(--texto);
+    letter-spacing: -0.02em;
   }
+  .form-pregunta + * { clear: both; }
 
   /* ─── Productos ─── */
   .form-productos {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: 0.5rem;
+  }
+  .form-productos--proximos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  .form-grupo-titulo {
+    margin: 1.125rem 0 0.5rem;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--texto-terciario);
   }
 
-  .form-prod { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .form-prod input { display: none; }
+  .form-prod { position: relative; display: block; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .form-prod--ancho { margin-top: 0.5rem; }
+  /* Oculto a la vista, no al teclado ni al lector: las flechas siguen eligiendo */
+  .form-prod input,
+  .form-pill input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
 
   .form-prod-inner {
-    padding: 12px 8px;
-    border: 1.5px solid var(--borde);
-    border-radius: 10px;
-    text-align: center;
-    display: flex; flex-direction: column; align-items: center; gap: 1px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    display: flex; align-items: center; gap: 0.75rem;
+    min-height: 3.5rem;
+    padding: 0.625rem 2rem 0.625rem 0.625rem;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
     background: var(--fondo);
+    transition: border-color 0.2s, background-color 0.2s, transform 0.2s var(--desacelerar), box-shadow 0.2s;
   }
-
-  .form-prod-inner :global(.form-prod-logo) {
-    margin-bottom: 4px;
+  .form-prod-icono {
+    flex: none;
+    display: grid; place-items: center;
+    width: 2.25rem; height: 2.25rem;
+    border-radius: 9px;
+    background: var(--superficie);
+    color: var(--texto);
+    transition: background-color 0.2s, color 0.2s;
   }
+  .form-prod-icono :global(.icono-svg) { stroke: currentColor; }
+  .form-prod-icono :global(.icono-svg *) { transition-delay: calc(var(--i, 0) * 60ms) !important; }
+  .form-prod-texto { display: flex; flex-direction: column; gap: 1px; min-width: 0; text-align: left; }
+  .form-prod-texto strong { font-size: 14px; font-weight: 600; color: var(--texto); }
+  .form-prod-texto span { font-size: 12px; color: var(--texto-terciario); }
 
-  .form-prod-inner strong { font-size: 13px; color: var(--texto); }
-  .form-prod-inner span { font-size: 10.5px; color: var(--texto-terciario); }
+  /* Los próximos: más chicos, en columna */
+  .form-prod--proximo .form-prod-inner {
+    flex-direction: column; justify-content: center; gap: 0.375rem;
+    padding: 0.75rem 0.5rem;
+  }
+  .form-prod--proximo .form-prod-icono { width: 2rem; height: 2rem; }
+  .form-prod--proximo .form-prod-texto { align-items: center; text-align: center; }
+  .form-prod--proximo .form-prod-texto strong { font-size: 13px; }
 
+  .form-prod-tilde {
+    position: absolute;
+    top: 0.5rem; right: 0.5rem;
+    display: grid; place-items: center;
+    width: 1.125rem; height: 1.125rem;
+    border-radius: 50%;
+    background: var(--salix);
+    color: var(--btn-texto);
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.18s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .form-prod-tilde svg { width: 0.7rem; height: 0.7rem; fill: none; stroke: currentColor; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  @media (hover: hover) {
+    .form-prod:hover .form-prod-inner { border-color: var(--texto-terciario); transform: translateY(-1px); }
+  }
+  .form-prod:active .form-prod-inner { transform: scale(0.98); }
+  .form-prod input:focus-visible + .form-prod-inner { outline: 2px solid var(--salix); outline-offset: 2px; }
   .form-prod input:checked + .form-prod-inner {
     border-color: var(--salix);
     background: var(--salix-suave);
-    transform: scale(1.04);
     box-shadow: 0 0 0 3px var(--salix-suave);
   }
+  .form-prod input:checked + .form-prod-inner .form-prod-icono { background: var(--salix); color: var(--btn-texto); }
+  .form-prod input:checked + .form-prod-inner .form-prod-tilde { opacity: 1; transform: none; }
 
-  .form-prod-inner:hover {
-    border-color: var(--texto-terciario);
-    transform: translateY(-2px);
-  }
-
-  .sacudir .form-prod-inner {
-    animation: sacudir 0.4s ease;
-    border-color: #e74c3c;
-  }
-
+  .sacudir .form-prod-inner { animation: sacudir 0.4s ease; border-color: var(--peligro); }
   @keyframes sacudir {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-4px); }
@@ -520,143 +809,145 @@ const { productoPreseleccionado } = Astro.props;
   }
 
   /* ─── Campos ─── */
-  .form-campos { display: flex; flex-direction: column; gap: 14px; }
-
-  .form-grupo { display: flex; flex-direction: column; gap: 5px; }
-
-  .form-grupo label {
-    font-size: 11.5px; font-weight: 600;
-    color: var(--texto-secundario);
-  }
-
+  .form-campos { display: flex; flex-direction: column; gap: 0.875rem; }
+  .form-grupo { display: flex; flex-direction: column; gap: 0.375rem; }
+  .form-grupo label,
+  .form-etiqueta { font-size: 12px; font-weight: 600; color: var(--texto-secundario); }
   .form-opc { font-weight: 400; color: var(--texto-terciario); }
 
   .form-grupo input,
   .form-grupo textarea {
     font-family: var(--fuente-principal);
-    font-size: 13.5px;
-    padding: 10px 12px;
-    border: 1.5px solid var(--borde);
+    font-size: 16px; /* con menos, Safari del iPhone agranda la página al enfocar */
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--borde);
     border-radius: 10px;
     background: var(--fondo);
     color: var(--texto);
-    transition: border-color 0.3s, box-shadow 0.3s;
-    outline: none; resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
   }
-
+  .form-grupo textarea { resize: vertical; min-height: 7.5rem; line-height: 1.5; }
   .form-grupo input::placeholder,
   .form-grupo textarea::placeholder { color: var(--texto-terciario); }
-
-  .form-grupo input:focus,
-  .form-grupo textarea:focus {
-    border-color: var(--salix);
-    box-shadow: 0 0 0 3px var(--salix-suave);
-  }
-
-  .form-error {
-    border-color: #e74c3c !important;
-    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15) !important;
+  .form-grupo input:focus-visible,
+  .form-grupo textarea:focus-visible { border-color: var(--salix); box-shadow: 0 0 0 3px var(--salix-suave); }
+  .form-grupo input[aria-invalid='true'] {
+    border-color: var(--peligro);
+    box-shadow: 0 0 0 3px var(--peligro-suave);
     animation: sacudir 0.4s ease;
   }
 
-  /* Pills */
-  .form-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-  .form-pill { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .form-pill input { display: none; }
+  .form-aviso { font-size: 12px; color: var(--peligro); }
+  .form-aviso:empty { display: none; }
+  .form-paso > .form-aviso { margin-top: 0.625rem; }
+  .form-pista { font-size: 12.5px; line-height: 1.5; color: var(--texto-terciario); }
 
+  /* Pills */
+  .form-pills { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+  .form-pill { position: relative; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .form-pill span {
-    display: inline-flex; padding: 6px 14px;
-    font-size: 12px; font-weight: 500;
-    border: 1.5px solid var(--borde);
+    display: inline-flex; align-items: center;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    font-size: 13px; font-weight: 500;
+    border: 1px solid var(--borde);
     border-radius: var(--radio-pill);
     color: var(--texto-secundario);
     background: var(--fondo);
-    transition: all 0.3s;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+  }
+  .form-pill input:checked + span { border-color: var(--salix); color: var(--salix); background: var(--salix-suave); }
+  .form-pill input:focus-visible + span { outline: 2px solid var(--salix); outline-offset: 2px; }
+  @media (hover: hover) {
+    .form-pill:hover span { border-color: var(--texto-terciario); }
   }
 
-  .form-pill input:checked + span {
-    border-color: var(--salix); color: var(--salix);
-    background: var(--salix-suave);
-  }
+  .form-trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
-  .form-pill span:hover { border-color: var(--texto-terciario); }
-
-  /* ─── Confirmacion ─── */
+  /* ─── Listo ─── */
   .form-exito {
-    text-align: center;
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-    padding: 1.5rem 0 0.5rem;
     position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 0.625rem;
+    padding: 1rem 0 0.25rem;
+    text-align: center;
     overflow: hidden;
   }
-
-  .form-confetti {
-    position: absolute; inset: 0;
-    pointer-events: none; z-index: 2;
-  }
-
-  .form-check { position: relative; z-index: 3; }
-
-  .form-check svg { width: 52px; height: 52px; }
-
-  .check-circ {
-    stroke-dasharray: 160; stroke-dashoffset: 160; fill: none;
-  }
-
-  .check-tick {
-    stroke-dasharray: 50; stroke-dashoffset: 50; fill: none;
-  }
-
-  .form-paso.visible .check-circ {
-    animation: dibujar 0.6s ease forwards 0.3s;
-  }
-
-  .form-paso.visible .check-tick {
-    animation: dibujar 0.4s ease forwards 0.8s;
-  }
-
+  .form-confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+  .form-check svg { width: 56px; height: 56px; }
+  .check-circ { stroke: var(--salix); stroke-dasharray: 160; stroke-dashoffset: 160; }
+  .check-tick { stroke: var(--salix); stroke-dasharray: 50; stroke-dashoffset: 50; }
+  .form-paso.visible .check-circ { animation: dibujar 0.6s var(--desacelerar) forwards 0.15s; }
+  .form-paso.visible .check-tick { animation: dibujar 0.35s var(--desacelerar) forwards 0.6s; }
   @keyframes dibujar { to { stroke-dashoffset: 0; } }
 
-  .form-exito-titulo {
-    font-size: 16px; font-weight: 600; color: var(--texto);
-    position: relative; z-index: 3;
-  }
-
-  .form-exito-sub {
-    font-size: 13px; color: var(--texto-secundario);
-    position: relative; z-index: 3;
-  }
-
-  .form-resumen {
-    width: 100%; max-width: 280px;
-    margin-top: 6px;
-    position: relative; z-index: 3;
-  }
-
+  .form-exito-titulo { font-size: 18px; font-weight: 600; color: var(--texto); outline: none; }
+  .form-exito-sub { max-width: 22rem; font-size: 13.5px; line-height: 1.6; color: var(--texto-secundario); text-wrap: balance; }
+  .form-resumen { width: 100%; max-width: 18rem; margin: 0.375rem 0 0; }
   .form-res-fila {
-    display: flex; justify-content: space-between;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--borde-sutil);
-    font-size: 12px;
+    display: flex; justify-content: space-between; gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--borde);
+    font-size: 12.5px;
   }
-
   .form-res-fila:last-child { border-bottom: none; }
-  .form-res-fila span:first-child { color: var(--texto-terciario); font-weight: 500; }
-  .form-res-fila span:last-child { color: var(--texto); font-weight: 500; }
+  .form-res-fila dt { color: var(--texto-terciario); }
+  .form-res-fila dd { margin: 0; min-width: 0; color: var(--texto); font-weight: 500; overflow-wrap: anywhere; text-align: right; }
+  .form-otra {
+    margin-top: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 0;
+    background: none;
+    color: var(--salix);
+    font: 600 13px var(--fuente-principal);
+    cursor: pointer;
+  }
+  .form-otra:focus-visible { outline: 2px solid var(--salix); outline-offset: 2px; border-radius: 8px; }
 
-  /* ─── Navegacion ─── */
+  /* ─── Error de envío ─── */
+  .form-error-envio {
+    margin-top: 1rem;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--peligro);
+    border-radius: 10px;
+    background: var(--peligro-suave);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--texto);
+  }
+  .form-error-envio[hidden] { display: none; }
+  .form-correo { font-weight: 600; user-select: all; }
+
+  /* ─── Navegación ─── */
   .form-nav {
     display: flex; justify-content: space-between; align-items: center;
     margin-top: 1.25rem; padding-top: 1rem;
-    border-top: 1px solid var(--borde-sutil);
+    border-top: 1px solid var(--borde);
   }
-
+  .form--terminado .form-nav { display: none; }
   .form-btn-atras { font-size: 13px !important; padding: 8px 18px !important; }
-  .form-btn-atras:disabled { opacity: 0.25; pointer-events: none; }
+  .form-btn-atras:disabled { visibility: hidden; }
   .form-btn-sig { font-size: 13px !important; padding: 8px 18px !important; margin-left: auto; }
+  .form-btn-icono { display: inline-flex; transition: transform 0.2s var(--desacelerar); }
+  @media (hover: hover) {
+    .form-btn-sig:hover .form-btn-icono { transform: translateX(2px); }
+  }
+  .form-btn-girador {
+    display: none;
+    width: 14px; height: 14px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: girar 0.7s linear infinite;
+  }
+  .form-btn-sig.cargando .form-btn-icono { display: none; }
+  .form-btn-sig.cargando .form-btn-girador { display: inline-block; }
+  @keyframes girar { to { transform: rotate(360deg); } }
 
-  /* ─── Responsive ─── */
-  @media (max-width: 480px) {
-    .form-productos { grid-template-columns: repeat(2, 1fr); }
+  @media (prefers-reduced-motion: reduce) {
+    .form-cuerpo, .form-paso.visible, .form-prod-inner, .form-dot, .form-indicador-progreso { transition: none; }
+    .sacudir .form-prod-inner, .form-grupo input[aria-invalid='true'] { animation: none; }
+    .form-paso.visible .check-circ, .form-paso.visible .check-tick { animation: none; stroke-dashoffset: 0; }
   }
 </style>
