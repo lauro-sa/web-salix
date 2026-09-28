@@ -1,0 +1,553 @@
+/* ARCHIVO GENERADO — no editar a mano. Sale de docs/familia-salix/publico-salix.css (repo de
+   Flux) vía `node scripts/marca/generar.mjs`: la barra y el pie de la familia se cambian ahí,
+   y esta copia se pisa. */
+
+/* ============================================================================
+   Barra, menú móvil y pie de las páginas públicas de la familia Salix.
+   Fuente ÚNICA (docs/familia-salix/publico-salix.md): el generador de Flux
+   (scripts/marca/generar.mjs) la copia a Flux (kit-salix), a Menú y a salixweb,
+   y `--verificar` falla si una copia difiere. Un cambio se hace ACÁ.
+
+   Cada producto pone solo lo suyo mapeando estas variables en su raíz:
+     --psx-fondo        fondo de la página (y de la cortina del pie)
+     --psx-texto        texto principal       --psx-texto-2  secundario
+     --psx-texto-3      terciario             --psx-borde    líneas
+     --psx-marca        color de su marca (barra de progreso, subrayado, hover)
+     --psx-cta-fondo / --psx-cta-texto / --psx-cta-hover   el botón de acción (tinta)
+     --psx-fuente       tipografía de la interfaz
+   El logo es el componente de marca de la familia (.msx, marca-salix.css); acá
+   solo se fija su tamaño, el mismo en todos los productos.
+   ============================================================================ */
+
+/* ── Lo común a todo lo que se toca: anillo de foco con teclado, sin demora de doble toque ── */
+:is(.psx-barra, .psx-menu, .psx-pie) :is(a, button) {
+  touch-action: manipulation;
+}
+:is(.psx-barra, .psx-menu, .psx-pie) :is(a, button):focus-visible {
+  outline: 2px solid var(--psx-marca);
+  outline-offset: 2px;
+}
+/* Un salto a una sección (o el foco con el teclado) no queda tapado por la barra fija. */
+html:has(.psx-barra) {
+  scroll-padding-top: calc(5rem + env(safe-area-inset-top, 0px));
+}
+
+/* ── Barra de progreso de lectura ── */
+.psx-progreso {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 2px;
+  background: var(--psx-marca);
+  border-radius: 0 1px 1px 0;
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+/* ── Barra ── Tres columnas con los costados iguales: los enlaces quedan centrados en la página,
+   no en el hueco entre el logo y el botón. Vidrio arriba del todo; al bajar, se entinta. */
+.psx-barra {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: calc(0.875rem + env(safe-area-inset-top, 0px))
+    max(clamp(1.25rem, 5vw, 2rem), env(safe-area-inset-right, 0px)) 0.875rem
+    max(clamp(1.25rem, 5vw, 2rem), env(safe-area-inset-left, 0px));
+  font-family: var(--psx-fuente);
+  background: transparent;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 0.4s,
+    border-color 0.4s;
+}
+.psx-barra--fija {
+  background: color-mix(in srgb, var(--psx-fondo) 60%, transparent);
+  border-bottom-color: var(--psx-borde);
+}
+.psx-barra-marca {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--psx-texto);
+}
+.psx-barra-marca a {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+/* El logo mide lo mismo en todos los productos (publico-salix.md §2): 26 px el ícono y 16 px el
+   nombre. `!important` porque el componente de marca escribe su tamaño en línea. */
+.psx-barra-marca .msx,
+.psx-pie-marca .msx {
+  --msx-tam: 1.625rem !important;
+}
+.psx-barra-enlaces {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+}
+.psx-enlace {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  color: var(--psx-texto-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+.psx-enlace::after {
+  content: '';
+  position: absolute;
+  bottom: 0.125rem;
+  left: 0.875rem;
+  right: 0.875rem;
+  height: 1.5px;
+  background: var(--psx-marca);
+  border-radius: 1px;
+  pointer-events: none;
+  /* Crece desde el centro con `transform`: lo resuelve el compositor, sin recalcular el layout. */
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.psx-enlace[aria-current='page'] {
+  color: var(--psx-texto);
+}
+.psx-enlace[aria-current='page']::after {
+  transform: scaleX(1);
+}
+@media (hover: hover) {
+  .psx-enlace:hover {
+    color: var(--psx-texto);
+  }
+  .psx-enlace:hover::after {
+    transform: scaleX(1);
+  }
+}
+.psx-barra-acciones {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── El botón de acción: tinta, no color de marca (el color vive en el logo y el progreso) ── */
+.psx-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--psx-cta-fondo);
+  color: var(--psx-cta-texto);
+  font-family: var(--psx-fuente);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.15s;
+}
+.psx-cta:active {
+  transform: translateY(1px);
+}
+@media (hover: hover) {
+  .psx-cta:hover {
+    background: var(--psx-cta-hover);
+  }
+}
+.psx-cta--ancho {
+  width: 100%;
+  min-height: 3rem;
+  font-size: 0.9375rem;
+}
+
+/* ── Hamburguesa: tres líneas que se hacen una X ── */
+.psx-hamburguesa {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 5px;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--psx-texto);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.psx-h-linea {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0, 0, 1),
+    opacity 0.2s,
+    width 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+.psx-h-linea:nth-child(2) {
+  width: 14px;
+}
+.psx-hamburguesa[aria-expanded='true'] .psx-h-linea {
+  width: 20px;
+}
+.psx-hamburguesa[aria-expanded='true'] .psx-h-linea:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+.psx-hamburguesa[aria-expanded='true'] .psx-h-linea:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.psx-hamburguesa[aria-expanded='true'] .psx-h-linea:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* ── Menú móvil: pantalla completa, enlaces numerados y un pie con el botón y lo propio ── */
+.psx-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 299;
+  display: flex;
+  flex-direction: column;
+  padding: calc(5.5rem + env(safe-area-inset-top, 0px)) max(1.5rem, env(safe-area-inset-right, 0px))
+    max(1.5rem, env(safe-area-inset-bottom, 0px)) max(1.5rem, env(safe-area-inset-left, 0px));
+  background: var(--psx-fondo);
+  font-family: var(--psx-fuente);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s cubic-bezier(0.2, 0, 0, 1),
+    visibility 0s linear 0.3s;
+}
+.psx-menu--abierto {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.3s cubic-bezier(0.2, 0, 0, 1),
+    visibility 0s;
+}
+.psx-menu-enlaces {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 26rem;
+  margin: auto;
+}
+.psx-menu-enlace {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--psx-borde);
+  color: var(--psx-texto);
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition:
+    opacity 0.35s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.35s cubic-bezier(0.2, 0, 0, 1),
+    color 0.2s;
+}
+.psx-menu-enlace:first-child {
+  border-top: 1px solid var(--psx-borde);
+}
+.psx-menu--abierto .psx-menu-enlace {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.05s + var(--i, 0) * 0.05s);
+}
+.psx-menu-num {
+  flex: none;
+  width: 1.75rem;
+  font-family: var(--psx-fuente-mono, ui-monospace, 'SF Mono', Menlo, monospace);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--psx-texto-3);
+}
+.psx-menu-texto {
+  font-size: clamp(1.5rem, 6.5vw, 1.875rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.psx-menu-enlace[aria-current='page'] {
+  color: var(--psx-marca);
+}
+@media (hover: hover) {
+  .psx-menu-enlace:hover {
+    color: var(--psx-marca);
+  }
+}
+.psx-menu-pie {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 26rem;
+  margin: 2rem auto 0;
+  opacity: 0;
+  transition: opacity 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+.psx-menu--abierto .psx-menu-pie {
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+/* Con el menú abierto la página de atrás no se mueve. */
+html.psx-sin-scroll {
+  overflow: hidden;
+  scrollbar-gutter: stable; /* sin la barra de scroll, la página no se corre de costado */
+}
+
+/* Hasta 1023 px: hamburguesa. Desde ahí, los enlaces y el botón en la barra. */
+@media (max-width: 1023.98px) {
+  .psx-barra {
+    grid-template-columns: 1fr auto;
+  }
+  .psx-barra-enlaces,
+  .psx-barra-acciones > .psx-cta,
+  .psx-barra-acciones > .psx-solo-ancho {
+    display: none;
+  }
+  .psx-hamburguesa {
+    display: flex;
+  }
+}
+@media (min-width: 1024px) {
+  .psx-menu {
+    display: none;
+  }
+}
+
+/* ── Cortina: el cuerpo tapa al pie, que está pegado al fondo, y lo destapa al llegar al final ── */
+.psx-cuerpo {
+  position: relative;
+  z-index: 2;
+  background: var(--psx-fondo);
+  box-shadow:
+    0 1px 0 var(--psx-borde),
+    0 20px 60px rgba(0, 0, 0, 0.12);
+}
+.psx-pie {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: var(--psx-fondo);
+  font-family: var(--psx-fuente);
+  color: var(--psx-texto-2);
+}
+/* Al destaparse, el contenido entra en cascada (arriba, después la base). */
+.psx-pie-animar {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.psx-pie--visible .psx-pie-animar {
+  opacity: 1;
+  transform: none;
+}
+.psx-pie--visible .psx-pie-arriba {
+  transition-delay: 0.1s;
+}
+.psx-pie--visible .psx-pie-base {
+  transition-delay: 0.25s;
+}
+.psx-pie--visible .psx-pie-firma {
+  transition-delay: 0.4s;
+}
+
+.psx-pie-arriba {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 2.2fr);
+  gap: 3rem;
+  max-width: 67.5rem;
+  margin: 0 auto;
+  padding: 4.5rem clamp(1.25rem, 6vw, 4rem) 3rem;
+}
+.psx-pie-marca {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  color: var(--psx-texto);
+}
+.psx-pie-marca a {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+/* La frase o el lema del producto, debajo del logo. Opcional. */
+.psx-pie-lema {
+  max-width: 22.5rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--psx-texto-2);
+}
+.psx-pie-columnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 1.5rem;
+}
+.psx-pie-columna {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+.psx-pie-titulo {
+  margin: 0 0 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--psx-texto-3);
+}
+.psx-pie-enlace {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  font-size: 0.875rem;
+  color: var(--psx-texto-2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+@media (hover: hover) {
+  .psx-pie-enlace:hover {
+    color: var(--psx-marca);
+  }
+}
+@media (pointer: coarse) {
+  .psx-pie-enlace {
+    min-height: 2.75rem;
+  }
+}
+
+/* La base: copyright a la izquierda; a la derecha lo propio (el crédito de Salix, el tema, el
+   idioma). Siempre en este lugar, en todos los productos. */
+.psx-pie-base {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  /* El ancho del contenido, no el de la caja con su margen: así la línea de arriba empieza y
+     termina donde empieza y termina el texto. */
+  width: calc(min(67.5rem, 100%) - 2 * clamp(1.25rem, 6vw, 4rem));
+  margin: 0 auto;
+  padding: 1.375rem 0;
+  border-top: 1px solid var(--psx-borde);
+  font-size: 0.8125rem;
+  color: var(--psx-texto-3);
+}
+.psx-pie-base-extra {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+/* «Un software de Salix»: todo el texto es el enlace; «Salix» resaltado en neutro. */
+.psx-credito {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  color: var(--psx-texto-3);
+  text-decoration: none;
+}
+.psx-credito strong {
+  font-weight: 600;
+  color: var(--psx-texto-2);
+}
+@media (hover: hover) {
+  .psx-credito:hover {
+    color: var(--psx-texto-2);
+  }
+  .psx-credito:hover strong {
+    color: var(--psx-texto);
+  }
+}
+/* La firma de quien hizo el sitio, debajo de todo. Opcional. */
+.psx-pie-firma {
+  display: flex;
+  justify-content: center;
+  max-width: 67.5rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 6vw, 4rem) max(1.5rem, env(safe-area-inset-bottom, 0px));
+}
+.psx-pie > :last-child {
+  padding-bottom: max(1.375rem, env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 760px) {
+  .psx-pie-arriba {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 3.5rem;
+  }
+  .psx-pie-columnas {
+    grid-template-columns: 1fr 1fr;
+  }
+  .psx-pie-base {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ── Reducir movimiento ── */
+@media (prefers-reduced-motion: reduce) {
+  .psx-enlace::after,
+  .psx-menu,
+  .psx-menu-enlace,
+  .psx-menu-pie,
+  .psx-h-linea {
+    transition: none;
+  }
+  .psx-menu-enlace {
+    transform: none;
+  }
+  .psx-pie-animar {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

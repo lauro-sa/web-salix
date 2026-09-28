@@ -65,6 +65,19 @@
 
 /* Tipografía y espaciado global */
 :root {
+  /* La barra y el pie de la familia (publico-salix.css) leen estas: se mapean a las de Salix, así
+     siguen al tema solas. */
+  --psx-fondo:     var(--fondo);
+  --psx-texto:     var(--texto);
+  --psx-texto-2:   var(--texto-secundario);
+  --psx-texto-3:   var(--texto-terciario);
+  --psx-borde:     var(--borde);
+  --psx-marca:     var(--salix);
+  --psx-cta-fondo: var(--btn-fondo);
+  --psx-cta-texto: var(--btn-texto);
+  --psx-cta-hover: var(--btn-hover);
+  --psx-fuente:    var(--fuente-principal);
+
   --fuente-principal: 'Inter', system-ui, -apple-system, sans-serif;
   --fuente-mono:      'JetBrains Mono', 'Fira Code', monospace;
 

@@ -43,69 +43,6 @@ export function iniciarToggleTema(idBoton, claveStorage = 'salix-tema') {
 }
 
 /**
- * Menu mobile (hamburguesa + overlay fullscreen).
- */
-export function iniciarMenuMobile(idBoton, idMenu, claseLinks = '.link-menu') {
-  const boton = document.getElementById(idBoton);
-  const menu  = document.getElementById(idMenu);
-  if (!boton || !menu) return;
-
-  let estaAbierto = false;
-
-  function alternarMenu() {
-    estaAbierto = !estaAbierto;
-    boton.classList.toggle('on', estaAbierto);
-    menu.classList.toggle('on',  estaAbierto);
-    boton.setAttribute('aria-expanded', estaAbierto);
-    const nav = document.getElementById('nav-principal');
-    if (estaAbierto) {
-      const anchoScrollbar = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = anchoScrollbar + 'px';
-      if (nav) nav.style.paddingRight = (32 + anchoScrollbar) + 'px';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-      if (nav) nav.style.paddingRight = '';
-    }
-  }
-
-  boton.addEventListener('click', alternarMenu);
-
-  document.querySelectorAll(claseLinks).forEach((link) => {
-    link.addEventListener('click', () => {
-      if (estaAbierto) alternarMenu();
-    });
-  });
-}
-
-/**
- * Barra de progreso de scroll en la parte superior.
- */
-export function iniciarBarraProgreso(idBarra) {
-  const barra = document.getElementById(idBarra);
-  if (!barra) return;
-
-  window.addEventListener('scroll', () => {
-    const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
-    const porcentaje  = (window.scrollY / scrollTotal) * 100;
-    barra.style.width = porcentaje + '%';
-  }, { passive: true });
-}
-
-/**
- * Agrega fondo con blur al nav cuando hay scroll.
- */
-export function iniciarNavScroll(idNav, umbral = 40) {
-  const nav = document.getElementById(idNav);
-  if (!nav) return;
-
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('fijo', window.scrollY > umbral);
-  }, { passive: true });
-}
-
-/**
  * Smooth scroll a secciones con offset para la nav fija.
  */
 export function iniciarSmoothScroll(offsetNav = 80) {

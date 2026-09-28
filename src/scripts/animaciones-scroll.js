@@ -331,36 +331,6 @@ function animarContacto() {
 }
 
 /**
- * Anima el footer.
- * Entra suavemente al llegar al final.
- */
-function animarFooter() {
-  const footer = document.querySelector('.footer');
-  if (!footer) return;
-
-  gsap.set(footer, { opacity: 0 });
-
-  ScrollTrigger.create({
-    trigger: footer,
-    start: 'top 95%',
-    onEnter: () => {
-      gsap.to(footer, {
-        opacity: 1,
-        duration: 1,
-        ease: EASE_ENTRADA,
-      });
-    },
-    onLeaveBack: () => {
-      gsap.to(footer, {
-        opacity: 0,
-        duration: 0.5,
-        ease: EASE_SALIDA,
-      });
-    },
-  });
-}
-
-/**
  * Funcion principal — inicializa todas las animaciones.
  */
 export function iniciarAnimacionesScroll() {
@@ -383,7 +353,6 @@ export function iniciarAnimacionesScroll() {
   animarCarrusel();
   animarCTA();
   animarContacto();
-  animarFooter();
 
   // Refresh despues de cargar imagenes/contenido
   window.addEventListener('load', () => {

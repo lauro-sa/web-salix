@@ -119,9 +119,6 @@ const schemaOrg = JSON.stringify({
 </head>
 
 <body>
-  <!-- Barra de progreso de scroll -->
-  <div id="barra-progreso" style="position:fixed;top:0;left:0;height:2px;width:0;background:var(--salix);z-index:9999;border-radius:0 1px 1px 0;transition:width 0.1s linear"></div>
-
   <!-- Contenido de la pagina -->
   <slot />
 </body>
@@ -134,13 +131,11 @@ const schemaOrg = JSON.stringify({
 <script>
   import {
     iniciarToggleTema,
-    iniciarMenuMobile,
-    iniciarBarraProgreso,
-    iniciarNavScroll,
     iniciarSmoothScroll,
     iniciarAnimacionIconos,
     iniciarTypewriter,
   } from '../scripts/utilidades.js';
+  import { montarPublicoSalix } from '../scripts/publico-salix';
   import { iniciarParticulas } from '../scripts/particulas.js';
   import { iniciarAnimacionesScroll } from '../scripts/animaciones-scroll.js';
   import '../firma-stian/firma-stian.js';
@@ -148,9 +143,8 @@ const schemaOrg = JSON.stringify({
   // Inicializar todo cuando el DOM este listo
   document.addEventListener('DOMContentLoaded', () => {
     iniciarToggleTema('boton-tema');
-    iniciarMenuMobile('boton-hamburguesa', 'menu-mobile');
-    iniciarBarraProgreso('barra-progreso');
-    iniciarNavScroll('nav-principal');
+    // La barra, el menú móvil y el pie de la familia (publico-salix.ts, GENERADO).
+    montarPublicoSalix(document);
     iniciarAnimacionIconos('.item-producto, .item-feature, .item-precio');
     iniciarTypewriter();
 

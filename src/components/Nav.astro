@@ -1,258 +1,63 @@
 ---
 // ============================================================
-// Nav.astro — Barra de navegacion principal (rediseño v2)
-// Logo animado, hamburguesa morphing, links con underline.
-// Toggle de tema movido al footer.
+// Nav.astro — la barra y el menú móvil de la familia Salix (publico-salix.md, en la carpeta de la
+// familia del repo de Flux). La forma y el comportamiento son los de toda la familia
+// (src/styles/publico-salix.css y src/scripts/publico-salix.ts, GENERADOS): acá solo va lo de
+// Salix — el logo, los enlaces y el botón.
 // ============================================================
 import LogoSalixAnimado from './LogoSalixAnimado.astro';
+
+const ENLACES = [
+  { href: '/#inicio', texto: 'Inicio' },
+  { href: '/#productos', texto: 'Productos' },
+  { href: '/#porque', texto: 'Por qué Salix' },
+  { href: '/#testimonios', texto: 'Clientes' },
+  { href: '/#contacto', texto: 'Contacto' },
+];
+const CTA = { href: '/#contacto', texto: 'Hablemos' };
 ---
 
-<nav id="nav-principal" class="nav">
-  <!-- Logo animado -->
-  <!-- Clases msx-*: el movimiento es el de toda la familia (src/styles/marca-salix.css, copiado de
-       docs/familia-salix/marca-salix.css en el repo de Flux). Acá no se escribe animación propia. -->
-  <a href="/" class="logo msx" style="--msx-tam:26px" aria-label="Salix inicio">
-    <span class="msx-icono">
-      <LogoSalixAnimado clase="msx-svg" id="copa-salix-nav" tamaño={26} />
-    </span>
-    <span class="msx-nombre" aria-hidden="true">
-      <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
-    </span>
-  </a>
+<div class="psx-progreso" aria-hidden="true"></div>
 
-  <!-- Links de navegacion desktop -->
-  <ul class="nav-links" role="list">
-    <li><a href="/#inicio">Inicio</a></li>
-    <li><a href="/#productos">Productos</a></li>
-    <li><a href="/#porque">Por que Salix</a></li>
-    <li><a href="/#testimonios">Clientes</a></li>
-    <li><a href="/#contacto">Contacto</a></li>
-  </ul>
+<header id="nav-principal" class="psx-barra">
+  <div class="psx-barra-marca">
+    <a href="/" aria-label="Salix, inicio">
+      <span class="msx">
+        <span class="msx-icono">
+          <LogoSalixAnimado clase="msx-svg" id="copa-salix-nav" tamaño={26} />
+        </span>
+        <span class="msx-nombre" aria-hidden="true">
+          <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
+        </span>
+      </span>
+    </a>
+  </div>
 
-  <!-- Controles de la derecha -->
-  <div class="nav-derecha">
-    <!-- Boton CTA nav -->
-    <a href="/#contacto" class="nav-cta boton boton-primario">Hablemos</a>
+  <nav class="psx-barra-enlaces" aria-label="Secciones">
+    {ENLACES.map((e) => <a class="psx-enlace" href={e.href}>{e.texto}</a>)}
+  </nav>
 
-    <!-- Hamburguesa minimalista -->
-    <button id="boton-hamburguesa" class="hamburguesa" aria-label="Abrir menu" aria-expanded="false">
-      <span class="h-linea"></span>
-      <span class="h-linea"></span>
-      <span class="h-linea"></span>
+  <div class="psx-barra-acciones">
+    <a class="psx-cta" href={CTA.href}>{CTA.texto}</a>
+    <button class="psx-hamburguesa" type="button" aria-label="Menú" aria-expanded="false" aria-controls="menu-movil">
+      <span class="psx-h-linea"></span>
+      <span class="psx-h-linea"></span>
+      <span class="psx-h-linea"></span>
     </button>
   </div>
-</nav>
+</header>
 
-<!-- Menu mobile fullscreen -->
-<div id="menu-mobile" class="menu-mobile" role="dialog" aria-label="Menu de navegacion">
-  <div class="menu-mobile-contenido">
-    <a href="/"             class="link-menu"><span class="link-menu-num">00</span><span class="link-menu-texto">Inicio</span></a>
-    <a href="/#productos"   class="link-menu"><span class="link-menu-num">01</span><span class="link-menu-texto">Productos</span></a>
-    <a href="/#porque"      class="link-menu"><span class="link-menu-num">02</span><span class="link-menu-texto">Por que Salix</span></a>
-    <a href="/#testimonios" class="link-menu"><span class="link-menu-num">03</span><span class="link-menu-texto">Clientes</span></a>
-    <a href="/#contacto"    class="link-menu"><span class="link-menu-num">04</span><span class="link-menu-texto">Contacto</span></a>
-  </div>
-  <div class="menu-mobile-firma">
+<div id="menu-movil" class="psx-menu">
+  <nav class="psx-menu-enlaces" aria-label="Secciones">
+    {ENLACES.map((e, i) => (
+      <a class="psx-menu-enlace" href={e.href} style={`--i:${i}`}>
+        <span class="psx-menu-num">{String(i + 1).padStart(2, '0')}</span>
+        <span class="psx-menu-texto">{e.texto}</span>
+      </a>
+    ))}
+  </nav>
+  <div class="psx-menu-pie">
+    <a class="psx-cta psx-cta--ancho" href={CTA.href}>{CTA.texto}</a>
     <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
   </div>
 </div>
-
-<style>
-  /* ─── Nav Base ─── */
-  .nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 300;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: calc(14px + env(safe-area-inset-top)) 32px 14px 32px;
-    background-color: transparent;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: background-color .4s, border-bottom .4s, box-shadow .4s;
-  }
-
-  .nav.fijo {
-    background-color: color-mix(in srgb, var(--fondo) 60%, transparent);
-    border-bottom: 1px solid var(--borde);
-  }
-
-  /* ─── Logo Animado ─── */
-  /* El logo: la forma y el movimiento salen de marca-salix.css (.msx). Acá solo lo que es de la barra. */
-  .logo { text-decoration: none; }
-
-  /* ─── Links Desktop ─── */
-  .nav-links { display: flex; align-items: center; gap: 2px; }
-
-  .nav-links a {
-    font-size: 13.5px; font-weight: 500; color: var(--texto-secundario);
-    padding: 10px 14px; border-radius: 8px;
-    min-height: 44px; display: inline-flex; align-items: center;
-    position: relative;
-    transition: color .25s;
-  }
-
-  .nav-links a::after {
-    content: '';
-    position: absolute;
-    bottom: 2px; left: 50%; right: 50%;
-    height: 1.5px;
-    background: var(--salix);
-    border-radius: 1px;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .nav-links a:hover { color: var(--texto); }
-  .nav-links a:hover::after { left: 14px; right: 14px; }
-
-  /* ─── Controles Derecha ─── */
-  .nav-derecha { display: flex; align-items: center; gap: 10px; }
-
-  .nav-cta {
-    font-size: 13px !important;
-    padding: 10px 18px !important;
-    min-height: 44px !important;
-  }
-
-  /* ─── Hamburguesa Minimalista (3 lineas → X) ─── */
-  .hamburguesa {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    padding: 12px;
-    min-width: 44px;
-    min-height: 44px;
-    background: none;
-    border: none;
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .h-linea {
-    display: block;
-    width: 20px; height: 1.5px;
-    background: var(--texto);
-    border-radius: 2px;
-    transition: transform 0.35s ease, opacity 0.35s ease, background 0.35s;
-  }
-
-  /* Linea del medio mas corta */
-  .h-linea:nth-child(2) { width: 14px; }
-
-  /* Estado abierto → X */
-  .hamburguesa.on .h-linea { background: var(--salix); width: 22px; }
-  .hamburguesa.on .h-linea:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-  .hamburguesa.on .h-linea:nth-child(2) { opacity: 0; transform: scaleX(0); }
-  .hamburguesa.on .h-linea:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-
-  /* ─── Menu Mobile Fullscreen ─── */
-  .menu-mobile {
-    position: fixed; inset: 0; z-index: 199;
-    background: var(--fondo);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity .4s ease;
-    overflow: hidden;
-  }
-
-  .menu-mobile.on { opacity: 1; pointer-events: all; }
-
-  .menu-mobile-contenido {
-    display: flex; flex-direction: column; gap: 0;
-    width: 100%; max-width: 340px; padding: 0 2rem;
-    text-align: left;
-  }
-
-  .link-menu {
-    display: flex; align-items: baseline; gap: 4px;
-    padding: 14px 0;
-    color: var(--texto);
-  }
-
-  .link-menu-num {
-    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 0;
-    transform: translateX(-60px);
-  }
-
-  .link-menu-texto {
-    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-                filter 0.7s ease;
-    opacity: 0;
-    transform: translateY(16px);
-    filter: blur(6px);
-  }
-
-  .menu-mobile.on .link-menu-num {
-    opacity: 0.2;
-    transform: translateX(0);
-  }
-
-  .menu-mobile.on .link-menu-texto {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0px);
-  }
-
-  /* Delays: num entra, 150ms después su texto */
-  .menu-mobile.on .link-menu:nth-child(1) .link-menu-num   { transition-delay: 0.12s; }
-  .menu-mobile.on .link-menu:nth-child(1) .link-menu-texto { transition-delay: 0.27s; }
-  .menu-mobile.on .link-menu:nth-child(2) .link-menu-num   { transition-delay: 0.38s; }
-  .menu-mobile.on .link-menu:nth-child(2) .link-menu-texto { transition-delay: 0.53s; }
-  .menu-mobile.on .link-menu:nth-child(3) .link-menu-num   { transition-delay: 0.64s; }
-  .menu-mobile.on .link-menu:nth-child(3) .link-menu-texto { transition-delay: 0.79s; }
-  .menu-mobile.on .link-menu:nth-child(4) .link-menu-num   { transition-delay: 0.90s; }
-  .menu-mobile.on .link-menu:nth-child(4) .link-menu-texto { transition-delay: 1.05s; }
-  .menu-mobile.on .link-menu:nth-child(5) .link-menu-num   { transition-delay: 1.16s; }
-  .menu-mobile.on .link-menu:nth-child(5) .link-menu-texto { transition-delay: 1.31s; }
-  .menu-mobile.on .link-menu:nth-child(6) .link-menu-num   { transition-delay: 1.42s; }
-  .menu-mobile.on .link-menu:nth-child(6) .link-menu-texto { transition-delay: 1.57s; }
-
-  .link-menu-num {
-    font-size: clamp(1.4rem, 5vw, 1.8rem);
-    font-weight: 600;
-    color: var(--texto-terciario);
-    opacity: 0.2;
-    font-family: var(--fuente-mono, monospace);
-  }
-
-  .link-menu-texto {
-    font-size: clamp(1.4rem, 5vw, 1.8rem);
-    font-weight: 500; letter-spacing: -0.3px;
-  }
-
-  .link-menu:hover {
-    color: var(--salix);
-    transform: translateX(6px);
-  }
-
-
-  /* ─── Firma en menu mobile ─── */
-  .menu-mobile-firma {
-    position: absolute;
-    bottom: max(24px, env(safe-area-inset-bottom, 24px));
-    left: 0; right: 0;
-    display: flex; justify-content: center;
-    opacity: 0;
-    transition: opacity .4s ease .38s;
-  }
-
-  .menu-mobile.on .menu-mobile-firma {
-    opacity: 1;
-  }
-
-  /* ─── Responsive ─── */
-  @media (max-width: 1024px) {
-    .nav-links { display: none; }
-    .nav-cta { display: none; }
-    .hamburguesa { display: flex; }
-    .nav { padding: calc(14px + env(safe-area-inset-top)) 20px 14px 20px; }
-  }
-
-  /* iOS: subir nav para cubrir zona del status bar */
-  @supports (-webkit-touch-callout: none) {
-    .nav {
-      top: -75px;
-      padding-top: calc(75px + 14px);
-    }
-  }
-</style>
