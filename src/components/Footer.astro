@@ -5,6 +5,7 @@
 // la firma (en la base, con el tema). La forma y la cortina son de toda la familia (src/styles/publico-salix.css,
 // GENERADO); acá solo va lo de Salix.
 // ============================================================
+import Idioma from './Idioma.astro';
 import LogoSalixAnimado from './LogoSalixAnimado.astro';
 import LemaSalix from './LemaSalix.astro';
 
@@ -65,6 +66,7 @@ const COLUMNAS = [
   <div class="psx-pie-base psx-pie-animar">
     <span>&copy; {AÑO} Salix &middot; Buenos Aires, Argentina</span>
     <div class="psx-pie-base-extra">
+      <Idioma id="idioma-pie" />
       <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
       <button id="boton-tema" class="tema-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
         <svg class="tema-icono icono-sol-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">

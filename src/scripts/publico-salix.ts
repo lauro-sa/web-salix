@@ -16,7 +16,11 @@
  *   - la barra se entinta apenas se baja (`.psx-barra--fija`);
  *   - el menú móvil: abre y cierra con la hamburguesa, Escape o tocando un enlace; bloquea el
  *     scroll de atrás, lleva el foco adentro y lo devuelve al botón;
- *   - la cortina del pie: `.psx-pie--visible` cuando el final de la página lo destapa.
+ *   - la cortina del pie: `.psx-pie--visible` cuando el final de la página lo destapa;
+ *   - el selector de idioma (`.psx-idioma`, en el pie y en el menú): abre y cierra la lista, lleva
+ *     el foco a la opción activa y lo devuelve al botón. ELEGIR el idioma es de cada producto: el
+ *     de React escucha el clic de su opción; uno sin framework, el evento `psx:idioma` que se emite
+ *     con `{ idioma }` al tocar una opción habilitada.
  */
 
 const CLASE_FIJA = 'psx-barra--fija'
@@ -67,7 +71,11 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
 
   // ── Menú móvil ──
   if (boton && menu) {
-    const enlaces = () => Array.from(menu.querySelectorAll<HTMLElement>('a, button'))
+    // Lo que se puede enfocar: nada de una lista cerrada (la del idioma) ni un botón deshabilitado.
+    const enlaces = () =>
+      Array.from(menu.querySelectorAll<HTMLElement>('a, button')).filter(
+        (el) => !el.closest('[hidden]') && !(el as HTMLButtonElement).disabled,
+      )
     const abierto = () => boton.getAttribute('aria-expanded') === 'true'
     const poner = (abrir: boolean, devolverFoco = true) => {
       boton.setAttribute('aria-expanded', String(abrir))
@@ -114,6 +122,57 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       document.documentElement.classList.remove(CLASE_SIN_SCROLL)
     })
   }
+
+  // ── Idioma ──
+  raiz.querySelectorAll<HTMLElement>('.psx-idioma').forEach((caja) => {
+    const botonIdioma = caja.querySelector<HTMLButtonElement>('.psx-idioma-boton')
+    const lista = caja.querySelector<HTMLElement>('.psx-idioma-lista')
+    if (!botonIdioma || !lista) return
+    const abierta = () => botonIdioma.getAttribute('aria-expanded') === 'true'
+    const poner = (abrir: boolean, devolverFoco = false) => {
+      botonIdioma.setAttribute('aria-expanded', String(abrir))
+      lista.hidden = !abrir
+      if (abrir) {
+        const activa =
+          lista.querySelector<HTMLElement>('button[aria-pressed="true"]') ??
+          lista.querySelector<HTMLElement>('button:not(:disabled)')
+        activa?.focus({ preventScroll: true })
+      } else if (devolverFoco) botonIdioma.focus({ preventScroll: true })
+    }
+    poner(false)
+    const alBoton = () => poner(!abierta())
+    // Escape cierra la lista y NO el menú del teléfono que la contiene: se frena acá.
+    const alTecla = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || !abierta()) return
+      e.preventDefault()
+      e.stopPropagation()
+      poner(false, true)
+    }
+    const alOpcion = (e: Event) => {
+      const opcion = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-idioma]')
+      if (!opcion || opcion.disabled) return
+      caja.dispatchEvent(new CustomEvent('psx:idioma', { bubbles: true, detail: { idioma: opcion.dataset.idioma } }))
+      poner(false, true)
+    }
+    const alAfuera = (e: PointerEvent) => {
+      if (abierta() && !caja.contains(e.target as Node)) poner(false)
+    }
+    const alSalirFoco = (e: FocusEvent) => {
+      if (abierta() && e.relatedTarget && !caja.contains(e.relatedTarget as Node)) poner(false)
+    }
+    botonIdioma.addEventListener('click', alBoton)
+    caja.addEventListener('keydown', alTecla)
+    lista.addEventListener('click', alOpcion)
+    caja.addEventListener('focusout', alSalirFoco)
+    document.addEventListener('pointerdown', alAfuera)
+    soltar.push(() => {
+      botonIdioma.removeEventListener('click', alBoton)
+      caja.removeEventListener('keydown', alTecla)
+      lista.removeEventListener('click', alOpcion)
+      caja.removeEventListener('focusout', alSalirFoco)
+      document.removeEventListener('pointerdown', alAfuera)
+    })
+  })
 
   return () => soltar.forEach((f) => f())
 }

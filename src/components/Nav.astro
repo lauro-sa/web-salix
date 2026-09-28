@@ -5,6 +5,7 @@
 // (src/styles/publico-salix.css y src/scripts/publico-salix.ts, GENERADOS): acá solo va lo de
 // Salix — el logo, los enlaces y el botón.
 // ============================================================
+import Idioma from './Idioma.astro';
 import LogoSalixAnimado from './LogoSalixAnimado.astro';
 
 const ENLACES = [
@@ -57,7 +58,10 @@ const CTA = { href: '/#contacto', texto: 'Hablemos' };
     ))}
   </nav>
   <div class="psx-menu-pie">
-    <a class="psx-cta psx-cta--ancho" href={CTA.href}>{CTA.texto}</a>
-    <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
+    <a class="psx-cta" href={CTA.href}>{CTA.texto}</a>
+    <div class="psx-menu-pie-extra">
+      <Idioma id="idioma-menu" />
+      <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
+    </div>
   </div>
 </div>

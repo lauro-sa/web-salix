@@ -596,6 +596,189 @@ html.psx-sin-scroll {
   padding-bottom: max(1.375rem, env(safe-area-inset-bottom, 0px));
 }
 
+/* ── Idioma ── En la base del pie y en la fila de abajo del menú del teléfono; nunca en la barra
+   (publico-salix.md §5). Un botón con el globo y el nombre del idioma en su lengua, y una lista
+   que abre hacia arriba. Los íconos los dibuja la hoja (máscaras), así cada producto pone solo
+   el texto. El comportamiento (abrir, cerrar, foco) es de `montarPublicoSalix`; elegir un idioma
+   es de cada producto. */
+.psx-idioma {
+  position: relative;
+  display: inline-flex;
+}
+.psx-idioma-boton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2rem;
+  padding: 0 0.625rem 0 0.5rem;
+  border: 1px solid var(--psx-borde);
+  border-radius: 999px;
+  background: none;
+  color: var(--psx-texto-2);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+.psx-idioma-boton::before,
+.psx-idioma-boton::after,
+.psx-idioma-lista button::before {
+  content: '';
+  flex-shrink: 0;
+  background: currentColor;
+  -webkit-mask: var(--psx-icono) center / contain no-repeat;
+  mask: var(--psx-icono) center / contain no-repeat;
+}
+.psx-idioma-boton::before {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9.25'/%3E%3Cpath d='M2.75 12h18.5M12 2.75c2.4 2.5 3.6 5.6 3.6 9.25s-1.2 6.75-3.6 9.25c-2.4-2.5-3.6-5.6-3.6-9.25S9.6 5.25 12 2.75z'/%3E%3C/svg%3E");
+  width: 0.9375rem;
+  height: 0.9375rem;
+  opacity: 0.8;
+}
+.psx-idioma-boton::after {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  width: 0.75rem;
+  height: 0.75rem;
+  opacity: 0.6;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+/* La lista abre hacia ARRIBA: el control vive al final de la página o del menú. */
+.psx-idioma-boton[aria-expanded='true']::after {
+  transform: rotate(180deg);
+}
+.psx-idioma-boton[aria-expanded='true'] {
+  color: var(--psx-texto);
+  border-color: color-mix(in srgb, var(--psx-texto) 28%, transparent);
+}
+@media (hover: hover) {
+  .psx-idioma-boton:hover {
+    color: var(--psx-texto);
+    border-color: color-mix(in srgb, var(--psx-texto) 28%, transparent);
+  }
+}
+@media (pointer: coarse) {
+  .psx-idioma-boton {
+    min-height: 2.75rem;
+  }
+}
+/* En el pie, el nombre entero («Español»); en la fila del menú del teléfono, el código («ES»):
+   ahí comparte la fila con la acción y, en Salix, con la firma. */
+.psx-idioma-codigo,
+.psx-menu-pie .psx-idioma-nombre {
+  display: none;
+}
+.psx-menu-pie .psx-idioma-codigo {
+  display: inline;
+  letter-spacing: 0.04em;
+}
+.psx-idioma-lista {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.5rem);
+  z-index: 20;
+  min-width: 13.5rem;
+  margin: 0;
+  padding: 0.375rem;
+  list-style: none;
+  background: var(--psx-fondo);
+  border: 1px solid var(--psx-borde);
+  border-radius: 0.875rem;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    0 16px 40px -12px rgb(0 0 0 / 0.28);
+  transform-origin: 100% 100%;
+  animation: psx-idioma-abrir 0.18s cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes psx-idioma-abrir {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem) scale(0.98);
+  }
+}
+/* «Automático» va arriba y separado: es lo que elige el dispositivo, no un idioma más. */
+.psx-idioma-lista > .psx-idioma-auto {
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--psx-borde);
+}
+.psx-idioma-lista button {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 2.25rem;
+  padding: 0 0.625rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--psx-texto-2);
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+.psx-idioma-lista button::before {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--psx-marca);
+  visibility: hidden;
+}
+.psx-idioma-lista button[aria-pressed='true'] {
+  color: var(--psx-texto);
+  font-weight: 600;
+}
+.psx-idioma-lista button[aria-pressed='true']::before {
+  visibility: visible;
+}
+.psx-idioma-lista button:focus-visible {
+  outline: 2px solid var(--psx-marca);
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .psx-idioma-lista button:not(:disabled):hover {
+    background: color-mix(in srgb, var(--psx-texto) 6%, transparent);
+    color: var(--psx-texto);
+  }
+}
+@media (pointer: coarse) {
+  .psx-idioma-lista button {
+    min-height: 2.75rem;
+  }
+}
+.psx-idioma-lista button:disabled {
+  color: var(--psx-texto-3);
+  cursor: default;
+}
+/* A la derecha de la opción: el idioma que detectó el dispositivo, o «Pronto». */
+.psx-idioma-detalle {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--psx-texto-3);
+}
+.psx-idioma-pronto {
+  margin-left: auto;
+  padding: 0.125rem 0.4375rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--psx-texto) 7%, transparent);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--psx-texto-3);
+}
+/* En la fila del menú, lo propio del producto va junto a la derecha (el idioma y la firma). */
+.psx-menu-pie-extra {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
 @media (max-width: 760px) {
   .psx-pie-arriba {
     grid-template-columns: 1fr;
@@ -608,6 +791,12 @@ html.psx-sin-scroll {
   .psx-pie-base {
     flex-direction: column;
     align-items: flex-start;
+  }
+  /* Con la base apilada, el idioma queda contra el borde izquierdo: la lista crece a la derecha. */
+  .psx-pie-base .psx-idioma-lista {
+    right: auto;
+    left: 0;
+    transform-origin: 0 100%;
   }
 }
 

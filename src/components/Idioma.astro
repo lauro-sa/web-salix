@@ -1,0 +1,37 @@
+---
+// ============================================================
+// Idioma.astro — el selector de idioma de la familia (publico-salix.md §5), en el pie y en la
+// fila de abajo del menú del teléfono; nunca en la barra. La forma y el abrir/cerrar son de la
+// pieza de familia (publico-salix.css / montarPublicoSalix); acá va solo lo de salixweb.
+//
+// El sitio está solo en español: inglés y portugués se muestran «Pronto». Cuando se traduzca, se
+// habilitan, se suma la fila «Automático» y se escucha el evento `psx:idioma`.
+// ============================================================
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+
+const IDIOMAS = [
+  { codigo: 'es', nombre: 'Español', disponible: true },
+  { codigo: 'en', nombre: 'English', disponible: false },
+  { codigo: 'pt', nombre: 'Português', disponible: false },
+];
+const activo = IDIOMAS[0];
+---
+
+<div class="psx-idioma">
+  <button type="button" class="psx-idioma-boton" aria-expanded="false" aria-controls={id} aria-label={`Idioma: ${activo.nombre}`}>
+    <span class="psx-idioma-nombre">{activo.nombre}</span><span class="psx-idioma-codigo">{activo.codigo.toUpperCase()}</span>
+  </button>
+  <ul class="psx-idioma-lista" id={id} hidden>
+    {IDIOMAS.map((i) => (
+      <li>
+        <button type="button" data-idioma={i.codigo} lang={i.codigo} aria-pressed={String(i.codigo === activo.codigo)} disabled={!i.disponible}>
+          {i.nombre}
+          {!i.disponible && <span class="psx-idioma-pronto">Pronto</span>}
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
