@@ -343,23 +343,21 @@ html:has(.psx-barra) {
 }
 .psx-menu-num {
   flex: none;
-  min-width: 2.4ch;
-  /* Grande como el texto, medio transparente y con textura de puntos (Sal, 2026-09-28: «que el 01,
-     el 02 estén en grande y medio transparentes, con alguna textura»). El relleno es una trama de
-     puntos recortada a la letra; el contorno fino la mantiene legible sobre cualquier fondo. */
+  min-width: 2ch;
+  /* Más grande que el texto y medio traslúcido, liso: marca el orden sin competir con el nombre
+     (Sal, 2026-09-28: «medio traslúcido, así suave y listo (…) que sea más grande que el texto»;
+     la trama de puntos de antes no le gustó). */
   font-family: var(--psx-fuente);
-  font-size: clamp(1.75rem, 8vw, 2.25rem);
-  font-weight: 700;
+  font-size: clamp(2.75rem, 13vw, 3.5rem);
+  font-weight: 300;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: transparent;
-  background-image: radial-gradient(circle, var(--psx-texto-2) 0.8px, transparent 1.1px);
-  background-size: 3px 3px;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-stroke: 0.6px color-mix(in srgb, var(--psx-texto-2) 55%, transparent);
-  opacity: 0.55;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: color-mix(in srgb, var(--psx-texto) 18%, transparent);
+  transition: color 0.2s;
+}
+.psx-menu-enlace[aria-current='page'] .psx-menu-num {
+  color: color-mix(in srgb, var(--psx-marca) 45%, transparent);
 }
 .psx-menu-texto {
   font-size: clamp(1.5rem, 6.5vw, 1.875rem);
