@@ -102,8 +102,11 @@ html:has(.psx-barra) {
     max(clamp(1.25rem, 5vw, 2rem), env(safe-area-inset-left, 0px));
   font-family: var(--psx-fuente);
   background: transparent;
-  backdrop-filter: blur(20px);
+  /* El prefijo va PRIMERO: Lightning CSS (el compilador de Next) toma la última declaración como
+     la que manda, y con el prefijo al final dejaba solo `-webkit-backdrop-filter`, que Chrome no
+     lee: la barra salía sin vidrio en Flux y en Menú. Lo cuida `publico-salix-compila.test.ts`. */
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid transparent;
   transition:
     background-color 0.4s,
