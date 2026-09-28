@@ -64,9 +64,20 @@ const schemaOrg = JSON.stringify({
   <meta name="theme-color" content="#fafafa" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href={conVersion('/favicon.svg')} />
-  <link rel="icon" type="image/x-icon" href={conVersion('/favicon.ico')} />
+  <!-- Favicon: la Cortina oscura en tema claro y clara en tema oscuro. Se declara solo el SVG
+       (con el .ico en la lista, Chrome podía elegirlo, y no cambia con el tema). El script elige el
+       archivo fijo según el tema del navegador y lo cambia si el tema cambia con la pestaña abierta:
+       la media query del SVG sola no alcanzaba (regla en docs/familia-salix/kit-marca.md de Flux). -->
+  <link rel="icon" type="image/svg+xml" id="favicon" href={conVersion('/favicon.svg')} />
+  <script is:inline define:vars={{ claro: conVersion('/favicon-claro.svg'), oscuro: conVersion('/favicon-oscuro.svg') }}>
+    (function () {
+      var m = window.matchMedia('(prefers-color-scheme: dark)');
+      var l = document.getElementById('favicon');
+      var aplicar = function () { if (l) l.setAttribute('href', m.matches ? oscuro : claro); };
+      aplicar();
+      m.addEventListener('change', aplicar);
+    })();
+  </script>
   <link rel="apple-touch-icon" href={conVersion('/apple-touch-icon.png')} />
 
   <!-- SEO Principal -->

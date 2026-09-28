@@ -29,8 +29,8 @@ import { execFileSync } from 'child_process'
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const LOGO = resolve(RAIZ, 'public/logo-salix.svg')
 
-// La huella mira el dibujo Y esta receta: si cambia cómo se arma el favicon (2026-09-28: la placa
-// clara), la URL tiene que cambiar igual, o la pestaña se queda con el ícono viejo en su caché.
+// La huella mira el dibujo Y esta receta: si cambia cómo se arma el favicon (2026-09-28: claro u oscuro
+// según el tema), la URL tiene que cambiar igual, o la pestaña se queda con el ícono viejo en su caché.
 const version = createHash('sha256')
   .update(readFileSync(LOGO))
   .update(readFileSync(fileURLToPath(import.meta.url)))
@@ -63,22 +63,23 @@ const svgLogo = readFileSync(LOGO, 'utf8')
 const d = svgLogo.match(/\sd="([^"]+)"/)[1]
 const regla = svgLogo.match(/fill-rule="(\w+)"/)?.[1] ?? 'nonzero'
 
-// favicon.svg — la Cortina en cobre sobre una placa clara, igual que el del panel
-// (`public/iconos/favicon-salix.svg` del repo de Flux, que sale de `faviconEnPlaca`).
-// 🔴 Sin prefers-color-scheme: con la marca negra que pasaba a blanco en oscuro, Chrome la
-// mostraba NEGRA sobre su barra oscura (no siempre evalúa la media query contra su propio tema,
-// y el .ico no puede cambiar de color). Con la placa se lee igual en pestañas claras y oscuras.
-const ocupacionFavicon = 0.72
-const desplaceFavicon = +((24 * (1 - ocupacionFavicon)) / 2).toFixed(3)
-const faviconSvg =
+// favicon — la Cortina sola, oscura en tema claro y clara en tema oscuro (misma regla que Flux,
+// `docs/familia-salix/kit-marca.md`). Tres archivos: el «auto» con la media query adentro (lo que
+// ve un navegador sin JavaScript) y los dos fijos, que elige el script de `Plantilla.astro` según
+// el tema del navegador. 🔴 La media query sola fallaba: Chrome no siempre la evalúa contra su
+// propio tema, y Sal veía la marca negra sobre la barra oscura (2026-09-28).
+const EN_CLARO = '#1a1a1a'
+const EN_OSCURO = '#f2f2f2'
+const favicon = (relleno) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="Salix">` +
-  `<defs><linearGradient id="placa" x1="0" y1="0" x2="1" y2="1">` +
-  `<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f0f0f1"/>` +
-  `</linearGradient></defs>` +
-  `<rect width="24" height="24" rx="5.5" fill="url(#placa)"/>` +
-  `<path transform="translate(${desplaceFavicon} ${desplaceFavicon}) scale(${ocupacionFavicon})" fill="#c2710c" ` +
-  `fill-rule="${regla}" d="${d}"/></svg>\n`
-writeFileSync(resolve(RAIZ, 'public/favicon.svg'), faviconSvg)
+  (relleno
+    ? `<path fill="${relleno}" fill-rule="${regla}" d="${d}"/></svg>\n`
+    : `<style>path{fill:${EN_CLARO}}@media(prefers-color-scheme:dark){path{fill:${EN_OSCURO}}}</style>` +
+      `<path fill-rule="${regla}" d="${d}"/></svg>\n`)
+const faviconSvg = favicon(EN_CLARO)
+writeFileSync(resolve(RAIZ, 'public/favicon.svg'), favicon(null))
+writeFileSync(resolve(RAIZ, 'public/favicon-claro.svg'), faviconSvg)
+writeFileSync(resolve(RAIZ, 'public/favicon-oscuro.svg'), favicon(EN_OSCURO))
 
 // El dibujo sobre un fondo, ocupando `ocupacion` del lado
 const icono = (lado, { fondo, color, ocupacion }) => {

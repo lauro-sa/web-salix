@@ -4,4 +4,4 @@
  * para que el CDN sirva el archivo nuevo apenas cambia, en vez de seguir con el
  * viejo hasta que expire su cache de 7 días.
  */
-export const VERSION_LOGO = '0509468e'
+export const VERSION_LOGO = '4646a537'
