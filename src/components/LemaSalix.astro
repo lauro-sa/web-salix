@@ -3,16 +3,18 @@
 // LemaSalix.astro — el significado del nombre: SALIX — Software And Logic for eXcellence.
 // Una sola fuente para la frase: se usa en «Por qué Salix», en el footer y en el
 // schema.org del layout (LEMA_SALIX). Las letras que forman SALIX van en cobre.
+// `sinSigla`: sin el «SALIX —» delante, para donde el logo ya dice el nombre justo arriba
+// (el pie). Repetirlo ahí es redundante (Sal, 2026-09-28).
 // ============================================================
 import { LEMA_SALIX } from '../lema';
 
-interface Props { clase?: string }
-const { clase = '' } = Astro.props;
+interface Props { clase?: string; sinSigla?: boolean }
+const { clase = '', sinSigla = false } = Astro.props;
 ---
 
-<p class:list={['lema-salix', clase]} aria-label={`SALIX — ${LEMA_SALIX}`}>
-  <span class="lema-sigla" aria-hidden="true">SALIX</span>
-  <span class="lema-raya" aria-hidden="true">—</span>
+<p class:list={['lema-salix', clase]} aria-label={sinSigla ? LEMA_SALIX : `SALIX — ${LEMA_SALIX}`}>
+  {!sinSigla && <span class="lema-sigla" aria-hidden="true">SALIX</span>}
+  {!sinSigla && <span class="lema-raya" aria-hidden="true">—</span>}
   <span aria-hidden="true"><b>S</b>oftware <b>A</b>nd <b>L</b>og<b>i</b>c for e<b>X</b>cellence</span>
 </p>
 

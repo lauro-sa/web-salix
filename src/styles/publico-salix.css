@@ -29,7 +29,44 @@
 }
 /* Un salto a una sección (o el foco con el teclado) no queda tapado por la barra fija. */
 html:has(.psx-barra) {
+  /* El alto de la barra: 0,875rem arriba y abajo + 2,75rem de contenido + la línea de 1px. */
+  --psx-alto-barra: calc(4.5rem + 1px + env(safe-area-inset-top, 0px));
   scroll-padding-top: calc(5rem + env(safe-area-inset-top, 0px));
+}
+
+/* La barra de scroll de la página arranca DEBAJO de la barra fija, no por encima de ella.
+   Solo existe en Chrome/Edge/Safari (el margen del riel es de ::-webkit-scrollbar); Firefox
+   conserva la suya de siempre. Y solo con mouse: con el dedo el sistema la muestra flotante.
+   ⚠️ Chrome ignora ::-webkit-scrollbar si scrollbar-color o scrollbar-width no son `auto`,
+   por eso acá se vuelven a `auto` (el producto puede haberlos fijado para toda la página).
+   Va en <html> Y en <body>: Chrome dibuja la barra de la página con el estilo del <body> si él
+   tiene uno propio (un `::-webkit-scrollbar` suelto del producto lo alcanza), y si no con el de <html>.
+   Lee --psx-texto desde <html>: si el producto lo mapea más abajo (Flux, en .kit-root), cae al
+   color de texto del sistema. */
+@supports selector(::-webkit-scrollbar) {
+  @media (hover: hover) and (pointer: fine) {
+    :is(html, body):has(.psx-barra) {
+      scrollbar-color: auto;
+      scrollbar-width: auto;
+    }
+    :is(html, body):has(.psx-barra)::-webkit-scrollbar {
+      width: 0.5rem;
+      background: transparent;
+    }
+    :is(html, body):has(.psx-barra)::-webkit-scrollbar-track {
+      margin-top: var(--psx-alto-barra);
+      background: transparent;
+    }
+    :is(html, body):has(.psx-barra)::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--psx-texto, CanvasText) 22%, transparent);
+      border: 2px solid transparent;
+      border-radius: 999px;
+      background-clip: padding-box;
+    }
+    :is(html, body):has(.psx-barra)::-webkit-scrollbar-thumb:hover {
+      background-color: color-mix(in srgb, var(--psx-texto, CanvasText) 40%, transparent);
+    }
+  }
 }
 
 /* ── Barra de progreso de lectura ── */
