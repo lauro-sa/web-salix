@@ -13,16 +13,16 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-interface Props { clase?: string }
-const { clase = '' } = Astro.props;
+interface Props { clase?: string; id?: string }
+const { clase = '', id = 'copa-salix' } = Astro.props;
 
 const svg = readFileSync(resolve(process.cwd(), 'public/logo-salix.svg'), 'utf8');
 const d = svg.match(/\sd="([^"]+)"/)?.[1] ?? '';
 const regla = svg.match(/fill-rule="(\w+)"/)?.[1] ?? 'nonzero';
 const ramas = d.split(/(?=M)/).map((r) => r.trim()).filter(Boolean);
 // El círculo que contiene a las ramas (viewBox 24: centro 12, radio 11,04). Recorta la
-// rama mientras baja, así nace desde el borde de la copa y no desde el aire.
-const id = 'copa-salix';
+// rama mientras baja, así nace desde el borde de la copa y no desde el aire. El `id`
+// tiene que ser único por instancia en la página.
 ---
 
 <svg class:list={['logo-animado', clase]} viewBox="0 0 24 24" aria-hidden="true">
