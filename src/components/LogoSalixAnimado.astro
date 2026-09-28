@@ -33,7 +33,7 @@ const { cx, cy, r } = datos.copa;
   <g clip-path={`url(#${id})`} fill="currentColor">
     {datos.ramas.map((rama) => (
       <path
-        class="rama"
+        class={modo === 'simple' ? 'rama rama-salix' : 'rama'}
         d={rama.d}
         data-desde={rama.desde}
         data-retraso={rama.retraso}
@@ -47,26 +47,9 @@ const { cx, cy, r } = datos.copa;
 <style>
   .logo-animado { display: block; color: var(--texto); overflow: visible; }
 
-  /* Simple: cada rama baja desde detrás del borde de la copa, a su ritmo (× 0,6: es chico) */
-  .logo-animado--simple .rama {
-    --ritmo-ramas: 0.6;
-    animation: rama-nace calc(var(--duracion) * var(--ritmo-ramas)) var(--curva-ramas)
-      calc(var(--retraso) * var(--ritmo-ramas) + 0.2s) both;
-  }
-  :global(a:hover) > * > .logo-animado--simple .rama,
-  :global(a:hover) > .logo-animado--simple .rama,
-  .logo-animado--simple:hover .rama {
-    animation:
-      rama-nace calc(var(--duracion) * var(--ritmo-ramas)) var(--curva-ramas)
-        calc(var(--retraso) * var(--ritmo-ramas) + 0.2s) both,
-      rama-mece 1.1s ease-in-out calc(var(--retraso) * 0.3);
-  }
-  @keyframes rama-nace { from { transform: translateY(var(--desde)); } }
-  @keyframes rama-mece {
-    0%, 100% { transform: translateY(0); }
-    35% { transform: translateY(1.1px); }
-    70% { transform: translateY(-0.4px); }
-  }
+  /* Simple (barra, pie): las ramas son .rama-salix y las mueve marca-salix.css, el movimiento de toda
+     la familia (nacen con el ritmo de ramas-salix.json y se mecen con el mouse). El modo «guion» (la
+     portada) lo sigue moviendo animaciones-scroll.js. */
   @media (prefers-reduced-motion: reduce) {
     .logo-animado .rama { animation: none !important; }
   }

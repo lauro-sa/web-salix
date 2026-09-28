@@ -29,9 +29,14 @@ const AÑO = new Date().getFullYear();
 
   <!-- Pie: logo | copyright | toggle -->
   <div class="footer-pie footer-animar">
-    <a href="/" class="footer-logo" aria-label="Salix inicio">
-      <LogoSalixAnimado clase="footer-logo-svg" id="copa-salix-footer" tamaño={22} />
-      <span class="footer-nombre">Salix</span>
+    <!-- El mismo logo y el mismo gesto que la barra (marca-salix.css); en el pie entra quieto. -->
+    <a href="/" class="footer-logo msx msx--estatico" style="--msx-tam:22px" aria-label="Salix inicio">
+      <span class="msx-icono">
+        <LogoSalixAnimado clase="msx-svg" id="copa-salix-footer" tamaño={22} />
+      </span>
+      <span class="msx-nombre" aria-hidden="true">
+        <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
+      </span>
     </a>
 
     <p>&copy; {AÑO} Salix &middot; Buenos Aires, Argentina</p>
@@ -142,18 +147,16 @@ const AÑO = new Date().getFullYear();
     letter-spacing: 0.02em;
   }
 
+  /* Tenue en reposo; con el mouse se enciende y hace el gesto de la familia. */
   .footer-logo {
-    display: flex; align-items: center; gap: 8px;
-    text-decoration: none; color: var(--texto);
+    text-decoration: none;
     opacity: 0.4;
     transition: opacity .3s;
   }
 
-  .footer-logo:hover { opacity: 0.7; }
+  .footer-logo:hover { opacity: 1; }
 
   .footer-lema { display: flex; justify-content: center; padding: 0 24px 18px; font-size: 12px; }
-  .footer-logo-svg { height: 22px; width: auto; }
-  .footer-nombre { font-size: 13px; font-weight: 600; color: var(--texto); }
 
   /* ─── Toggle Tema Minimalista ─── */
   .tema-toggle {

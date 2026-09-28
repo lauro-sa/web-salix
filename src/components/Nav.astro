@@ -9,12 +9,14 @@ import LogoSalixAnimado from './LogoSalixAnimado.astro';
 
 <nav id="nav-principal" class="nav">
   <!-- Logo animado -->
-  <a href="/" class="logo" aria-label="Salix inicio">
-    <div class="logo-icono">
-      <LogoSalixAnimado clase="logo-svg" id="copa-salix-nav" tamaño={26} />
-    </div>
-    <span class="logo-nombre" aria-label="Salix">
-      <span class="logo-letra" style="--i:0">S</span><span class="logo-letra" style="--i:1">a</span><span class="logo-letra" style="--i:2">l</span><span class="logo-letra" style="--i:3">i</span><span class="logo-letra" style="--i:4">x</span>
+  <!-- Clases msx-*: el movimiento es el de toda la familia (src/styles/marca-salix.css, copiado de
+       docs/familia-salix/marca-salix.css en el repo de Flux). Acá no se escribe animación propia. -->
+  <a href="/" class="logo msx" style="--msx-tam:26px" aria-label="Salix inicio">
+    <span class="msx-icono">
+      <LogoSalixAnimado clase="msx-svg" id="copa-salix-nav" tamaño={26} />
+    </span>
+    <span class="msx-nombre" aria-hidden="true">
+      <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
     </span>
   </a>
 
@@ -73,65 +75,8 @@ import LogoSalixAnimado from './LogoSalixAnimado.astro';
   }
 
   /* ─── Logo Animado ─── */
-  .logo {
-    display: flex; align-items: center; gap: 8px;
-    text-decoration: none; color: var(--texto);
-  }
-
-  .logo-icono {
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  /* El logo entra con sus ramas (LogoSalixAnimado, modo simple): ya no gira. */
-
-  /* Brillo pulsante detras del logo */
-  .logo-icono::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    background: var(--salix);
-    opacity: 0;
-    filter: blur(12px);
-    animation: logoPulso 3s ease-in-out 1.2s infinite;
-    z-index: -1;
-  }
-
-  @keyframes logoPulso {
-    0%, 100% { opacity: 0; transform: scale(0.8); }
-    50%      { opacity: 0.15; transform: scale(1.2); }
-  }
-
-  /* Nombre "Salix" letra por letra */
-  .logo-nombre {
-    font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
-    display: flex;
-  }
-
-  .logo-letra {
-    display: inline-block;
-    animation: letraEntrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    animation-delay: calc(0.6s + var(--i) * 0.08s);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s;
-  }
-
-  .logo:hover .logo-letra {
-    color: var(--salix);
-    animation: letraRebote 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    animation-delay: calc(var(--i) * 0.04s);
-  }
-
-  @keyframes letraEntrada {
-    0%   { opacity: 0; transform: translateY(14px) scale(0.5); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  @keyframes letraRebote {
-    0%   { transform: translateY(0); }
-    40%  { transform: translateY(-6px); }
-    100% { transform: translateY(0); }
-  }
+  /* El logo: la forma y el movimiento salen de marca-salix.css (.msx). Acá solo lo que es de la barra. */
+  .logo { text-decoration: none; }
 
   /* ─── Links Desktop ─── */
   .nav-links { display: flex; align-items: center; gap: 2px; }

@@ -26,6 +26,14 @@ const PRODUCTOS: Producto[] = [
     color:       'var(--salix)',
   },
   {
+    nombre:      'Menú by Salix',
+    descripcion: 'La carta digital de tu local, con un QR que no cambia nunca. Cambiás precios, platos y fotos cuando quieras.',
+    icono:       'menu',
+    disponible:  true,
+    url:         'https://menu.salixweb.com',
+    color:       'var(--salix)',
+  },
+  {
     nombre:      'Sites',
     descripcion: 'Sitios web a medida con tecnologia Salix. Rapidos, con SEO completo y diseño profesional.',
     icono:       'sitio',
@@ -122,6 +130,10 @@ const TEXTO = {
     gap: 1rem;
   }
 
+  /* Si la última tarjeta queda sola en su fila, ocupa la fila entera: una tarjeta suelta al lado de
+     dos huecos se lee como que falta algo. Vale para las tres y las dos columnas. */
+  .grilla-productos > .card-producto:last-child:nth-child(3n + 1) { grid-column: 1 / -1; }
+
   /* Card de cada producto */
   .card-producto {
     background: var(--card);
@@ -182,9 +194,12 @@ const TEXTO = {
 
   @media (max-width: 1024px) {
     .grilla-productos { grid-template-columns: repeat(2, 1fr); }
+    .grilla-productos > .card-producto:last-child:nth-child(3n + 1) { grid-column: auto; }
+    .grilla-productos > .card-producto:last-child:nth-child(2n + 1) { grid-column: 1 / -1; }
   }
 
   @media (max-width: 640px) {
     .grilla-productos { grid-template-columns: 1fr; }
+    .grilla-productos > .card-producto:last-child { grid-column: auto; }
   }
 </style>

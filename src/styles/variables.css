@@ -67,6 +67,12 @@
 :root {
   --fuente-principal: 'Inter', system-ui, -apple-system, sans-serif;
   --fuente-mono:      'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Los nombres que usa marca-salix.css (el movimiento del logo de la familia, copiado del repo
+     de Flux): se apuntan a los tokens de salixweb acá, sin tocar la copia. */
+  --texto-primario: var(--texto);
+  --texto-marca:    var(--salix);
+  --fuente-sans:    var(--fuente-principal);
   --radio-pill:    100px;
   --radio-card:    16px;
   --radio-icono:   12px;

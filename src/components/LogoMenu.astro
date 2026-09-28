@@ -1,0 +1,34 @@
+---
+// Isotipo de Menú — el QR «Tres ojos», entero (el logo quieto de Menú: sin las mordidas, que son
+// solo su animación de entrada; ver docs/familia-salix/marca-menu.md en el repo de Flux).
+//
+// La geometría sale de src/logos-productos.json, que escribe el generador de marca del repo de
+// Flux (`node scripts/marca/generar.mjs`) desde la familia. No se escribe a mano.
+import logos from '../logos-productos.json';
+
+interface Props {
+  tamaño?: number;
+  clase?: string;
+}
+
+const { tamaño = 22, clase = '' } = Astro.props;
+const { menu } = logos;
+---
+
+<svg
+  class:list={['logo-menu', clase]}
+  width={tamaño}
+  height={tamaño}
+  viewBox={menu.viewBox}
+  aria-hidden="true"
+>
+  <path d={menu.d} fill-rule={menu.fillRule} fill="currentColor" />
+</svg>
+
+<style>
+  .logo-menu {
+    display: block;
+    color: var(--ico-color);
+    flex-shrink: 0;
+  }
+</style>
