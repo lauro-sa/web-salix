@@ -183,6 +183,20 @@ html:has(.psx-barra) {
     background: var(--psx-cta-hover);
   }
 }
+/* En la barra, más discreto (Sal, 2026-09-28: «demasiado grande el botón en sí»): 36 px a la
+   vista; con el dedo, la zona de toque sigue siendo de 44. */
+.psx-barra .psx-cta {
+  position: relative;
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
+}
+@media (pointer: coarse) {
+  .psx-barra .psx-cta::after {
+    content: '';
+    position: absolute;
+    inset: -0.25rem 0;
+  }
+}
 .psx-cta--ancho {
   width: 100%;
   min-height: 3rem;
@@ -270,7 +284,7 @@ html:has(.psx-barra) {
 .psx-menu-enlace {
   display: flex;
   align-items: baseline;
-  gap: 1rem;
+  gap: 1.25rem;
   padding: 0.875rem 0;
   border-bottom: 1px solid var(--psx-borde);
   color: var(--psx-texto);
@@ -292,12 +306,23 @@ html:has(.psx-barra) {
 }
 .psx-menu-num {
   flex: none;
-  width: 1.75rem;
-  font-family: var(--psx-fuente-mono, ui-monospace, 'SF Mono', Menlo, monospace);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  min-width: 2.4ch;
+  /* Grande como el texto, medio transparente y con textura de puntos (Sal, 2026-09-28: «que el 01,
+     el 02 estén en grande y medio transparentes, con alguna textura»). El relleno es una trama de
+     puntos recortada a la letra; el contorno fino la mantiene legible sobre cualquier fondo. */
+  font-family: var(--psx-fuente);
+  font-size: clamp(1.75rem, 8vw, 2.25rem);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--psx-texto-3);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: transparent;
+  background-image: radial-gradient(circle, var(--psx-texto-2) 0.8px, transparent 1.1px);
+  background-size: 3px 3px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 0.6px color-mix(in srgb, var(--psx-texto-2) 55%, transparent);
+  opacity: 0.55;
 }
 .psx-menu-texto {
   font-size: clamp(1.5rem, 6.5vw, 1.875rem);
@@ -389,9 +414,6 @@ html.psx-sin-scroll {
 .psx-pie--visible .psx-pie-base {
   transition-delay: 0.25s;
 }
-.psx-pie--visible .psx-pie-firma {
-  transition-delay: 0.4s;
-}
 
 .psx-pie-arriba {
   display: grid;
@@ -463,8 +485,8 @@ html.psx-sin-scroll {
   }
 }
 
-/* La base: copyright a la izquierda; a la derecha lo propio (el crédito de Salix, el tema, el
-   idioma). Siempre en este lugar, en todos los productos. */
+/* La base: copyright a la izquierda; a la derecha lo propio (el crédito de Salix, la firma de quien
+   hizo el sitio, el tema, el idioma). Siempre en este lugar, en todos los productos. */
 .psx-pie-base {
   display: flex;
   align-items: center;
@@ -505,14 +527,6 @@ html.psx-sin-scroll {
   .psx-credito:hover strong {
     color: var(--psx-texto);
   }
-}
-/* La firma de quien hizo el sitio, debajo de todo. Opcional. */
-.psx-pie-firma {
-  display: flex;
-  justify-content: center;
-  max-width: 67.5rem;
-  margin: 0 auto;
-  padding: 0 clamp(1.25rem, 6vw, 4rem) max(1.5rem, env(safe-area-inset-bottom, 0px));
 }
 .psx-pie > :last-child {
   padding-bottom: max(1.375rem, env(safe-area-inset-bottom, 0px));

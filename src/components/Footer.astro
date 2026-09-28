@@ -2,7 +2,7 @@
 // ============================================================
 // Footer.astro — el pie de la familia Salix (publico-salix.md, en la carpeta de la familia del
 // repo de Flux): marca con su lema, columnas de enlaces, la base con el copyright y lo propio, y
-// la firma. La forma y la cortina son de toda la familia (src/styles/publico-salix.css,
+// la firma (en la base, con el tema). La forma y la cortina son de toda la familia (src/styles/publico-salix.css,
 // GENERADO); acá solo va lo de Salix.
 // ============================================================
 import LogoSalixAnimado from './LogoSalixAnimado.astro';
@@ -11,14 +11,12 @@ import LemaSalix from './LemaSalix.astro';
 const AÑO = new Date().getFullYear();
 const COLUMNAS = [
   {
+    // Solo los que existen hoy (Sal, 2026-09-28): los que vienen no se listan hasta que estén.
     titulo: 'Productos',
     enlaces: [
       { href: '/flux', texto: 'Flux' },
       { href: 'https://menu.salixweb.com', texto: 'Menú' },
       { href: '/sites', texto: 'Sites' },
-      { href: '/go', texto: 'Go' },
-      { href: '/play', texto: 'Play' },
-      { href: '/book', texto: 'Book' },
     ],
   },
   {
@@ -67,6 +65,7 @@ const COLUMNAS = [
   <div class="psx-pie-base psx-pie-animar">
     <span>&copy; {AÑO} Salix &middot; Buenos Aires, Argentina</span>
     <div class="psx-pie-base-extra">
+      <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
       <button id="boton-tema" class="tema-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
         <svg class="tema-icono icono-sol-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
           <circle cx="9" cy="9" r="3.5"/>
@@ -91,9 +90,6 @@ const COLUMNAS = [
     </div>
   </div>
 
-  <div class="psx-pie-firma psx-pie-animar">
-    <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
-  </div>
 </footer>
 
 <style>
