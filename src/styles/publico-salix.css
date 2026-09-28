@@ -234,10 +234,33 @@ html:has(.psx-barra) {
     inset: -0.25rem 0;
   }
 }
-.psx-cta--ancho {
-  width: 100%;
-  min-height: 3rem;
-  font-size: 0.9375rem;
+/* En el pie del menú del teléfono, la acción NO es un bloque: es un enlace en línea con una
+   flecha, a la izquierda, alineado con los enlaces de arriba; lo propio del producto (la firma, el
+   idioma) va a la derecha de la misma fila. Sal, 2026-09-28, sobre el botón a todo el ancho con
+   la firma centrada abajo: «muy grotesco, llama mucha atención (…) no parece como estuvieran
+   centrados los dos». */
+.psx-menu-pie .psx-cta {
+  min-height: 2.75rem;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--psx-texto);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.psx-menu-pie .psx-cta::after {
+  content: '→' / '';
+  color: var(--psx-marca);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+@media (hover: hover) {
+  .psx-menu-pie .psx-cta:hover {
+    background: none;
+    color: var(--psx-marca);
+  }
+  .psx-menu-pie .psx-cta:hover::after {
+    transform: translateX(0.25rem);
+  }
 }
 
 /* ── Hamburguesa: tres líneas que se hacen una X ── */
@@ -375,12 +398,15 @@ html:has(.psx-barra) {
 }
 .psx-menu-pie {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
   width: 100%;
   max-width: 26rem;
   margin: 2rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--psx-borde);
   opacity: 0;
   transition: opacity 0.35s cubic-bezier(0.2, 0, 0, 1);
 }
