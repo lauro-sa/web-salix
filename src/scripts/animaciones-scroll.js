@@ -25,8 +25,7 @@ function animarHero() {
   const hero = document.querySelector('.hero');
   if (!hero) return;
 
-  const marca     = hero.querySelector('.hero-marca--principal');
-  const marcaCortina = hero.querySelector('.hero-marca--cortina');
+  const marca     = hero.querySelector('.hero-marca');
   const badge     = hero.querySelector('.hero-badge');
   const lineas    = hero.querySelectorAll('.linea-titulo');
   const sub       = hero.querySelector('.hero-subtitulo');
@@ -34,36 +33,38 @@ function animarHero() {
   const scrollInd = hero.querySelector('.hero-scroll');
 
   // Estado inicial: todo invisible, desplazado
-  const elementosEntrada = [marca, marcaCortina, badge, ...lineas, sub, botones, scrollInd].filter(Boolean);
+  const elementosEntrada = [marca, badge, ...lineas, sub, botones, scrollInd].filter(Boolean);
   gsap.set(elementosEntrada, { opacity: 0, y: 25 });
 
   // Timeline de entrada — delay inicial para que cargue la pagina
   const tlEntrada = gsap.timeline({ delay: 0.4 });
 
-  // Entrada del logo: las ramas del sauce nacen desde arriba y bajan, cada una a su
-  // ritmo (desparejas a propósito, como ramas de verdad), y después aparece el nombre.
-  const ramas   = marca ? [...marca.querySelectorAll('.rama')] : [];
-  const nombre  = marca?.querySelector('.hero-nombre-marca');
+  // Entrada del logo («cortina», elegida por Sal el 2026-09-28): las ramas bajan desde
+  // la copa, cada una a su ritmo, y a la vez el logo sube desde donde va el nombre y lo
+  // va destapando. El ritmo de cada rama NO se escribe acá: viene en data-retraso /
+  // data-duracion, que salen de src/ramas-salix.json (lo escribe el generador de Flux).
   const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (marca && ramas.length > 1 && !sinMovimiento) {
+  const ramas  = marca ? [...marca.querySelectorAll('.rama')] : [];
+  const logo   = marca?.querySelector('.logo-animado');
+  const nombre = marca?.querySelector('.hero-nombre-marca');
+  if (marca && ramas.length > 1 && logo && nombre && !sinMovimiento) {
     gsap.set(marca, { opacity: 1, y: 0 });
-    // Cada rama arranca escondida detrás del borde de la copa: sube lo que mide.
+    const bajada = nombre.offsetHeight + 14; // el logo arranca tapando el nombre
+    gsap.set(logo, { y: bajada });
+    gsap.set(nombre, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0.25, y: -10 });
+    ramas.forEach((rama) => gsap.set(rama, { y: Number(rama.dataset.desde) }));
     ramas.forEach((rama) => {
-      const caja = rama.getBBox();
-      gsap.set(rama, { y: -(caja.y + caja.height) });
-    });
-    if (nombre) gsap.set(nombre, { opacity: 0, y: 12 });
-    // Retrasos y duraciones fijos (no al azar): la entrada se ve igual cada vez.
-    const RETRASO  = [0.3, 0.08, 0.48, 0, 0.38, 0.16, 0.58];
-    const DURACION = [1.5, 1.8, 1.35, 1.95, 1.45, 1.7, 1.3];
-    ramas.forEach((rama, i) => {
       tlEntrada.to(rama, {
         y: 0,
-        duration: DURACION[i % DURACION.length],
+        duration: Number(rama.dataset.duracion),
         ease: 'back.out(1.3)',
-      }, RETRASO[i % RETRASO.length]);
+      }, Number(rama.dataset.retraso));
     });
-    if (nombre) tlEntrada.to(nombre, { opacity: 1, y: 0, duration: 0.9, ease: EASE_ENTRADA }, 1.1);
+    tlEntrada.to(logo, { y: 0, duration: 1.7, ease: 'power3.inOut' }, 0.35);
+    tlEntrada.to(nombre, {
+      clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, y: 0,
+      duration: 1.4, ease: 'power3.out',
+    }, 0.75);
     // Al pasar el mouse, las ramas se mecen como con viento
     marca.addEventListener('mouseenter', () => {
       gsap.fromTo(ramas, { y: 0 }, {
@@ -73,48 +74,7 @@ function animarHero() {
       });
     });
   } else if (marca) {
-    tlEntrada.to(marca, {
-      opacity: 1, y: 0,
-      duration: 1.2,
-      ease: EASE_ENTRADA,
-    });
-  }
-
-  // PRUEBA «cortina»: las ramas bajan igual, y a la vez el logo entero sube desde
-  // donde va el nombre y, al subir, lo va destapando como una cortina.
-  if (marcaCortina) {
-    const ramasC = [...marcaCortina.querySelectorAll('.rama')];
-    const logoC = marcaCortina.querySelector('.logo-animado');
-    const nombreC = marcaCortina.querySelector('.hero-nombre-marca');
-    if (sinMovimiento || ramasC.length < 2 || !logoC || !nombreC) {
-      tlEntrada.to(marcaCortina, { opacity: 1, y: 0, duration: 1.2, ease: EASE_ENTRADA }, 0);
-    } else {
-      gsap.set(marcaCortina, { opacity: 1, y: 0 });
-      const bajada = nombreC.offsetHeight + 14; // el logo arranca tapando el nombre
-      gsap.set(logoC, { y: bajada });
-      gsap.set(nombreC, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0.25, y: -10 });
-      ramasC.forEach((rama) => {
-        const caja = rama.getBBox();
-        gsap.set(rama, { y: -(caja.y + caja.height) });
-      });
-      const RETRASO  = [0.3, 0.08, 0.48, 0, 0.38, 0.16, 0.58];
-      const DURACION = [1.5, 1.8, 1.35, 1.95, 1.45, 1.7, 1.3];
-      ramasC.forEach((rama, i) => {
-        tlEntrada.to(rama, { y: 0, duration: DURACION[i % 7], ease: 'back.out(1.3)' }, RETRASO[i % 7]);
-      });
-      tlEntrada.to(logoC, { y: 0, duration: 1.7, ease: 'power3.inOut' }, 0.35);
-      tlEntrada.to(nombreC, {
-        clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, y: 0,
-        duration: 1.4, ease: 'power3.out',
-      }, 0.75);
-      marcaCortina.addEventListener('mouseenter', () => {
-        gsap.fromTo(ramasC, { y: 0 }, {
-          keyframes: { y: [0, 1.1, -0.4, 0] },
-          duration: 1.1, ease: 'sine.inOut',
-          stagger: { each: 0.06, from: 'center' }, overwrite: 'auto',
-        });
-      });
-    }
+    tlEntrada.to(marca, { opacity: 1, y: 0, duration: 1.2, ease: EASE_ENTRADA });
   }
 
   // Badge — aparece mientras el logo termina

@@ -4,6 +4,7 @@
 // Todos los componentes de pagina usan este layout.
 // ============================================================
 import { VERSION_LOGO } from '../marca-version';
+import { LEMA_SALIX } from '../lema';
 
 interface Props {
   titulo:      string;
@@ -33,6 +34,7 @@ const schemaOrg = JSON.stringify({
   "name":        "Salix",
   "url":         "https://salixweb.com",
   "logo":        `https://salixweb.com/og-image.png?v=${VERSION_LOGO}`,
+  "slogan":      `SALIX — ${LEMA_SALIX}`,
   "description": "Suite de productos de software para empresas argentinas",
   "address":     { "@type": "PostalAddress", "addressLocality": "Buenos Aires", "addressCountry": "AR" },
   "contactPoint": { "@type": "ContactPoint", "email": "hola@salixweb.com", "contactType": "customer service", "availableLanguage": "Spanish" },

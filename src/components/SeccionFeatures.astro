@@ -3,6 +3,7 @@
 // SeccionFeatures.astro — Grilla "Por que Salix" (6 items)
 // ============================================================
 import IconoSVG from './ui/IconoSVG.astro';
+import LemaSalix from './LemaSalix.astro';
 
 interface Feature {
   titulo:      string;
@@ -32,6 +33,7 @@ const TEXTO = {
     <span class="etiqueta">{TEXTO.etiqueta}</span>
     <h2 class="titulo-seccion">{TEXTO.titulo}</h2>
     <p class="typewriter subtitulo" data-texto={TEXTO.subtitulo} aria-label={TEXTO.subtitulo}></p>
+    <LemaSalix clase="lema-porque" />
   </div>
 
   <div class="grilla-features" role="list">
@@ -52,6 +54,11 @@ const TEXTO = {
   .encabezado-seccion {
     margin-bottom: 3rem;
     display: flex; flex-direction: column; gap: 0.75rem;
+  }
+  .encabezado-seccion :global(.lema-porque) {
+    align-self: flex-start; margin-top: .5rem;
+    font-size: .95rem;
+    padding: .45rem .9rem; border: 1px solid var(--borde); border-radius: 100px;
   }
 
   .grilla-features {

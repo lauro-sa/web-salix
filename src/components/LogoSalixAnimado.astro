@@ -1,37 +1,73 @@
 ---
 // ============================================================
-// LogoSalixAnimado.astro — el isotipo de la portada, con sus ramas vivas.
+// LogoSalixAnimado.astro — el isotipo de Salix con sus ramas vivas.
 //
-// El dibujo NO se copia acá: se lee de public/logo-salix.svg en el build (lo escribe
-// el generador de marca de Flux, la fuente única de la familia). La Cortina viene con
-// un subpath por rama, y eso es lo que deja animarlas por separado: si un logo nuevo
-// viniera en un solo contorno, esto lo muestra entero y quieto, sin romperse.
+// Las ramas y su ritmo NO se escriben acá: salen de src/ramas-salix.json, que escribe
+// el generador de marca de Flux (RITMO_RAMAS en scripts/marca/generar.mjs), la fuente
+// única de la familia. Así el logo se mueve igual en salixweb, en el panel y en Menú.
 //
-// La animación (las ramas bajan desde arriba, cada una a su ritmo) la hace
-// animaciones-scroll.js dentro de la entrada del hero, con GSAP.
+//   modo="simple"  las ramas bajan solas con CSS (barra de arriba, footer, logos chicos)
+//   modo="guion"   no anima por CSS: lo mueve animaciones-scroll.js (la portada, «cortina»)
 // ============================================================
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import datos from '../ramas-salix.json';
 
-interface Props { clase?: string; id?: string }
-const { clase = '', id = 'copa-salix' } = Astro.props;
-
-const svg = readFileSync(resolve(process.cwd(), 'public/logo-salix.svg'), 'utf8');
-const d = svg.match(/\sd="([^"]+)"/)?.[1] ?? '';
-const regla = svg.match(/fill-rule="(\w+)"/)?.[1] ?? 'nonzero';
-const ramas = d.split(/(?=M)/).map((r) => r.trim()).filter(Boolean);
-// El círculo que contiene a las ramas (viewBox 24: centro 12, radio 11,04). Recorta la
-// rama mientras baja, así nace desde el borde de la copa y no desde el aire. El `id`
-// tiene que ser único por instancia en la página.
+interface Props {
+  clase?: string;
+  /** id del recorte de la copa: único por instancia en la página. */
+  id?: string;
+  modo?: 'simple' | 'guion';
+  /** Alto en px. Sin él, lo decide el CSS de quien lo usa. */
+  tamaño?: number;
+}
+const { clase = '', id = 'copa-salix', modo = 'simple', tamaño } = Astro.props;
+const { cx, cy, r } = datos.copa;
 ---
 
-<svg class:list={['logo-animado', clase]} viewBox="0 0 24 24" aria-hidden="true">
-  <defs><clipPath id={id}><circle cx="12" cy="12" r="11.05" /></clipPath></defs>
-  <g clip-path={`url(#${id})`} fill="currentColor" fill-rule={regla}>
-    {ramas.map((r) => <path class="rama" d={r} />)}
+<svg
+  class:list={['logo-animado', `logo-animado--${modo}`, clase]}
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+  style={`--curva-ramas:${datos.curva};${tamaño ? `height:${tamaño}px;width:${tamaño}px;` : ''}`}
+>
+  <defs><clipPath id={id}><circle cx={cx} cy={cy} r={r} /></clipPath></defs>
+  <g clip-path={`url(#${id})`} fill="currentColor">
+    {datos.ramas.map((rama) => (
+      <path
+        class="rama"
+        d={rama.d}
+        data-desde={rama.desde}
+        data-retraso={rama.retraso}
+        data-duracion={rama.duracion}
+        style={`--desde:${rama.desde}px;--retraso:${rama.retraso}s;--duracion:${rama.duracion}s`}
+      />
+    ))}
   </g>
 </svg>
 
 <style>
   .logo-animado { display: block; color: var(--texto); overflow: visible; }
+
+  /* Simple: cada rama baja desde detrás del borde de la copa, a su ritmo (× 0,6: es chico) */
+  .logo-animado--simple .rama {
+    --ritmo-ramas: 0.6;
+    animation: rama-nace calc(var(--duracion) * var(--ritmo-ramas)) var(--curva-ramas)
+      calc(var(--retraso) * var(--ritmo-ramas) + 0.2s) both;
+  }
+  :global(a:hover) > * > .logo-animado--simple .rama,
+  :global(a:hover) > .logo-animado--simple .rama,
+  .logo-animado--simple:hover .rama {
+    animation:
+      rama-nace calc(var(--duracion) * var(--ritmo-ramas)) var(--curva-ramas)
+        calc(var(--retraso) * var(--ritmo-ramas) + 0.2s) both,
+      rama-mece 1.1s ease-in-out calc(var(--retraso) * 0.3);
+  }
+  @keyframes rama-nace { from { transform: translateY(var(--desde)); } }
+  @keyframes rama-mece {
+    0%, 100% { transform: translateY(0); }
+    35% { transform: translateY(1.1px); }
+    70% { transform: translateY(-0.4px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-animado .rama { animation: none !important; }
+  }
 </style>
