@@ -3,6 +3,7 @@
 // Plantilla.astro — Layout base del sitio
 // Todos los componentes de pagina usan este layout.
 // ============================================================
+import { VERSION_LOGO } from '../marca-version';
 
 interface Props {
   titulo:      string;
@@ -21,13 +22,17 @@ const {
 } = Astro.props;
 
 const urlCanonica = Astro.url.href;
-const imagenAbsoluta = new URL(imagen, Astro.site).href;
+// La imagen de compartir y los íconos llevan la versión del logo en la URL: el CDN
+// de Hostinger cachea public/ 7 días, y sin la `?v=` un logo nuevo tarda una semana
+// en verse (y los que ya compartieron el link siguen con la vista previa vieja).
+const conVersion = (ruta: string) => `${ruta}?v=${VERSION_LOGO}`;
+const imagenAbsoluta = new URL(imagen === '/og-image.png' ? conVersion(imagen) : imagen, Astro.site).href;
 const schemaOrg = JSON.stringify({
   "@context":    "https://schema.org",
   "@type":       "Organization",
   "name":        "Salix",
   "url":         "https://salixweb.com",
-  "logo":        "https://salixweb.com/og-image.png",
+  "logo":        `https://salixweb.com/og-image.png?v=${VERSION_LOGO}`,
   "description": "Suite de productos de software para empresas argentinas",
   "address":     { "@type": "PostalAddress", "addressLocality": "Buenos Aires", "addressCountry": "AR" },
   "contactPoint": { "@type": "ContactPoint", "email": "hola@salixweb.com", "contactType": "customer service", "availableLanguage": "Spanish" },
@@ -58,9 +63,9 @@ const schemaOrg = JSON.stringify({
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href={conVersion('/favicon.svg')} />
+  <link rel="icon" type="image/x-icon" href={conVersion('/favicon.ico')} />
+  <link rel="apple-touch-icon" href={conVersion('/apple-touch-icon.png')} />
 
   <!-- SEO Principal -->
   <title>{titulo}</title>

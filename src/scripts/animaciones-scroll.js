@@ -39,8 +39,39 @@ function animarHero() {
   // Timeline de entrada — delay inicial para que cargue la pagina
   const tlEntrada = gsap.timeline({ delay: 0.4 });
 
-  // Entrada del logo — lenta y suave
-  if (marca) {
+  // Entrada del logo: las ramas del sauce nacen desde arriba y bajan, cada una a su
+  // ritmo (desparejas a propósito, como ramas de verdad), y después aparece el nombre.
+  const ramas   = marca ? [...marca.querySelectorAll('.rama')] : [];
+  const nombre  = marca?.querySelector('.hero-nombre-marca');
+  const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (marca && ramas.length > 1 && !sinMovimiento) {
+    gsap.set(marca, { opacity: 1, y: 0 });
+    // Cada rama arranca escondida detrás del borde de la copa: sube lo que mide.
+    ramas.forEach((rama) => {
+      const caja = rama.getBBox();
+      gsap.set(rama, { y: -(caja.y + caja.height) });
+    });
+    if (nombre) gsap.set(nombre, { opacity: 0, y: 12 });
+    // Retrasos y duraciones fijos (no al azar): la entrada se ve igual cada vez.
+    const RETRASO  = [0.3, 0.08, 0.48, 0, 0.38, 0.16, 0.58];
+    const DURACION = [1.5, 1.8, 1.35, 1.95, 1.45, 1.7, 1.3];
+    ramas.forEach((rama, i) => {
+      tlEntrada.to(rama, {
+        y: 0,
+        duration: DURACION[i % DURACION.length],
+        ease: 'back.out(1.3)',
+      }, RETRASO[i % RETRASO.length]);
+    });
+    if (nombre) tlEntrada.to(nombre, { opacity: 1, y: 0, duration: 0.9, ease: EASE_ENTRADA }, 1.1);
+    // Al pasar el mouse, las ramas se mecen como con viento
+    marca.addEventListener('mouseenter', () => {
+      gsap.fromTo(ramas, { y: 0 }, {
+        keyframes: { y: [0, 1.1, -0.4, 0] },
+        duration: 1.1, ease: 'sine.inOut',
+        stagger: { each: 0.06, from: 'center' }, overwrite: 'auto',
+      });
+    });
+  } else if (marca) {
     tlEntrada.to(marca, {
       opacity: 1, y: 0,
       duration: 1.2,

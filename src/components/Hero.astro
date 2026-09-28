@@ -3,7 +3,7 @@
 // Hero.astro — Seccion principal / primera pantalla
 // ============================================================
 import GridMagnetico from './ui/GridMagnetico.astro';
-import LogoSalix from './LogoSalix.astro';
+import LogoSalixAnimado from './LogoSalixAnimado.astro';
 
 const CONTENIDO = {
   badge:           'Suite de software · Argentina',
@@ -22,7 +22,7 @@ const CONTENIDO = {
 
   <!-- Logo y marca -->
   <div class="hero-marca" aria-hidden="true">
-    <LogoSalix clase="hero-logo" tamaño={28} />
+    <LogoSalixAnimado clase="hero-logo" />
     <span class="hero-nombre-marca">Salix</span>
   </div>
 
@@ -76,11 +76,12 @@ const CONTENIDO = {
   }
 
   /* Logo */
-  .hero-marca { display: flex; align-items: center; gap: 11px; margin-bottom: 28px; }
-  .hero-logo { height: 28px; width: auto; }
+  /* Logo arriba y el nombre abajo: el isotipo es lo primero que se ve al entrar */
+  .hero-marca { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 32px; }
+  .hero-marca :global(.hero-logo) { width: clamp(72px, 9vw, 104px); height: auto; }
   .hero-nombre-marca {
-    font-size: 18px; font-weight: 600; color: var(--texto);
-    letter-spacing: -.3px;
+    font-size: clamp(22px, 2.4vw, 28px); font-weight: 600; color: var(--texto);
+    letter-spacing: -.4px; line-height: 1;
   }
 
   /* Badge */

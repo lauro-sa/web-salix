@@ -1,0 +1,37 @@
+---
+// ============================================================
+// LogoSalixAnimado.astro — el isotipo de la portada, con sus ramas vivas.
+//
+// El dibujo NO se copia acá: se lee de public/logo-salix.svg en el build (lo escribe
+// el generador de marca de Flux, la fuente única de la familia). La Cortina viene con
+// un subpath por rama, y eso es lo que deja animarlas por separado: si un logo nuevo
+// viniera en un solo contorno, esto lo muestra entero y quieto, sin romperse.
+//
+// La animación (las ramas bajan desde arriba, cada una a su ritmo) la hace
+// animaciones-scroll.js dentro de la entrada del hero, con GSAP.
+// ============================================================
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface Props { clase?: string }
+const { clase = '' } = Astro.props;
+
+const svg = readFileSync(resolve(process.cwd(), 'public/logo-salix.svg'), 'utf8');
+const d = svg.match(/\sd="([^"]+)"/)?.[1] ?? '';
+const regla = svg.match(/fill-rule="(\w+)"/)?.[1] ?? 'nonzero';
+const ramas = d.split(/(?=M)/).map((r) => r.trim()).filter(Boolean);
+// El círculo que contiene a las ramas (viewBox 24: centro 12, radio 11,04). Recorta la
+// rama mientras baja, así nace desde el borde de la copa y no desde el aire.
+const id = 'copa-salix';
+---
+
+<svg class:list={['logo-animado', clase]} viewBox="0 0 24 24" aria-hidden="true">
+  <defs><clipPath id={id}><circle cx="12" cy="12" r="11.05" /></clipPath></defs>
+  <g clip-path={`url(#${id})`} fill="currentColor" fill-rule={regla}>
+    {ramas.map((r) => <path class="rama" d={r} />)}
+  </g>
+</svg>
+
+<style>
+  .logo-animado { display: block; color: var(--texto); overflow: visible; }
+</style>
