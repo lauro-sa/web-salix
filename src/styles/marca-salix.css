@@ -137,13 +137,13 @@
     transform: scale(1.06);
     filter: drop-shadow(0 0 0.5rem var(--msx-acento));
   }
-  /* La entrada sigue en la lista: si el hover la reemplazara, al sacar el mouse volvería a
-     empezar y las letras desaparecerían y entrarían de nuevo. */
+  /* El rebote REEMPLAZA a la entrada, y es a propósito: al sacar el mouse la entrada vuelve a
+     empezar y las letras salen de nuevo desde abajo, una por una. Es parte del gesto (Sal,
+     2026-09-28: «rebotaban y después volvían a aparecer desde abajo»). */
   .msx:hover .msx-letra {
     color: var(--msx-acento);
-    animation:
-      msx-letra-entrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) calc(0.6s + var(--i) * 0.08s) both,
-      msx-letra-rebote 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 0.04s);
+    animation: msx-letra-rebote 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation-delay: calc(var(--i) * 0.04s);
   }
   .msx.msx--estatico:hover .msx-letra {
     animation: msx-letra-rebote 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 0.04s);
