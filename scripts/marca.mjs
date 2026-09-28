@@ -29,13 +29,19 @@ import { execFileSync } from 'child_process'
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const LOGO = resolve(RAIZ, 'public/logo-salix.svg')
 
-const version = createHash('sha256').update(readFileSync(LOGO)).digest('hex').slice(0, 8)
+// La huella mira el dibujo Y esta receta: si cambia cómo se arma el favicon (2026-09-28: la placa
+// clara), la URL tiene que cambiar igual, o la pestaña se queda con el ícono viejo en su caché.
+const version = createHash('sha256')
+  .update(readFileSync(LOGO))
+  .update(readFileSync(fileURLToPath(import.meta.url)))
+  .digest('hex')
+  .slice(0, 8)
 
 writeFileSync(
   resolve(RAIZ, 'src/marca-version.ts'),
   `/* ARCHIVO GENERADO — no editar a mano. Sale de \`npm run marca\`.
  *
- * Huella de public/logo-salix.svg. LogoSalix.astro la cuelga de la URL del logo
+ * Huella de public/logo-salix.svg y de scripts/marca.mjs. LogoSalix.astro la cuelga de la URL del logo
  * para que el CDN sirva el archivo nuevo apenas cambia, en vez de seguir con el
  * viejo hasta que expire su cache de 7 días.
  */
@@ -57,13 +63,22 @@ const svgLogo = readFileSync(LOGO, 'utf8')
 const d = svgLogo.match(/\sd="([^"]+)"/)[1]
 const regla = svgLogo.match(/fill-rule="(\w+)"/)?.[1] ?? 'nonzero'
 
-// favicon.svg — sigue al tema del sistema, como el que había
-writeFileSync(
-  resolve(RAIZ, 'public/favicon.svg'),
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\n` +
-    `  <style>path{fill:#111} @media (prefers-color-scheme:dark){path{fill:#f0f0f0}}</style>\n` +
-    `  <path fill-rule="${regla}" d="${d}"/>\n</svg>\n`,
-)
+// favicon.svg — la Cortina en cobre sobre una placa clara, igual que el del panel
+// (`public/iconos/favicon-salix.svg` del repo de Flux, que sale de `faviconEnPlaca`).
+// 🔴 Sin prefers-color-scheme: con la marca negra que pasaba a blanco en oscuro, Chrome la
+// mostraba NEGRA sobre su barra oscura (no siempre evalúa la media query contra su propio tema,
+// y el .ico no puede cambiar de color). Con la placa se lee igual en pestañas claras y oscuras.
+const ocupacionFavicon = 0.72
+const desplaceFavicon = +((24 * (1 - ocupacionFavicon)) / 2).toFixed(3)
+const faviconSvg =
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="Salix">` +
+  `<defs><linearGradient id="placa" x1="0" y1="0" x2="1" y2="1">` +
+  `<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f0f0f1"/>` +
+  `</linearGradient></defs>` +
+  `<rect width="24" height="24" rx="5.5" fill="url(#placa)"/>` +
+  `<path transform="translate(${desplaceFavicon} ${desplaceFavicon}) scale(${ocupacionFavicon})" fill="#c2710c" ` +
+  `fill-rule="${regla}" d="${d}"/></svg>\n`
+writeFileSync(resolve(RAIZ, 'public/favicon.svg'), faviconSvg)
 
 // El dibujo sobre un fondo, ocupando `ocupacion` del lado
 const icono = (lado, { fondo, color, ocupacion }) => {
@@ -79,7 +94,10 @@ const icono = (lado, { fondo, color, ocupacion }) => {
 writeFileSync(resolve(RAIZ, 'public/apple-touch-icon.png'), await icono(180, { fondo: '#fbfaf8', color: '#111111', ocupacion: 0.62 }))
 
 // favicon.ico — un ICO de verdad con 16, 32 y 48 (PNG adentro)
-const pngs = await Promise.all([16, 32, 48].map((l) => icono(l, { color: '#111111', ocupacion: 0.96 })))
+// El .ico se rasteriza del MISMO svg: así los dos no se separan nunca.
+const pngs = await Promise.all(
+  [16, 32, 48].map((l) => sharp(Buffer.from(faviconSvg), { density: 72 * (l / 24) * 4 }).resize(l, l).png().toBuffer()),
+)
 const cabecera = Buffer.alloc(6 + 16 * pngs.length)
 cabecera.writeUInt16LE(0, 0); cabecera.writeUInt16LE(1, 2); cabecera.writeUInt16LE(pngs.length, 4)
 let desplazamiento = cabecera.length
