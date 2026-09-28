@@ -36,7 +36,7 @@ html:has(.psx-barra) {
 
 /* La barra de scroll de la página arranca DEBAJO de la barra fija, no por encima de ella.
    Solo existe en Chrome/Edge/Safari (el margen del riel es de ::-webkit-scrollbar); Firefox
-   conserva la suya de siempre. Y solo con mouse: con el dedo el sistema la muestra flotante.
+   conserva la suya de siempre. Y solo con mouse (hover): con el dedo el sistema la muestra flotante.
    ⚠️ Chrome ignora ::-webkit-scrollbar si scrollbar-color o scrollbar-width no son `auto`,
    por eso acá se vuelven a `auto` (el producto puede haberlos fijado para toda la página).
    Va en <html> Y en <body>: Chrome dibuja la barra de la página con el estilo del <body> si él
@@ -44,7 +44,7 @@ html:has(.psx-barra) {
    Lee --psx-texto desde <html>: si el producto lo mapea más abajo (Flux, en .kit-root), cae al
    color de texto del sistema. */
 @supports selector(::-webkit-scrollbar) {
-  @media (hover: hover) and (pointer: fine) {
+  @media (hover: hover) {
     :is(html, body):has(.psx-barra) {
       scrollbar-color: auto;
       scrollbar-width: auto;
