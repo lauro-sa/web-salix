@@ -4,7 +4,7 @@
 
 /*
  * Comportamiento de la barra, el menú móvil y el pie de las páginas públicas de la familia Salix
- * (publico-salix.md). Fuente ÚNICA: el generador de Flux lo copia a Flux, Menú y salixweb.
+ * (publico-salix.md). Fuente ÚNICA: el generador de Flux lo copia a Flux, Menu y salixweb.
  * Sin dependencias ni framework: lo llama un `<script>` de Astro o un `useEffect` de React con el
  * elemento raíz de la página, y devuelve la función que lo desmonta.
  *

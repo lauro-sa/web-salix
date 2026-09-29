@@ -5,7 +5,7 @@
 /* ============================================================================
    Barra, menú móvil y pie de las páginas públicas de la familia Salix.
    Fuente ÚNICA (docs/familia-salix/publico-salix.md): el generador de Flux
-   (scripts/marca/generar.mjs) la copia a Flux (kit-salix), a Menú y a salixweb,
+   (scripts/marca/generar.mjs) la copia a Flux (kit-salix), a Menu y a salixweb,
    y `--verificar` falla si una copia difiere. Un cambio se hace ACÁ.
 
    Cada producto pone solo lo suyo mapeando estas variables en su raíz:
@@ -104,7 +104,7 @@ html:has(.psx-barra) {
   background: transparent;
   /* El prefijo va PRIMERO: Lightning CSS (el compilador de Next) toma la última declaración como
      la que manda, y con el prefijo al final dejaba solo `-webkit-backdrop-filter`, que Chrome no
-     lee: la barra salía sin vidrio en Flux y en Menú. Lo cuida `publico-salix-compila.test.ts`. */
+     lee: la barra salía sin vidrio en Flux y en Menu. Lo cuida `publico-salix-compila.test.ts`. */
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid transparent;

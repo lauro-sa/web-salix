@@ -37,9 +37,9 @@ export const PRODUCTOS: Producto[] = [
     color: 'var(--salix)',
   },
   {
-    id: 'Menú',
-    nombre: 'Menú by Salix',
-    corto: 'Menú',
+    id: 'Menu',
+    nombre: 'Menu by Salix',
+    corto: 'Menu',
     linea: 'Carta digital con QR',
     pista: '¿Qué local tenés y cuántos platos tiene la carta?',
     descripcion: 'La carta digital de tu local, con un QR que no cambia nunca. Cambiás precios, platos y fotos cuando quieras.',
