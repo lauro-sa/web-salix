@@ -15,8 +15,9 @@ const PATH_WA =
 // El logo de Salix IA sale de src/logos-productos.json, que escribe el generador de marca del
 // repo de Flux (`node scripts/marca/generar.mjs`) desde su isotipo-salix-ia.svg. No se copia a
 // mano: hasta el 2026-09-30 acá había una copia del glifo viejo que nadie iba a actualizar.
-// Va por capas: sus círculos se superponen al 50 % y el cruce se oscurece.
-const CAPAS_IA = logos.salixIa.capas;
+// Va en su versión de LÍNEA (tres anillos): los pictogramas de módulo de esta página son de línea, y
+// un relleno entre ellos pesaba el doble (Sal, 2026-09-30).
+const CAPAS_IA = logos.salixIaLinea.capas;
 ---
 
 {nombre === 'whatsapp' && (
@@ -25,7 +26,7 @@ const CAPAS_IA = logos.salixIa.capas;
   </svg>
 )}
 {nombre === 'salix-ia' && (
-  <svg class="icono-modulo-flux" width={tamaño} height={tamaño} viewBox={logos.salixIa.viewBox} fill="currentColor" aria-hidden="true">
+  <svg class="icono-modulo-flux" width={tamaño} height={tamaño} viewBox={logos.salixIaLinea.viewBox} fill="currentColor" aria-hidden="true">
     {CAPAS_IA.map((capa) => (
       <path fill-rule={capa.fillRule} fill-opacity={capa.opacidad === 1 ? undefined : capa.opacidad} d={capa.d}></path>
     ))}
