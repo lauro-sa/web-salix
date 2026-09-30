@@ -1,5 +1,6 @@
 ---
-// Isotipo de Flux — el círculo con la onda. Fill, no stroke.
+// Isotipo de Flux — la «Ficha en dos tonos» desde el 2026-09-30 (antes, el círculo con la onda).
+// Fill, no stroke.
 //
 // ⚠️ Hasta el 2026-08-19 acá había otro dibujo: el logo de la CBC, la radiodifusora
 // pública de Canadá, bajado de Simple Icons. Toda la familia lo arrastraba como
@@ -17,6 +18,12 @@ interface Props {
 const { tamaño = 22, clase = '' } = Astro.props;
 
 const { flux } = logos;
+// Un logo en dos tonos llega con `capas` (un path por tono, la transparencia del mismo color);
+// uno de un solo color, sin ellas. Pintar `flux.d` solo perdería el segundo tono.
+const capas =
+  'capas' in flux && Array.isArray(flux.capas)
+    ? (flux.capas as { opacidad: number; fillRule: string; d: string }[])
+    : [{ opacidad: 1, fillRule: flux.fillRule, d: flux.d }];
 ---
 
 <svg
@@ -26,7 +33,16 @@ const { flux } = logos;
   viewBox={flux.viewBox}
   aria-hidden="true"
 >
-  <path d={flux.d} fill-rule={flux.fillRule} fill="currentColor" />
+  {
+    capas.map((c) => (
+      <path
+        d={c.d}
+        fill-rule={c.fillRule}
+        fill="currentColor"
+        fill-opacity={c.opacidad < 1 ? c.opacidad : undefined}
+      />
+    ))
+  }
 </svg>
 
 <style>
