@@ -14,7 +14,7 @@
  *      2026-08-19 con el logo cruzado en producción.
  *   2. Regenera `public/og-image.png`, la imagen de la vista previa al compartir,
  *      que lleva el mismo isotipo.
- *   3. Regenera el favicon (svg e ico) y el ícono de iPhone desde el mismo dibujo.
+ *   3. Arma el favicon.ico (desde el SVG que escribe el generador de Flux) y el ícono de iPhone.
  *
  * El dibujo NO se edita acá: `public/logo-salix.svg` lo escribe el generador de
  * marca del repo de Flux (`node scripts/marca/generar.mjs`), que es la fuente
@@ -63,23 +63,12 @@ const svgLogo = readFileSync(LOGO, 'utf8')
 const d = svgLogo.match(/\sd="([^"]+)"/)[1]
 const regla = svgLogo.match(/fill-rule="(\w+)"/)?.[1] ?? 'nonzero'
 
-// favicon — la Cortina sola, oscura en tema claro y clara en tema oscuro (misma regla que Flux,
-// `docs/familia-salix/kit-marca.md`). Tres archivos: el «auto» con la media query adentro (lo que
-// ve un navegador sin JavaScript) y los dos fijos, que elige el script de `Plantilla.astro` según
-// el tema del navegador. 🔴 La media query sola fallaba: Chrome no siempre la evalúa contra su
-// propio tema, y Sal veía la marca negra sobre la barra oscura (2026-09-28).
-const EN_CLARO = '#1a1a1a'
-const EN_OSCURO = '#f2f2f2'
-const favicon = (relleno) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="Salix">` +
-  (relleno
-    ? `<path fill="${relleno}" fill-rule="${regla}" d="${d}"/></svg>\n`
-    : `<style>path{fill:${EN_CLARO}}@media(prefers-color-scheme:dark){path{fill:${EN_OSCURO}}}</style>` +
-      `<path fill-rule="${regla}" d="${d}"/></svg>\n`)
-const faviconSvg = favicon(EN_CLARO)
-writeFileSync(resolve(RAIZ, 'public/favicon.svg'), favicon(null))
-writeFileSync(resolve(RAIZ, 'public/favicon-claro.svg'), faviconSvg)
-writeFileSync(resolve(RAIZ, 'public/favicon-oscuro.svg'), favicon(EN_OSCURO))
+// favicon — los tres SVG (auto, -claro, -oscuro) los escribe el generador de marca de Flux, igual que
+// el del panel: la Cortina a sangre, oscura en tema claro y clara en tema oscuro. La regla del favicon
+// es UNA en toda la familia (`docs/familia-salix/kit-marca.md` §8). Acá solo se arma el .ico desde el
+// claro. 🔴 La media query sola fallaba: Chrome no siempre la evalúa contra su propio tema, y Sal veía
+// la marca negra sobre la barra oscura (2026-09-28); por eso el script de `Plantilla.astro` elige.
+const faviconSvg = readFileSync(resolve(RAIZ, 'public/favicon-claro.svg'), 'utf8')
 
 // El dibujo sobre un fondo, ocupando `ocupacion` del lado
 const icono = (lado, { fondo, color, ocupacion }) => {

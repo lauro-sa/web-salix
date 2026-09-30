@@ -194,6 +194,27 @@
     forwards;
 }
 
+/* ── La portada de la landing (kit-marca §4 «La portada»): el logo GRANDE y su entrada, la
+   «cortina» de salixweb. El logo se mide por el ancho Y por el alto de la ventana; arranca abajo,
+   tapando el nombre, y sube despacio mientras hace su propia entrada (Salix: las ramas; Flux:
+   «Líneas»); el nombre se destapa de arriba hacia abajo a medida que el logo se va. Los tiempos son
+   los del script de salixweb (web-salix/src/scripts/animaciones-scroll.js), que la hace con GSAP:
+   power3.inOut 1,7 s a los 0,75 s, y power3.out 1,4 s a los 1,15 s. El resto de la portada entra
+   a los ~1,85 s. Estructura: `.msx-portada` > `.msx-portada-logo` + `.msx-portada-nombre`. ── */
+.msx-portada {
+  --msx-portada-logo: clamp(4.5rem, min(10vw, 13vh), 8rem);
+  --msx-portada-nombre: clamp(1.375rem, min(2.4vw, 3.4vh), 1.875rem);
+  --msx-portada-hueco: clamp(0.625rem, 1.6vh, 1rem);
+}
+.msx-portada-logo {
+  position: relative;
+  z-index: 1; /* es la cortina: va por encima del nombre */
+  animation: msx-portada-sube 1.7s cubic-bezier(0.645, 0.045, 0.355, 1) 0.75s backwards;
+}
+.msx-portada-nombre {
+  animation: msx-portada-destapa 1.4s cubic-bezier(0.215, 0.61, 0.355, 1) 1.15s backwards;
+}
+
 /* ── Estático (`animar={false}`): sin entrada ni glow; el hover sigue vivo ── */
 .msx.msx--estatico .msx-svg,
 .msx.msx--estatico .msx-icono::after,
@@ -217,6 +238,10 @@
   .msx-letra,
   .msx-firma,
   .rama-salix {
+    animation: none;
+  }
+  .msx-portada-logo,
+  .msx-portada-nombre {
     animation: none;
   }
   /* «Líneas»: el logo lleno desde el primer cuadro, sin trazo. */
@@ -313,5 +338,18 @@
 @keyframes msx-ln-llena {
   to {
     fill-opacity: var(--o, 1);
+  }
+}
+@keyframes msx-portada-sube {
+  from {
+    /* Todo el alto del nombre y 14 px más (0,875 rem): el logo tapa el lugar del nombre. */
+    transform: translateY(calc(var(--msx-portada-nombre) + 0.875rem));
+  }
+}
+@keyframes msx-portada-destapa {
+  from {
+    opacity: 0.25;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-10px);
   }
 }
