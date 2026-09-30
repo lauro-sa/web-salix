@@ -167,6 +167,33 @@
   transform-origin: center;
 }
 
+/* ── «Líneas» (kit-marca §4): el contorno se dibuja y después se rellena. Es la entrada GRANDE de
+   Flux —la cabecera de la landing y el splash—; en la barra y el pie sigue la entrada de arriba.
+   Cada subpath lleva su trazo (`.msx-ln-trazo`, con `pathLength="1"`: el guion no siempre sigue
+   de un subpath al otro) y cada tono su relleno (`.msx-ln-relleno`). En `--o` va la opacidad del
+   tono (la mitad clara de la Ficha, 0.4) y en `--r` su retraso: los tonos arrancan escalonados.
+   El trazo no escala con el dibujo (`non-scaling-stroke`): mide lo mismo a 40 que a 160 px. ── */
+.msx-ln-trazo {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--msx-ln-grosor, 1.6px);
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  stroke-opacity: var(--o, 1);
+  animation:
+    msx-ln-dibuja var(--msx-ln-dibujo, 1.15s) cubic-bezier(0.65, 0, 0.35, 1) var(--r, 0s) forwards,
+    msx-ln-apaga 0.5s ease calc(var(--r, 0s) + var(--msx-ln-dibujo, 1.15s) - 0.1s) forwards;
+}
+.msx-ln-relleno {
+  fill: currentColor;
+  fill-opacity: 0;
+  animation: msx-ln-llena 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) calc(var(--r, 0s) + var(--msx-ln-dibujo, 1.15s) - 0.2s)
+    forwards;
+}
+
 /* ── Estático (`animar={false}`): sin entrada ni glow; el hover sigue vivo ── */
 .msx.msx--estatico .msx-svg,
 .msx.msx--estatico .msx-icono::after,
@@ -191,6 +218,14 @@
   .msx-firma,
   .rama-salix {
     animation: none;
+  }
+  /* «Líneas»: el logo lleno desde el primer cuadro, sin trazo. */
+  .msx-ln-trazo {
+    display: none;
+  }
+  .msx-ln-relleno {
+    animation: none;
+    fill-opacity: var(--o, 1);
   }
 }
 
@@ -263,5 +298,20 @@
   35%,
   50% {
     transform: translate(var(--dx), var(--dy)) scale(0.94);
+  }
+}
+@keyframes msx-ln-dibuja {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes msx-ln-apaga {
+  to {
+    stroke-opacity: 0;
+  }
+}
+@keyframes msx-ln-llena {
+  to {
+    fill-opacity: var(--o, 1);
   }
 }
