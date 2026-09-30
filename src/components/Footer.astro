@@ -41,16 +41,20 @@ const COLUMNAS = [
 <footer class="psx-pie">
   <div class="psx-pie-arriba psx-pie-animar">
     <div class="psx-pie-marca">
-      <a href="/" aria-label="Salix, inicio">
-        <span class="msx">
-          <span class="msx-icono">
-            <LogoSalixAnimado clase="msx-svg" id="copa-salix-footer" tamaño={26} />
+      <!-- La envoltura del logo del pie de la familia (publico-salix.md §«El logo del pie»): repite su
+           entrada cada vez que la cortina destapa el pie. Salix no lleva «by Salix»: es la madre. -->
+      <div class="psx-pie-logo">
+        <a href="/" aria-label="Salix, inicio">
+          <span class="msx">
+            <span class="msx-icono">
+              <LogoSalixAnimado clase="msx-svg" id="copa-salix-footer" tamaño={26} />
+            </span>
+            <span class="msx-nombre" aria-hidden="true">
+              <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
+            </span>
           </span>
-          <span class="msx-nombre" aria-hidden="true">
-            <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
-          </span>
-        </span>
-      </a>
+        </a>
+      </div>
       <LemaSalix clase="psx-pie-lema" sinSigla />
     </div>
     <nav class="psx-pie-columnas" aria-label="Enlaces del pie">

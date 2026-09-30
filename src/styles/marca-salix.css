@@ -49,12 +49,10 @@
   height: var(--msx-tam, 1.625rem);
   width: auto;
   fill: currentColor;
-  /* `backwards`, no `both`: el último cuadro de la entrada es el estado normal, y si quedara
-     retenido le ganaría al `transform` del hover (el isotipo dejaba de agrandarse). */
+  /* `backwards`, no `both`: el último cuadro de la entrada es el estado normal y no queda
+     retenido encima de nada. */
   animation: msx-entrada 1s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-  transition:
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 0.4s;
+  transition: filter 0.4s;
 }
 /* Glow de acento que respira detrás del ícono */
 .msx-icono::after {
@@ -127,14 +125,21 @@
   --ritmo-ramas: 1;
 }
 
-/* ── Hover (kit-marca §2.4): el isotipo se agranda y brilla, las letras rebotan en el acento, y la
-   Cortina además mece las ramas. 🔴 Nunca gira: el giro mandaba las mordidas de Menu a otra
-   esquina y acostaba la Cortina. Solo donde hay hover: con el dedo el primer toque lo dejaba
-   pegado, y un aparato táctil responde `hover: none`. Es la query de hover de la familia (en Flux,
-   `QUERY_CON_HOVER` de umbral-movil.ts: ninguna @media que decida el aparato se escribe distinta). ── */
+/* ── Hover (kit-marca §2.4): el «latido», IGUAL en toda la familia. El isotipo late dos veces
+   como un corazón (sube, baja, sube un poco menos) y brilla en el acento; las letras rebotan.
+   Antes cada logo tenía su gesto —Menu se despiezaba, las ramas de Salix se mecían— y Sal pidió
+   el mismo para los tres (2026-09-30: «que sea latido tanto en Menu como Flux como Salix»).
+   El latido va en `.msx-icono` y no en `.msx-svg`: ahí vive la entrada, y un hover que la
+   reemplazara la haría arrancar de nuevo (con su giro) al sacar el mouse. 🔴 Nunca gira. Solo
+   donde hay hover: con el dedo el primer toque lo dejaba pegado, y un aparato táctil responde
+   `hover: none` (el pie de la página pública late al tocarlo: `.msx--late`, publico-salix.ts).
+   Es la query de hover de la familia (en Flux, `QUERY_CON_HOVER` de umbral-movil.ts: ninguna
+   @media que decida el aparato se escribe distinta). ── */
 @media (hover: hover) {
+  .msx:hover .msx-icono {
+    animation: msx-latido 0.9s cubic-bezier(0.3, 0, 0.3, 1);
+  }
   .msx:hover .msx-svg {
-    transform: scale(1.06);
     filter: drop-shadow(0 0 0.5rem var(--msx-acento));
   }
   /* El rebote REEMPLAZA a la entrada, y es a propósito: al sacar el mouse la entrada vuelve a
@@ -148,20 +153,17 @@
   .msx.msx--estatico:hover .msx-letra {
     animation: msx-letra-rebote 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 0.04s);
   }
-  /* Menu: «Despiece» — las piezas del QR se alejan del centro y vuelven, como un plano desarmado
-     (marca-menu.md §3.ter). El vector de cada pieza lo escribe el generador de Menu en --dx/--dy. */
-  .msx:hover .pieza-menu {
-    animation: msx-despiece 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 0.02s) both;
-  }
-  .msx:hover .rama-salix {
-    animation:
-      msx-rama-nace calc(var(--duracion) * var(--ritmo-ramas)) var(--curva-ramas)
-        calc(var(--retraso) * var(--ritmo-ramas)) both,
-      msx-rama-mece 1.1s ease-in-out calc(var(--retraso) * 0.3);
-  }
+}
+/* El mismo latido a pedido (el toque en el pie, donde no hay hover): lo pone y lo saca el script. */
+.msx.msx--late .msx-icono {
+  animation: msx-latido 0.9s cubic-bezier(0.3, 0, 0.3, 1);
+}
+.msx.msx--late .msx-svg {
+  filter: drop-shadow(0 0 0.5rem var(--msx-acento));
 }
 
-/* Las piezas de Menu escalan y se mueven desde su propio centro, no desde el del logo. */
+/* Las piezas de Menu escalan y se mueven desde su propio centro, no desde el del logo (el hover ya
+   no las despieza: late como toda la familia, pero la entrada de Menu sí las mueve). */
 .pieza-menu {
   transform-box: fill-box;
   transform-origin: center;
@@ -215,6 +217,104 @@
   animation: msx-portada-destapa 1.4s cubic-bezier(0.215, 0.61, 0.355, 1) 1.15s backwards;
 }
 
+/* ── El telón corto (kit-marca §4 «El telón corto»): la PRIMERA vez que alguien abre la portada en
+   la sesión, la pantalla entera es del color de la marca, el logo grande entra con su movimiento
+   y el nombre sube debajo; a los ~1,9 s el telón sube con el borde curvo y el logo con el nombre
+   vuelan a su lugar en la portada. Unos 2,8 s en total. Lo decide antes del primer pintado el
+   script de `telon-salix.ts` (atributo `data-msx-telon` en <html>: activo → sube → hecho), así
+   que el telón está en el HTML del servidor y se pinta con el primer cuadro, sin esperar a React.
+   Menu tiene su telón largo propio (marca-menu.md §3.bis): es la excepción declarada.
+   Perillas: `--msx-telon-color` (el fondo; por defecto el acento) y `--msx-telon-tinta` (el logo
+   y las letras). Estructura: `.msx-telon` (el fondo, con `.msx-telon-firma`) y, aparte porque
+   vuelan, `.msx-telon-marca` > `.msx-telon-logo` + `.msx-telon-nombre`. ── */
+.msx-telon,
+.msx-telon-marca {
+  display: none;
+  position: fixed;
+  inset: 0;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--msx-telon-tinta, #fff);
+}
+html[data-msx-telon='activo'] :is(.msx-telon, .msx-telon-marca),
+html[data-msx-telon='sube'] :is(.msx-telon, .msx-telon-marca) {
+  display: flex;
+}
+.msx-telon {
+  z-index: 310; /* arriba de la barra de la familia (300) y de su menú (299) */
+  justify-content: flex-end;
+  padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+  cursor: pointer; /* tocarlo lo saltea */
+  background: radial-gradient(
+    120% 80% at 50% 38%,
+    var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 0%,
+    color-mix(in srgb, var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 72%, black) 100%
+  );
+}
+.msx-telon-marca {
+  z-index: 311;
+  justify-content: center;
+  gap: clamp(0.875rem, 2.6vh, 1.625rem);
+  pointer-events: none;
+  --msx-ln-grosor: 2.4px;
+}
+.msx-telon-logo {
+  display: block;
+  width: clamp(6rem, min(30vw, 24vh), 11rem);
+  height: clamp(6rem, min(30vw, 24vh), 11rem);
+  transform-origin: 0 0;
+}
+.msx-telon-logo > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.msx-telon-nombre {
+  font-size: clamp(2.125rem, min(8vw, 6vh), 3.75rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  transform-origin: 0 0;
+  animation: msx-telon-aparece 0.56s cubic-bezier(0.05, 0.7, 0.1, 1) 0.45s backwards;
+}
+/* «by Salix», tenue: la firma de la madre en todas las entradas de la familia. */
+.msx-telon-firma {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  animation: msx-telon-aparece 0.56s cubic-bezier(0.05, 0.7, 0.1, 1) 0.8s backwards;
+}
+.msx-telon-firma b {
+  font-weight: 700;
+}
+/* Sube: el fondo se va para arriba con el borde de abajo curvo (el logo y el nombre los vuela el
+   script, que es el único que sabe dónde quedaron en la portada). */
+html[data-msx-telon='sube'] .msx-telon {
+  pointer-events: none;
+  animation: msx-telon-sube 0.9s cubic-bezier(0.7, 0, 0.25, 1) forwards;
+}
+/* Lo que el telón le trae a la portada no hace su propia entrada: llega volando. Mientras el telón
+   está, su lugar queda vacío (ocupando su espacio, para que el vuelo tenga destino). */
+html[data-msx-telon] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
+  animation: none;
+}
+html[data-msx-telon='activo'] :is([data-msx-telon-logo], [data-msx-telon-nombre]),
+html[data-msx-telon='sube'] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
+  opacity: 0;
+}
+/* Si el script no llega a correr (el JavaScript no cargó), el telón se va solo a los 6 s y la
+   portada queda como si nada. La entrada entera dura ~2,8 s. */
+html[data-msx-telon='activo'] :is(.msx-telon, .msx-telon-marca) {
+  animation: msx-telon-rescate 0.4s ease 6s forwards;
+}
+html[data-msx-telon='activo'] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
+  animation: msx-telon-rescate-portada 0.4s ease 6s forwards;
+}
+
 /* ── Estático (`animar={false}`): sin entrada ni glow; el hover sigue vivo ── */
 .msx.msx--estatico .msx-svg,
 .msx.msx--estatico .msx-icono::after,
@@ -231,9 +331,10 @@
   animation: none;
 }
 
-/* ── Reducir movimiento: se apagan la entrada y el glow (el hover es una transición corta y queda) ── */
+/* ── Reducir movimiento: se apagan la entrada, el glow y el latido (queda el brillo del hover) ── */
 @media (prefers-reduced-motion: reduce) {
   .msx-svg,
+  .msx-icono,
   .msx-icono::after,
   .msx-letra,
   .msx-firma,
@@ -303,26 +404,45 @@
     transform: translateY(var(--desde));
   }
 }
-@keyframes msx-rama-mece {
+/* El latido: dos pulsos, el segundo más chico, y quieto el resto del ciclo (como un corazón). */
+@keyframes msx-latido {
   0%,
-  to {
-    transform: translateY(0);
-  }
-  35% {
-    transform: translateY(1.1px);
-  }
-  70% {
-    transform: translateY(-0.4px);
-  }
-}
-@keyframes msx-despiece {
-  0%,
+  70%,
   to {
     transform: none;
   }
-  35%,
-  50% {
-    transform: translate(var(--dx), var(--dy)) scale(0.94);
+  14% {
+    transform: scale(1.14);
+  }
+  28% {
+    transform: none;
+  }
+  42% {
+    transform: scale(1.08);
+  }
+}
+@keyframes msx-telon-aparece {
+  from {
+    opacity: 0;
+    transform: translateY(0.875rem);
+  }
+}
+@keyframes msx-telon-sube {
+  to {
+    transform: translateY(-104%);
+    border-bottom-left-radius: 50% 16vh;
+    border-bottom-right-radius: 50% 16vh;
+  }
+}
+@keyframes msx-telon-rescate {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes msx-telon-rescate-portada {
+  to {
+    opacity: 1;
   }
 }
 @keyframes msx-ln-dibuja {

@@ -17,6 +17,8 @@
  *   - el menú móvil: abre y cierra con la hamburguesa, Escape o tocando un enlace; bloquea el
  *     scroll de atrás, lleva el foco adentro y lo devuelve al botón;
  *   - la cortina del pie: `.psx-pie--visible` cuando el final de la página lo destapa;
+ *   - el logo del pie (`.psx-pie-logo`): al destaparse, al pasar el mouse o al tocarlo asoma
+ *     «by Salix» (`.psx-pie-firma`) y, con el dedo, late (`.msx--late`: donde no hay hover);
  *   - el selector de idioma (`.psx-idioma`, en el pie y en el menú): abre y cierra la lista, lleva
  *     el foco a la opción activa y lo devuelve al botón. ELEGIR el idioma es de cada producto: el
  *     de React escucha el clic de su opción; uno sin framework, el evento `psx:idioma` que se emite
@@ -27,11 +29,23 @@ const CLASE_FIJA = 'psx-barra--fija'
 const CLASE_ABIERTO = 'psx-menu--abierto'
 const CLASE_VISIBLE = 'psx-pie--visible'
 const CLASE_SIN_SCROLL = 'psx-sin-scroll'
+const CLASE_ASOMA = 'psx-pie-logo--asoma'
+const CLASE_LATE = 'msx--late'
+/** Al destaparse el pie, la firma espera a que el nombre termine de entrar. */
+const FIRMA_TRAS_ENTRADA = '0.9s'
+
+/** Vuelve a arrancar una animación de clase: se saca, se fuerza un cuadro de estilo y se pone. */
+function reiniciar(el: Element, clase: string) {
+  el.classList.remove(clase)
+  void (el as HTMLElement).offsetWidth
+  el.classList.add(clase)
+}
 
 export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   const progreso = raiz.querySelector<HTMLElement>('.psx-progreso')
   const barra = raiz.querySelector<HTMLElement>('.psx-barra')
   const pie = raiz.querySelector<HTMLElement>('.psx-pie')
+  const pieLogo = raiz.querySelector<HTMLElement>('.psx-pie-logo')
   const boton = raiz.querySelector<HTMLButtonElement>('.psx-hamburguesa')
   const menu = boton?.getAttribute('aria-controls')
     ? document.getElementById(boton.getAttribute('aria-controls') as string)
@@ -42,6 +56,12 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   // ── Scroll: progreso, barra fija y cortina, una vez por cuadro ──
   let raf = 0
   let ultimoProgreso = -1
+  let pieVisible = false
+  const asomar = (retraso: string) => {
+    if (!pieLogo) return
+    pieLogo.style.setProperty('--psx-firma-retraso', retraso)
+    reiniciar(pieLogo, CLASE_ASOMA)
+  }
   const medir = () => {
     raf = 0
     const alto = document.documentElement.scrollHeight
@@ -55,6 +75,8 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     if (pie) {
       const destapado = reducir || window.scrollY + window.innerHeight >= alto - pie.offsetHeight * 0.3
       pie.classList.toggle(CLASE_VISIBLE, destapado)
+      if (destapado && !pieVisible) asomar(FIRMA_TRAS_ENTRADA)
+      pieVisible = destapado
     }
   }
   const pedir = () => {
@@ -68,6 +90,25 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     window.removeEventListener('scroll', pedir)
     window.removeEventListener('resize', pedir)
   })
+
+  // ── El logo del pie: asoma la firma al pasar o tocar; con el dedo, además late ──
+  if (pieLogo) {
+    const alEntrar = (e: PointerEvent) => {
+      asomar('0s')
+      const marca = pieLogo.querySelector('.msx')
+      if (e.pointerType !== 'mouse' && marca && !reducir) reiniciar(marca, CLASE_LATE)
+    }
+    const alTerminar = (e: AnimationEvent) => {
+      if (e.animationName === 'msx-latido') pieLogo.querySelector('.msx')?.classList.remove(CLASE_LATE)
+      else if (e.animationName.startsWith('psx-firma')) pieLogo.classList.remove(CLASE_ASOMA)
+    }
+    pieLogo.addEventListener('pointerenter', alEntrar)
+    pieLogo.addEventListener('animationend', alTerminar)
+    soltar.push(() => {
+      pieLogo.removeEventListener('pointerenter', alEntrar)
+      pieLogo.removeEventListener('animationend', alTerminar)
+    })
+  }
 
   // ── Menú móvil ──
   if (boton && menu) {
