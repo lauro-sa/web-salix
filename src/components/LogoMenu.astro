@@ -13,6 +13,12 @@ interface Props {
 
 const { tamaño = 22, clase = '' } = Astro.props;
 const { menu } = logos;
+// En dos tonos desde el 2026-10-03 (arriba lleno, abajo al 40 %): llega con `capas`, un path por
+// tono, igual que LogoFlux. Pintar `menu.d` solo perdería el segundo tono.
+const capas =
+  'capas' in menu && Array.isArray(menu.capas)
+    ? (menu.capas as { opacidad: number; fillRule: string; d: string }[])
+    : [{ opacidad: 1, fillRule: menu.fillRule, d: menu.d }];
 ---
 
 <svg
@@ -22,7 +28,16 @@ const { menu } = logos;
   viewBox={menu.viewBox}
   aria-hidden="true"
 >
-  <path d={menu.d} fill-rule={menu.fillRule} fill="currentColor" />
+  {
+    capas.map((c) => (
+      <path
+        d={c.d}
+        fill-rule={c.fillRule}
+        fill="currentColor"
+        fill-opacity={c.opacidad < 1 ? c.opacidad : undefined}
+      />
+    ))
+  }
 </svg>
 
 <style>
