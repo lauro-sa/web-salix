@@ -19,8 +19,10 @@ export default defineConfig({
       // Dividir chunks grandes para mejor performance
       rollupOptions: {
         output: {
-          manualChunks: {
-            'animaciones': ['./src/scripts/particulas.js', './src/scripts/morphing.js'],
+          // Una función, no un objeto: desde Astro 7 (Vite con rolldown) la forma de
+          // objeto ya no se acepta y el build falla («manualChunks is not a function»).
+          manualChunks(id) {
+            if (id.includes('/src/scripts/particulas.js') || id.includes('/src/scripts/morphing.js')) return 'animaciones';
           }
         }
       }

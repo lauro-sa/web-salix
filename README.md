@@ -100,3 +100,9 @@ el iPhone aunque todo lo demás esté bien.
   — es una carpeta oculta y los clientes FTP suelen esconderla).
 - Contexto completo: repo Flux web → `docs/operacion/llaves-acceso-passkeys-setup.md`
   y `docs/familia-salix/cliente-nativo-flux.md` §11.
+
+## Registro de actualizaciones
+
+| Fecha | Qué |
+|---|---|
+| 2026-10-22 | Parche de seguridad: Astro 4.16 → **7.4.2** y `@astrojs/sitemap` al día (avisos de npm: RCE crítico en la optimización de imágenes AVIF, XSS; más Vite y transitivas). `npm audit` en 0. `manualChunks` pasó a función: Astro 7 (Vite con rolldown) ya no acepta la forma de objeto. Las 9 páginas comparadas contra lo online (mismo texto, mismos precios en /flux/ e /integraciones/). Publicado con rsync; `logo-flux.svg` quedó en el servidor a propósito (no está en el repo y puede estar enlazado de afuera). |
