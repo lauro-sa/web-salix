@@ -7,7 +7,7 @@
 
    🔴 FUENTE ÚNICA. Se edita acá y en ningún otro lado: el generador de Flux
    (`node scripts/marca/generar.mjs`) lo copia a Flux, al panel
-   (`src/kit-salix/admin/`) y a Menu, y `--verificar` falla si una copia
+   (`panel/`) y a Menu, y `--verificar` falla si una copia
    difiere. salixweb lo lee de la familia. Contrato: `kit-marca.md` §2.
 
    Clases con prefijo propio `msx-` (y keyframes `msx-*`): el componente de
