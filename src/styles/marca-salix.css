@@ -223,7 +223,7 @@
 /* ── El telón corto (kit-marca §4 «El telón corto»): cada vez que se carga la portada (al entrar y
    al recargar), la pantalla entera es del color de la marca, el logo grande entra con su movimiento
    y el nombre sube debajo; a los ~1,9 s el telón sube con el borde curvo y el logo con el nombre
-   vuelan a su lugar en la portada. Unos 2,8 s en total. Lo decide antes del primer pintado el
+   vuelan al logo de la barra. Unos 2,8 s en total. Lo decide antes del primer pintado el
    script de `telon-salix.ts` (atributo `data-msx-telon` en <html>: activo → sube → hecho), así
    que el telón está en el HTML del servidor y se pinta con el primer cuadro, sin esperar a React.
    Menu tiene su telón largo propio (marca-menu.md §3.bis): es la excepción declarada.
@@ -300,13 +300,17 @@ html[data-msx-telon='sube'] .msx-telon {
   pointer-events: none;
   animation: msx-telon-sube 0.9s cubic-bezier(0.7, 0, 0.25, 1) forwards;
 }
-/* Lo que el telón le trae a la portada no hace su propia entrada: llega volando. Mientras el telón
-   está, su lugar queda vacío (ocupando su espacio, para que el vuelo tenga destino). */
-html[data-msx-telon] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
+/* Lo que el telón trae no hace su propia entrada: llega volando. Mientras el telón está, su lugar
+   queda vacío (ocupando su espacio, para que el vuelo tenga destino). El destino es el logo de la
+   barra; si la página marca otro con `data-msx-telon-logo`, el de la barra entra como siempre. */
+html[data-msx-telon] :is([data-msx-telon-logo], [data-msx-telon-nombre]),
+html[data-msx-telon]:not(:has([data-msx-telon-logo])) .psx-barra-marca :is(.msx-icono, .msx-nombre) {
   animation: none;
 }
 html[data-msx-telon='activo'] :is([data-msx-telon-logo], [data-msx-telon-nombre]),
-html[data-msx-telon='sube'] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
+html[data-msx-telon='sube'] :is([data-msx-telon-logo], [data-msx-telon-nombre]),
+html[data-msx-telon='activo']:not(:has([data-msx-telon-logo])) .psx-barra-marca :is(.msx-icono, .msx-nombre),
+html[data-msx-telon='sube']:not(:has([data-msx-telon-logo])) .psx-barra-marca :is(.msx-icono, .msx-nombre) {
   opacity: 0;
 }
 /* Las zonas seguras (zonas-seguras.md): mientras el telón tapa la pantalla, la barra pública lleva
@@ -325,7 +329,8 @@ html[data-msx-telon='activo'] .psx-barra {
 html[data-msx-telon='activo'] :is(.msx-telon, .msx-telon-marca) {
   animation: msx-telon-rescate 0.4s ease 6s forwards;
 }
-html[data-msx-telon='activo'] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
+html[data-msx-telon='activo'] :is([data-msx-telon-logo], [data-msx-telon-nombre]),
+html[data-msx-telon='activo']:not(:has([data-msx-telon-logo])) .psx-barra-marca :is(.msx-icono, .msx-nombre) {
   animation: msx-telon-rescate-portada 0.4s ease 6s forwards;
 }
 
