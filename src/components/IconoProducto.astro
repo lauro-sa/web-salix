@@ -1,8 +1,9 @@
 ---
-// Icono de producto: Flux y Menu usan su isotipo (generado desde la familia); el resto, el SVG de trazo.
+// Icono de producto: Flux, Menu y Nuvix usan su isotipo; el resto, el SVG de trazo.
 import IconoSVG from './ui/IconoSVG.astro';
 import LogoFlux from './LogoFlux.astro';
 import LogoMenu from './LogoMenu.astro';
+import LogoNuvix from './LogoNuvix.astro';
 
 interface Props {
   nombre: string;
@@ -17,6 +18,8 @@ const { nombre, tamaño = 22, grosor = 1.5 } = Astro.props;
   <LogoFlux tamaño={tamaño} />
 ) : nombre === 'menu' ? (
   <LogoMenu tamaño={tamaño} />
+) : nombre === 'nuvix' ? (
+  <LogoNuvix tamaño={tamaño} />
 ) : (
   <IconoSVG nombre={nombre} tamaño={tamaño} grosor={grosor} />
 )}

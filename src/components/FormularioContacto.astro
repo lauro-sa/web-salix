@@ -24,8 +24,10 @@ interface Props {
 
 const { productoPreseleccionado } = Astro.props;
 
-const disponibles = PRODUCTOS.filter((p) => p.disponible);
-const proximos = PRODUCTOS.filter((p) => !p.disponible);
+// Un producto con `formulario: false` se muestra en la grilla pero no se ofrece acá.
+const enFormulario = PRODUCTOS.filter((p) => p.formulario !== false);
+const disponibles = enFormulario.filter((p) => p.disponible);
+const proximos = enFormulario.filter((p) => !p.disponible);
 const PASOS = ['Producto', 'Contacto', 'Mensaje', 'Listo'];
 const flecha = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
 ---

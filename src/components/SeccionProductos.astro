@@ -12,7 +12,8 @@ import { PRODUCTOS } from '../productos';
 const TEXTO = {
   etiqueta:  'Productos y servicios',
   titulo:    'Una suite completa.',
-  subtitulo: 'Cada producto es una PWA independiente, pensada para resolver un problema específico. Todas conectadas, todas con WhatsApp y MercadoPago.',
+  // «Los de negocio»: Nuvix es una app de iPhone para personas, sin WhatsApp ni MercadoPago.
+  subtitulo: 'Cada producto resuelve un problema específico. Los de negocio son PWA independientes, conectadas entre sí, con WhatsApp y MercadoPago.',
 };
 ---
 
@@ -67,6 +68,8 @@ const TEXTO = {
   /* Si la última tarjeta queda sola en su fila, ocupa la fila entera: una tarjeta suelta al lado de
      dos huecos se lee como que falta algo. Vale para las tres y las dos columnas. */
   .grilla-productos > .card-producto:last-child:nth-child(3n + 1) { grid-column: 1 / -1; }
+  /* Y si quedan dos, la última toma los dos lugares que sobran. */
+  .grilla-productos > .card-producto:last-child:nth-child(3n + 2) { grid-column: span 2; }
 
   /* Card de cada producto */
   .card-producto {
@@ -129,6 +132,7 @@ const TEXTO = {
   @media (max-width: 1024px) {
     .grilla-productos { grid-template-columns: repeat(2, 1fr); }
     .grilla-productos > .card-producto:last-child:nth-child(3n + 1) { grid-column: auto; }
+    .grilla-productos > .card-producto:last-child:nth-child(3n + 2) { grid-column: auto; }
     .grilla-productos > .card-producto:last-child:nth-child(2n + 1) { grid-column: 1 / -1; }
   }
 

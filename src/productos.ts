@@ -8,6 +8,8 @@
 //   corto    el nombre en el formulario ("Flux")
 //   linea    qué es, en dos o tres palabras, debajo del nombre en el formulario
 //   pista    la ayuda del mensaje en el paso 3: qué nos sirve saber para responder bien
+//   formulario   `false` deja al producto fuera del formulario de contacto: se muestra en la
+//                grilla y nada más (Nuvix: no se juntan correos de interesados; regla de su web)
 // ============================================================
 
 export interface Producto {
@@ -21,6 +23,7 @@ export interface Producto {
   disponible: boolean;
   url: string;
   color: string;
+  formulario?: boolean;
 }
 
 export const PRODUCTOS: Producto[] = [
@@ -59,6 +62,19 @@ export const PRODUCTOS: Producto[] = [
     disponible: true,
     url: '/sites',
     color: 'var(--salix)',
+  },
+  {
+    id: 'Nuvix',
+    nombre: 'Nuvix by Salix',
+    corto: 'Nuvix',
+    linea: 'Registro de tratamiento',
+    pista: '',
+    descripcion: 'Una app para iPhone: el registro personal de un tratamiento inyectable semanal o diario. Cuándo toca la próxima aplicación y dónde sigue.',
+    icono: 'nuvix',
+    disponible: false,
+    url: 'https://nuvix.salixweb.com',
+    color: 'var(--salix)',
+    formulario: false,
   },
   {
     id: 'Go',
