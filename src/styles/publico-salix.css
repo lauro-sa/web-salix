@@ -86,7 +86,14 @@ html:has(.psx-barra) {
 }
 
 /* ── Barra ── Tres columnas con los costados iguales: los enlaces quedan centrados en la página,
-   no en el hueco entre el logo y el botón. Vidrio arriba del todo; al bajar, se entinta. */
+   no en el hueco entre el logo y el botón. Arriba del todo lleva el color del tope de la página
+   (--psx-tope) y, al bajar, el del fondo.
+
+   En el iPhone el color es siempre liso y sin desenfoque. Desde iOS 26 Safari ya no lee
+   `theme-color`: pinta la franja de la hora con el color de fondo de lo que esté fijo contra el
+   borde de arriba, y a un elemento con `backdrop-filter` no lo lee (cae al fondo de `body`, y al
+   volver arriba se queda con el color viejo). Con la barra lisa, franja y barra dan el mismo color
+   exacto al cargar, al bajar y al subir. Medido en el simulador el 2026-11-18. */
 .psx-barra {
   position: fixed;
   top: 0;
@@ -101,20 +108,39 @@ html:has(.psx-barra) {
     max(clamp(1.25rem, 5vw, 2rem), env(safe-area-inset-right, 0px)) 0.875rem
     max(clamp(1.25rem, 5vw, 2rem), env(safe-area-inset-left, 0px));
   font-family: var(--psx-fuente);
-  background: transparent;
-  /* El prefijo va PRIMERO: Lightning CSS (el compilador de Next) toma la última declaración como
-     la que manda, y con el prefijo al final dejaba solo `-webkit-backdrop-filter`, que Chrome no
-     lee: la barra salía sin vidrio en Flux y en Menu. Lo cuida `publico-salix-compila.test.ts`. */
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  background: var(--psx-tope, transparent);
   border-bottom: 1px solid transparent;
   transition:
     background-color 0.4s,
     border-color 0.4s;
 }
+/* Las reglas que siguen pesan todas lo mismo (una clase) y manda el orden: así el producto que
+   pinta su barra de otro color las pisa sin pelear.
+   `-webkit-touch-callout` existe solo en el iPhone y el iPad: es la forma de separarlos sin guion.
+   Ahí, sin --psx-tope, el tope es el fondo: nunca transparente, o Safari no tiene qué leer. */
+@supports (-webkit-touch-callout: none) {
+  .psx-barra {
+    background: var(--psx-tope, var(--psx-fondo));
+  }
+}
 .psx-barra--fija {
-  background: color-mix(in srgb, var(--psx-fondo) 60%, transparent);
+  background: var(--psx-fondo);
   border-bottom-color: var(--psx-borde);
+}
+@supports not (-webkit-touch-callout: none) {
+  /* En el resto queda el vidrio al bajar.
+     El prefijo va PRIMERO: Lightning CSS (el compilador de Next) toma la última declaración como
+     la que manda, y con el prefijo al final dejaba solo `-webkit-backdrop-filter`, que Chrome no
+     lee: la barra salía sin vidrio en Flux y en Menu. Lo cuida `publico-salix-compila.test.ts`. */
+  .psx-barra--fija {
+    background: color-mix(in srgb, var(--psx-fondo) 60%, transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+}
+/* Con el menú abierto la barra es el techo del menú: lleva su mismo color. */
+.psx-barra:where(:has(.psx-hamburguesa[aria-expanded='true'])) {
+  background: var(--psx-fondo);
 }
 .psx-barra-marca {
   justify-self: start;
