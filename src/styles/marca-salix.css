@@ -54,7 +54,10 @@
   animation: msx-entrada 1s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   transition: filter 0.4s;
 }
-/* Glow de acento que respira detrás del ícono */
+/* Glow de acento que respira detrás del ícono: DOS veces al entrar, y queda quieto. Hasta el 2026-10-27
+   respiraba sin fin en cada pantalla (el logo está en todas): una animación perpetua sin ningún dato
+   detrás (costo por cuadro, «lo primero que hay que medir es la pantalla quieta»). Al pasar el mouse
+   late el ícono (abajo). */
 .msx-icono::after {
   content: '';
   position: absolute;
@@ -64,7 +67,7 @@
   opacity: 0;
   filter: blur(0.75rem);
   z-index: -1;
-  animation: msx-pulso 3s ease-in-out 1.2s infinite;
+  animation: msx-pulso 3s ease-in-out 1.2s 2;
 }
 
 /* ── Nombre (wordmark, letra por letra) ── */
@@ -325,7 +328,7 @@ html[data-msx-telon='activo'] :is([data-msx-telon-logo], [data-msx-telon-nombre]
 }
 
 /* ── Equipo que no lo sostiene (`data-fluidez='baja'`, lo mide Flux): el glow deja de respirar.
-   Es un círculo desenfocado que escala sin fin, siempre a la vista. Donde nadie mide la fluidez,
+   Es un círculo desenfocado que escala, siempre a la vista: ni las dos respiraciones de la entrada. Donde nadie mide la fluidez,
    esta regla no aplica nunca. ── */
 :root[data-fluidez='baja'] .msx-icono::after {
   animation: none;

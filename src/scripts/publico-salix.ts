@@ -16,7 +16,9 @@
  *   - la barra se entinta apenas se baja (`.psx-barra--fija`);
  *   - el menú móvil: abre y cierra con la hamburguesa, Escape o tocando un enlace; bloquea el
  *     scroll de atrás, lleva el foco adentro y lo devuelve al botón;
- *   - la cortina del pie: `.psx-pie--visible` cuando el final de la página lo destapa;
+ *   - la cortina del pie: escribe en `--psx-pie-avance` cuánto del pie está destapado (de 0 a 1),
+ *     y con eso su contenido va apareciendo; `.psx-pie--visible` cuando ya está casi entero a la
+ *     vista. Un pie más alto que la pantalla no va pegado al fondo (`.psx-pie--suelto`);
  *   - el logo del pie (`.psx-pie-logo`): al destaparse, al pasar el mouse o al tocarlo asoma
  *     «by Salix» (`.psx-pie-firma`) y, con el dedo, late (`.msx--late`: donde no hay hover);
  *   - el selector de idioma (`.psx-idioma`, en el pie y en el menú): abre y cierra la lista, lleva
@@ -28,9 +30,14 @@
 const CLASE_FIJA = 'psx-barra--fija'
 const CLASE_ABIERTO = 'psx-menu--abierto'
 const CLASE_VISIBLE = 'psx-pie--visible'
+const CLASE_SUELTO = 'psx-pie--suelto'
 const CLASE_SIN_SCROLL = 'psx-sin-scroll'
 const CLASE_ASOMA = 'psx-pie-logo--asoma'
 const CLASE_LATE = 'msx--late'
+/** Qué parte del pie tiene que estar destapada para darlo por «a la vista» (el logo repite su entrada). */
+const PIE_A_LA_VISTA = 0.7
+/** Lo mismo para un pie suelto, que entra desde abajo como cualquier bloque. */
+const PIE_SUELTO_A_LA_VISTA = 0.25
 /** Al destaparse el pie, la firma espera a que el nombre termine de entrar. */
 const FIRMA_TRAS_ENTRADA = '0.9s'
 
@@ -56,6 +63,7 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   // ── Scroll: progreso, barra fija y cortina, una vez por cuadro ──
   let raf = 0
   let ultimoProgreso = -1
+  let ultimoAvance = -1
   let pieVisible = false
   const asomar = (retraso: string) => {
     if (!pieLogo) return
@@ -73,7 +81,22 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     }
     barra?.classList.toggle(CLASE_FIJA, window.scrollY > 12)
     if (pie) {
-      const destapado = reducir || window.scrollY + window.innerHeight >= alto - pie.offsetHeight * 0.3
+      const altoPie = pie.offsetHeight
+      // Un pie más alto que la pantalla no puede ir pegado al fondo: su parte de arriba no se
+      // vería nunca. Va suelto, como un pie común.
+      const cabe = altoPie <= window.innerHeight - (barra?.offsetHeight ?? 0)
+      pie.classList.toggle(CLASE_SUELTO, !cabe)
+      // Cuánto del pie quedó a la vista, de 0 a 1: el cuerpo termina donde empieza el pie.
+      const aLaVista =
+        altoPie > 0 ? Math.min(1, Math.max(0, (window.scrollY + window.innerHeight - (alto - altoPie)) / altoPie)) : 1
+      // Con eso aparece su contenido, a medida que la cortina lo destapa. Suelto o con menos
+      // movimiento, está entero desde el principio.
+      const avance = reducir || !cabe ? 1 : Math.round(aLaVista * 1000) / 1000
+      if (avance !== ultimoAvance) {
+        pie.style.setProperty('--psx-pie-avance', String(avance))
+        ultimoAvance = avance
+      }
+      const destapado = reducir || aLaVista >= (cabe ? PIE_A_LA_VISTA : PIE_SUELTO_A_LA_VISTA)
       pie.classList.toggle(CLASE_VISIBLE, destapado)
       if (destapado && !pieVisible) asomar(FIRMA_TRAS_ENTRADA)
       pieVisible = destapado
@@ -89,6 +112,8 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     cancelAnimationFrame(raf)
     window.removeEventListener('scroll', pedir)
     window.removeEventListener('resize', pedir)
+    pie?.style.removeProperty('--psx-pie-avance')
+    pie?.classList.remove(CLASE_SUELTO)
   })
 
   // ── El logo del pie: asoma la firma al pasar o tocar; con el dedo, además late ──

@@ -460,23 +460,32 @@ html.psx-sin-scroll {
   font-family: var(--psx-fuente);
   color: var(--psx-texto-2);
 }
-/* Al destaparse, el contenido entra en cascada (arriba, después la base). */
+/* Un pie más alto que la pantalla va suelto, como un pie común (lo marca publico-salix.ts): pegado
+   al fondo, su parte de arriba quedaría siempre fuera de la pantalla. */
+.psx-pie--suelto {
+  position: relative;
+}
+/* El contenido aparece A MEDIDA que la cortina lo destapa, no de golpe al final (Sal, 2026-11-18:
+   «si voy subiendo de a poquito no va apareciendo; tendría que ser progresiva la aparición»).
+   `--psx-pie-avance` es cuánto del pie está destapado, de 0 a 1: lo escribe publico-salix.ts una vez
+   por cuadro. Cada bloque tiene su tramo: la base se destapa primero y aparece primero; lo de
+   arriba, después. Sin JavaScript vale 1 y está todo a la vista. La transición corta empareja los
+   saltos de la rueda del mouse; no demora nada. */
 .psx-pie-animar {
-  opacity: 0;
-  transform: translateY(1.25rem);
+  --psx-pie-paso: clamp(0, (var(--psx-pie-avance, 1) - var(--psx-pie-desde, 0)) / var(--psx-pie-tramo, 0.6), 1);
+  opacity: var(--psx-pie-paso);
+  transform: translateY(calc((1 - var(--psx-pie-paso)) * 1.5rem));
   transition:
-    opacity 0.6s ease,
-    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 0.2s linear,
+    transform 0.2s ease-out;
 }
-.psx-pie--visible .psx-pie-animar {
-  opacity: 1;
-  transform: none;
+.psx-pie-arriba {
+  --psx-pie-desde: 0.15;
+  --psx-pie-tramo: 0.6;
 }
-.psx-pie--visible .psx-pie-arriba {
-  transition-delay: 0.1s;
-}
-.psx-pie--visible .psx-pie-base {
-  transition-delay: 0.25s;
+.psx-pie-base {
+  --psx-pie-desde: 0;
+  --psx-pie-tramo: 0.35;
 }
 
 .psx-pie-arriba {
