@@ -220,8 +220,8 @@
   animation: msx-portada-destapa 1.4s cubic-bezier(0.215, 0.61, 0.355, 1) 1.15s backwards;
 }
 
-/* ── El telón corto (kit-marca §4 «El telón corto»): la PRIMERA vez que alguien abre la portada en
-   la sesión, la pantalla entera es del color de la marca, el logo grande entra con su movimiento
+/* ── El telón corto (kit-marca §4 «El telón corto»): cada vez que se carga la portada (al entrar y
+   al recargar), la pantalla entera es del color de la marca, el logo grande entra con su movimiento
    y el nombre sube debajo; a los ~1,9 s el telón sube con el borde curvo y el logo con el nombre
    vuelan a su lugar en la portada. Unos 2,8 s en total. Lo decide antes del primer pintado el
    script de `telon-salix.ts` (atributo `data-msx-telon` en <html>: activo → sube → hecho), así
@@ -308,6 +308,17 @@ html[data-msx-telon] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
 html[data-msx-telon='activo'] :is([data-msx-telon-logo], [data-msx-telon-nombre]),
 html[data-msx-telon='sube'] :is([data-msx-telon-logo], [data-msx-telon-nombre]) {
   opacity: 0;
+}
+/* Las zonas seguras (zonas-seguras.md): mientras el telón tapa la pantalla, la barra pública lleva
+   el color del borde de arriba del telón. Safari del iPhone pinta la franja de la hora con el
+   color de la barra aunque el telón la tape (publico-salix.md §1): sin esto la franja salía del
+   color de la página, cortada contra el telón. El degradé llega al centro del borde de arriba al
+   47,5 % de su recorrido: el color × (1 − 0,28 × 0,475). Cuando el telón sube, la barra vuelve a lo
+   suyo con su propia transición. */
+html[data-msx-telon='activo'] .psx-barra {
+  background: color-mix(in srgb, var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 86.7%, black);
+  border-bottom-color: transparent;
+  transition: none;
 }
 /* Si el script no llega a correr (el JavaScript no cargó), el telón se va solo a los 6 s y la
    portada queda como si nada. La entrada entera dura ~2,8 s. */
