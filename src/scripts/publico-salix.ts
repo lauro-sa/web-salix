@@ -44,8 +44,9 @@ const PIE_A_LA_VISTA = 0.7
 const PIE_SUELTO_A_LA_VISTA = 0.25
 /** Al destaparse el pie, la firma espera a que el nombre termine de entrar. */
 const FIRMA_TRAS_ENTRADA = '0.9s'
-/** El aire que el cierre conserva contra la barra y contra el pie al acomodarse, en px. */
+/** El aire que el cierre conserva contra la barra y contra el pie al acomodarse, en px: en una pantalla baja, el 3 % de su alto. */
 const AIRE_CIERRE = 28
+const aireCierre = () => Math.min(AIRE_CIERRE, Math.round(window.innerHeight * 0.03))
 /** Hasta cuánto se achica el cierre sin que su letra deje de leerse bien. Si ni así entra arriba del pie, el pie va suelto. */
 const ESCALA_MINIMA_CIERRE = 0.6
 
@@ -76,6 +77,7 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   let ultimoAvance = -1
   let pieVisible = false
   let ultimoCierre = ''
+  let ultimoAltoPie = ''
   const asomar = (retraso: string) => {
     if (!pieLogo) return
     pieLogo.style.setProperty('--psx-firma-retraso', retraso)
@@ -101,9 +103,16 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       // vería nunca. Va suelto, como un pie común. Lo mismo si la página tiene un cierre y, con el
       // pie destapado, no queda lugar para el cierre ni achicado al máximo (pantallas bajas, el
       // teléfono): mejor un pie común que un cierre cortado por la barra o con letra diminuta.
-      const minimoCierre = cierreCaja ? cierreCaja.offsetHeight * ESCALA_MINIMA_CIERRE + 2 * AIRE_CIERRE : 0
+      const minimoCierre = cierreCaja ? cierreCaja.offsetHeight * ESCALA_MINIMA_CIERRE + 2 * aireCierre() : 0
       const cabe = altoPie + minimoCierre <= window.innerHeight - altoBarra
       pie.classList.toggle(CLASE_SUELTO, !cabe)
+      // El cierre llena lo que queda arriba de un pie pegado (publico-salix.css, `.psx-cierre`).
+      const altoParaElCierre = cabe ? `${altoPie}px` : ''
+      if (cierre && altoParaElCierre !== ultimoAltoPie) {
+        if (altoParaElCierre) cierre.style.setProperty('--psx-pie-alto', altoParaElCierre)
+        else cierre.style.removeProperty('--psx-pie-alto')
+        ultimoAltoPie = altoParaElCierre
+      }
       // Cuánto del pie quedó a la vista, de 0 a 1: el cuerpo termina donde empieza el pie.
       const aLaVista =
         altoPie > 0 ? Math.min(1, Math.max(0, (window.scrollY + window.innerHeight - (alto - altoPie)) / altoPie)) : 1
@@ -139,7 +148,7 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
         // El aire nunca pide más que el que el cierre ya tenía alrededor de su contenido.
         const margenArriba = cierreCaja.offsetTop
         const margenAbajo = r.height - margenArriba - altoCaja
-        const aire = Math.max(0, Math.min(AIRE_CIERRE, margenArriba, margenAbajo))
+        const aire = Math.max(0, Math.min(aireCierre(), margenArriba, margenAbajo))
         const objetivo = Math.min(1, Math.max(ESCALA_MINIMA_CIERRE, (visto - 2 * aire) / altoCaja))
         const alCentro = arriba + visto / 2 - (r.top + margenArriba + altoCaja / 2)
         // Cuánto se acomoda: lo que se destapó del pie, o más si hace falta para que ni a mitad de
@@ -180,6 +189,7 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     pie?.classList.remove(CLASE_SUELTO)
     cierreCaja?.style.removeProperty('--psx-cierre-escala')
     cierreCaja?.style.removeProperty('--psx-cierre-corre')
+    cierre?.style.removeProperty('--psx-pie-alto')
   })
 
   // ── El logo del pie: asoma la firma al pasar o tocar; con el dedo, además late ──

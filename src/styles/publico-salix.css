@@ -485,6 +485,15 @@ html.psx-sin-scroll {
    La transición corta empareja los saltos de la rueda del mouse. */
 .psx-cierre {
   position: relative;
+  /* Con el pie pegado al fondo, el cierre llena todo lo que queda entre la barra y el pie: si fuera más
+     bajo, en la última pantalla asomaría arriba una franja del bloque anterior. El alto del pie lo
+     escribe publico-salix.ts (solo cuando va pegado); sin él no pide ningún alto. Se mide con la
+     pantalla grande (`lvh`): no cambia cuando el teléfono esconde su barra al bajar. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - var(--psx-alto-barra, 4.5rem) - var(--psx-pie-alto, 100vh));
+  min-height: calc(100lvh - var(--psx-alto-barra, 4.5rem) - var(--psx-pie-alto, 100lvh));
 }
 .psx-cierre-caja {
   transform: translateY(var(--psx-cierre-corre, 0)) scale(var(--psx-cierre-escala, 1));
@@ -877,24 +886,73 @@ html.psx-sin-scroll {
   gap: 0.75rem 1rem;
 }
 
+/* El pie del teléfono es compacto (Sal, 2026-11-19: «que se acomode el footer a la pantalla del móvil y
+   el contenedor final también se ajuste, para que se vea todo perfecto»): tiene que entrar en la última
+   pantalla JUNTO con el cierre, en un iPhone grande, uno común o un Android. Por eso los enlaces van
+   pegados (cada uno conserva sus 44 px para el dedo), la base va en un renglón y, en el cierre, lo
+   accesorio (`.psx-cierre-extra`: la bajada, un sello) no se muestra: quedan el título y el botón. */
 @media (max-width: 760px) {
   .psx-pie-arriba {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-top: 3.5rem;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  .psx-pie-marca {
+    gap: 0.25rem;
   }
   .psx-pie-columnas {
     grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+  }
+  .psx-pie-columna {
+    gap: 0;
+  }
+  .psx-pie-titulo {
+    margin-bottom: 0;
+  }
+  /* Una columna que queda sola en el último renglón lo ocupa entero, con sus enlaces de corrido. */
+  .psx-pie-columna:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 1.5rem;
+  }
+  .psx-pie-columna:last-child:nth-child(odd) .psx-pie-titulo {
+    width: 100%;
   }
   .psx-pie-base {
-    flex-direction: column;
-    align-items: flex-start;
+    gap: 0 1rem;
+    padding-top: 0.5rem;
+  }
+  .psx-pie-base-extra {
+    gap: 0 1rem;
+  }
+  .psx-cierre-extra {
+    display: none;
   }
   /* Con la base apilada, el idioma queda contra el borde izquierdo: la lista crece a la derecha. */
   .psx-pie-base .psx-idioma-lista {
     right: auto;
     left: 0;
     transform-origin: 0 100%;
+  }
+}
+
+/* En un teléfono bajo (un Android chico, con sus barras) los enlaces del pie se juntan un poco más. */
+@media (max-width: 760px) and (max-height: 700px) {
+  .psx-pie-arriba {
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+  }
+  .psx-pie-enlace {
+    min-height: 2.5rem;
+  }
+}
+/* En un teléfono de alto común el lema del pie se guarda: ese renglón es el que le falta al cierre. */
+@media (max-width: 760px) and (max-height: 820px) {
+  .psx-pie-lema {
+    display: none;
   }
 }
 
