@@ -19,6 +19,10 @@
  *   - la cortina del pie: escribe en `--psx-pie-avance` cuánto del pie está destapado (de 0 a 1),
  *     y con eso su contenido va apareciendo; `.psx-pie--visible` cuando ya está casi entero a la
  *     vista. Un pie más alto que la pantalla no va pegado al fondo (`.psx-pie--suelto`);
+ *   - el cierre que se acomoda: el último bloque de la página (`.psx-cierre`, con su contenido en
+ *     `.psx-cierre-caja`) se achica y se centra a medida que la cortina destapa el pie, para que al
+ *     llegar al fondo entre entero entre la barra y el pie en vez de quedar cortado por la barra.
+ *     Escribe `--psx-cierre-escala` y `--psx-cierre-corre` en la caja, una vez por cuadro;
  *   - el logo del pie (`.psx-pie-logo`): al destaparse, al pasar el mouse o al tocarlo asoma
  *     «by Salix» (`.psx-pie-firma`) y, con el dedo, late (`.msx--late`: donde no hay hover);
  *   - el selector de idioma (`.psx-idioma`, en el pie y en el menú): abre y cierra la lista, lleva
@@ -40,6 +44,10 @@ const PIE_A_LA_VISTA = 0.7
 const PIE_SUELTO_A_LA_VISTA = 0.25
 /** Al destaparse el pie, la firma espera a que el nombre termine de entrar. */
 const FIRMA_TRAS_ENTRADA = '0.9s'
+/** El aire que el cierre conserva contra la barra y contra el pie al acomodarse, en px. */
+const AIRE_CIERRE = 28
+/** Hasta cuánto se achica el cierre sin que su letra deje de leerse bien. Si ni así entra arriba del pie, el pie va suelto. */
+const ESCALA_MINIMA_CIERRE = 0.6
 
 /** Vuelve a arrancar una animación de clase: se saca, se fuerza un cuadro de estilo y se pone. */
 function reiniciar(el: Element, clase: string) {
@@ -53,6 +61,8 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   const barra = raiz.querySelector<HTMLElement>('.psx-barra')
   const pie = raiz.querySelector<HTMLElement>('.psx-pie')
   const pieLogo = raiz.querySelector<HTMLElement>('.psx-pie-logo')
+  const cierre = raiz.querySelector<HTMLElement>('.psx-cierre')
+  const cierreCaja = cierre?.querySelector<HTMLElement>('.psx-cierre-caja') ?? null
   const boton = raiz.querySelector<HTMLButtonElement>('.psx-hamburguesa')
   const menu = boton?.getAttribute('aria-controls')
     ? document.getElementById(boton.getAttribute('aria-controls') as string)
@@ -65,6 +75,7 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   let ultimoProgreso = -1
   let ultimoAvance = -1
   let pieVisible = false
+  let ultimoCierre = ''
   const asomar = (retraso: string) => {
     if (!pieLogo) return
     pieLogo.style.setProperty('--psx-firma-retraso', retraso)
@@ -80,11 +91,18 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       ultimoProgreso = p
     }
     barra?.classList.toggle(CLASE_FIJA, window.scrollY > 12)
+    // Cuántos px del pie destapó la cortina y qué parte (0 si va suelto o no hay pie): con eso se acomoda el cierre.
+    let pieDestapado = 0
+    let pesoCierre = 0
+    const altoBarra = barra?.offsetHeight ?? 0
     if (pie) {
       const altoPie = pie.offsetHeight
       // Un pie más alto que la pantalla no puede ir pegado al fondo: su parte de arriba no se
-      // vería nunca. Va suelto, como un pie común.
-      const cabe = altoPie <= window.innerHeight - (barra?.offsetHeight ?? 0)
+      // vería nunca. Va suelto, como un pie común. Lo mismo si la página tiene un cierre y, con el
+      // pie destapado, no queda lugar para el cierre ni achicado al máximo (pantallas bajas, el
+      // teléfono): mejor un pie común que un cierre cortado por la barra o con letra diminuta.
+      const minimoCierre = cierreCaja ? cierreCaja.offsetHeight * ESCALA_MINIMA_CIERRE + 2 * AIRE_CIERRE : 0
+      const cabe = altoPie + minimoCierre <= window.innerHeight - altoBarra
       pie.classList.toggle(CLASE_SUELTO, !cabe)
       // Cuánto del pie quedó a la vista, de 0 a 1: el cuerpo termina donde empieza el pie.
       const aLaVista =
@@ -92,6 +110,10 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       // Con eso aparece su contenido, a medida que la cortina lo destapa. Suelto o con menos
       // movimiento, está entero desde el principio.
       const avance = reducir || !cabe ? 1 : Math.round(aLaVista * 1000) / 1000
+      if (cabe && !reducir) {
+        pieDestapado = aLaVista * altoPie
+        pesoCierre = aLaVista
+      }
       if (avance !== ultimoAvance) {
         pie.style.setProperty('--psx-pie-avance', String(avance))
         ultimoAvance = avance
@@ -100,6 +122,48 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       pie.classList.toggle(CLASE_VISIBLE, destapado)
       if (destapado && !pieVisible) asomar(FIRMA_TRAS_ENTRADA)
       pieVisible = destapado
+    }
+    if (cierre && cierreCaja) {
+      // El cierre ocupa la pantalla mientras el pie está tapado. A medida que la cortina lo destapa,
+      // lo que queda a la vista del cierre es la franja entre la barra y el pie: su contenido va
+      // yendo hacia el tamaño que entra en esa franja, centrado en ella, en la misma proporción en
+      // que el pie se destapa. Así no hay saltos y al llegar al fondo entra justo.
+      let escala = 1
+      let corre = 0
+      const altoCaja = cierreCaja.offsetHeight
+      if (pesoCierre > 0 && altoCaja > 0) {
+        const r = cierre.getBoundingClientRect()
+        const arriba = Math.max(altoBarra, r.top)
+        const abajo = Math.min(window.innerHeight - pieDestapado, r.bottom)
+        const visto = abajo - arriba
+        // El aire nunca pide más que el que el cierre ya tenía alrededor de su contenido.
+        const margenArriba = cierreCaja.offsetTop
+        const margenAbajo = r.height - margenArriba - altoCaja
+        const aire = Math.max(0, Math.min(AIRE_CIERRE, margenArriba, margenAbajo))
+        const objetivo = Math.min(1, Math.max(ESCALA_MINIMA_CIERRE, (visto - 2 * aire) / altoCaja))
+        const alCentro = arriba + visto / 2 - (r.top + margenArriba + altoCaja / 2)
+        // Cuánto se acomoda: lo que se destapó del pie, o más si hace falta para que ni a mitad de
+        // camino el contenido quede bajo la barra o bajo el pie. Los bordes se mueven en línea recta
+        // con el peso, así que el peso justo sale de una cuenta.
+        const encoge = (altoCaja * (1 - objetivo)) / 2
+        const techo = r.top + margenArriba
+        const piso = techo + altoCaja
+        const subeTecho = alCentro + encoge
+        const bajaPiso = alCentro - encoge
+        const pesoTecho = techo < arriba + aire && subeTecho > 0 ? (arriba + aire - techo) / subeTecho : 0
+        const pesoPiso = piso > abajo - aire && bajaPiso < 0 ? (piso - (abajo - aire)) / -bajaPiso : 0
+        const peso = Math.min(1, Math.max(pesoCierre, pesoTecho, pesoPiso))
+        escala = 1 + peso * (objetivo - 1)
+        corre = peso * alCentro
+      }
+      const escalaRedonda = Math.round(escala * 1000) / 1000
+      const correRedondo = Math.round(corre * 10) / 10
+      const valor = `${escalaRedonda}|${correRedondo}`
+      if (valor !== ultimoCierre) {
+        cierreCaja.style.setProperty('--psx-cierre-escala', String(escalaRedonda))
+        cierreCaja.style.setProperty('--psx-cierre-corre', `${correRedondo}px`)
+        ultimoCierre = valor
+      }
     }
   }
   const pedir = () => {
@@ -114,6 +178,8 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     window.removeEventListener('resize', pedir)
     pie?.style.removeProperty('--psx-pie-avance')
     pie?.classList.remove(CLASE_SUELTO)
+    cierreCaja?.style.removeProperty('--psx-cierre-escala')
+    cierreCaja?.style.removeProperty('--psx-cierre-corre')
   })
 
   // ── El logo del pie: asoma la firma al pasar o tocar; con el dedo, además late ──

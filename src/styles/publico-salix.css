@@ -478,6 +478,24 @@ html.psx-sin-scroll {
     0 1px 0 var(--psx-borde),
     0 20px 60px rgba(0, 0, 0, 0.12);
 }
+/* El cierre que se acomoda: el último bloque de la página, el que queda arriba del pie. Mientras
+   el pie está tapado ocupa su lugar de siempre; cuando la cortina lo destapa, publico-salix.ts
+   escribe cuánto achicar y cuánto correr su contenido para que entre entero entre la barra y el
+   pie, en vez de quedar cortado por la barra (Sal, 2026-11-19). Sin JavaScript no cambia nada.
+   La transición corta empareja los saltos de la rueda del mouse. */
+.psx-cierre {
+  position: relative;
+}
+.psx-cierre-caja {
+  transform: translateY(var(--psx-cierre-corre, 0)) scale(var(--psx-cierre-escala, 1));
+  transform-origin: 50% 50%;
+  transition: transform 0.2s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .psx-cierre-caja {
+    transition: none;
+  }
+}
 .psx-pie {
   position: sticky;
   bottom: 0;
