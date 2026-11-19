@@ -87,14 +87,15 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     raf = 0
     const alto = document.documentElement.scrollHeight
     const max = alto - window.innerHeight
-    const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0
+    // El scroll sin el rebote del teléfono: pasado el fondo (o el principio), cuenta como el borde.
+    const scroll = Math.min(Math.max(window.scrollY, 0), Math.max(max, 0))
+    const p = max > 0 ? scroll / max : 0
     if (progreso && p !== ultimoProgreso) {
       progreso.style.transform = `scaleX(${p})`
       ultimoProgreso = p
     }
     barra?.classList.toggle(CLASE_FIJA, window.scrollY > 12)
-    // Cuántos px del pie destapó la cortina y qué parte (0 si va suelto o no hay pie): con eso se acomoda el cierre.
-    let pieDestapado = 0
+    // Qué parte del pie destapó la cortina (0 si va suelto o no hay pie): con eso se acomoda el cierre.
     let pesoCierre = 0
     const altoBarra = barra?.offsetHeight ?? 0
     if (pie) {
@@ -115,14 +116,11 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       }
       // Cuánto del pie quedó a la vista, de 0 a 1: el cuerpo termina donde empieza el pie.
       const aLaVista =
-        altoPie > 0 ? Math.min(1, Math.max(0, (window.scrollY + window.innerHeight - (alto - altoPie)) / altoPie)) : 1
+        altoPie > 0 ? Math.min(1, Math.max(0, (scroll + window.innerHeight - (alto - altoPie)) / altoPie)) : 1
       // Con eso aparece su contenido, a medida que la cortina lo destapa. Suelto o con menos
       // movimiento, está entero desde el principio.
       const avance = reducir || !cabe ? 1 : Math.round(aLaVista * 1000) / 1000
-      if (cabe && !reducir) {
-        pieDestapado = aLaVista * altoPie
-        pesoCierre = aLaVista
-      }
+      if (cabe && !reducir) pesoCierre = aLaVista
       if (avance !== ultimoAvance) {
         pie.style.setProperty('--psx-pie-avance', String(avance))
         ultimoAvance = avance
@@ -133,37 +131,29 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       pieVisible = destapado
     }
     if (cierre && cierreCaja) {
-      // El cierre ocupa la pantalla mientras el pie está tapado. A medida que la cortina lo destapa,
-      // lo que queda a la vista del cierre es la franja entre la barra y el pie: su contenido va
-      // yendo hacia el tamaño que entra en esa franja, centrado en ella, en la misma proporción en
-      // que el pie se destapa. Así no hay saltos y al llegar al fondo entra justo.
+      // El cierre ocupa la pantalla mientras el pie está tapado. Cuando el pie queda destapado del todo,
+      // lo que se ve del cierre es la franja entre la barra y el pie: su contenido va hacia el tamaño y
+      // el lugar que tiene que tener AL FINAL, en la misma proporción en que el pie se destapa. La cuenta
+      // usa solo medidas quietas (altos y cuánto se destapó), nunca dónde está cada cosa en este cuadro:
+      // medir posiciones en cada cuadro hacía temblar el cierre al bajar de golpe con el dedo y con el
+      // rebote del teléfono (Sal, 2026-11-19: «queda como vibrando»).
       let escala = 1
       let corre = 0
       const altoCaja = cierreCaja.offsetHeight
-      if (pesoCierre > 0 && altoCaja > 0) {
-        const r = cierre.getBoundingClientRect()
-        const arriba = Math.max(altoBarra, r.top)
-        const abajo = Math.min(window.innerHeight - pieDestapado, r.bottom)
-        const visto = abajo - arriba
+      if (pesoCierre > 0 && altoCaja > 0 && pie) {
+        const altoCierre = cierre.offsetHeight
+        const altoPie = pie.offsetHeight
+        const franja = window.innerHeight - altoBarra - altoPie
         // El aire nunca pide más que el que el cierre ya tenía alrededor de su contenido.
         const margenArriba = cierreCaja.offsetTop
-        const margenAbajo = r.height - margenArriba - altoCaja
+        const margenAbajo = altoCierre - margenArriba - altoCaja
         const aire = Math.max(0, Math.min(aireCierre(), margenArriba, margenAbajo))
-        const objetivo = Math.min(1, Math.max(ESCALA_MINIMA_CIERRE, (visto - 2 * aire) / altoCaja))
-        const alCentro = arriba + visto / 2 - (r.top + margenArriba + altoCaja / 2)
-        // Cuánto se acomoda: lo que se destapó del pie, o más si hace falta para que ni a mitad de
-        // camino el contenido quede bajo la barra o bajo el pie. Los bordes se mueven en línea recta
-        // con el peso, así que el peso justo sale de una cuenta.
-        const encoge = (altoCaja * (1 - objetivo)) / 2
-        const techo = r.top + margenArriba
-        const piso = techo + altoCaja
-        const subeTecho = alCentro + encoge
-        const bajaPiso = alCentro - encoge
-        const pesoTecho = techo < arriba + aire && subeTecho > 0 ? (arriba + aire - techo) / subeTecho : 0
-        const pesoPiso = piso > abajo - aire && bajaPiso < 0 ? (piso - (abajo - aire)) / -bajaPiso : 0
-        const peso = Math.min(1, Math.max(pesoCierre, pesoTecho, pesoPiso))
-        escala = 1 + peso * (objetivo - 1)
-        corre = peso * alCentro
+        const objetivo = Math.min(1, Math.max(ESCALA_MINIMA_CIERRE, (franja - 2 * aire) / altoCaja))
+        // Al final el cierre termina donde empieza el pie: de ahí sale dónde queda el centro de su contenido.
+        const centroDeLaCaja = window.innerHeight - altoPie - altoCierre + margenArriba + altoCaja / 2
+        const alCentro = altoBarra + franja / 2 - centroDeLaCaja
+        escala = 1 + pesoCierre * (objetivo - 1)
+        corre = Math.abs(alCentro) < 1 ? 0 : pesoCierre * alCentro
       }
       const escalaRedonda = Math.round(escala * 1000) / 1000
       const correRedondo = Math.round(corre * 10) / 10
