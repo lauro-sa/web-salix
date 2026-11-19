@@ -13,7 +13,9 @@ import SeccionPlanes       from '../components/SeccionPlanes.astro';
 import BannerCTA           from '../components/BannerCTA.astro';
 import SeccionTestimonios  from '../components/SeccionTestimonios.astro';
 import FormularioContacto  from '../components/FormularioContacto.astro';
+import CierreSalix         from '../components/CierreSalix.astro';
 import Footer              from '../components/Footer.astro';
+import { CORREO_CONTACTO } from '../productos';
 ---
 
 <Plantilla
@@ -32,6 +34,19 @@ import Footer              from '../components/Footer.astro';
     <SeccionTestimonios />
 
     <FormularioContacto />
+
+    <CierreSalix
+      etiqueta="Salix"
+      titulo="Software que simplifica"
+      resaltado="tu negocio."
+      subtitulo="Elegí por dónde empezar o escribinos: te respondemos rápido."
+    >
+      <a href="#productos" class="boton boton-primario">
+        Ver productos
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href={`mailto:${CORREO_CONTACTO}`} class="boton boton-secundario">{CORREO_CONTACTO}</a>
+    </CierreSalix>
   </main>
 
   <Footer />

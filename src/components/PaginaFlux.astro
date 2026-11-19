@@ -4,6 +4,7 @@ import LogoFlux from './LogoFlux.astro';
 import IconoSVG from './ui/IconoSVG.astro';
 import IconoModuloFlux from './IconoModuloFlux.astro';
 import FormularioContacto from './FormularioContacto.astro';
+import CierreSalix from './CierreSalix.astro';
 import TarjetaSesiones from './TarjetaSesiones.astro';
 
 const URL_FLUX = 'https://flux.salixweb.com';
@@ -272,16 +273,16 @@ const PLANES = [
   </div>
 </div>
 
-<section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
-  <h2 class="titulo-seccion aparecer">30 días para probar Flux. <span style="color:var(--salix)">Sin tarjeta.</span></h2>
-  <p class="subtitulo aparecer delay-1" style="text-align:center">Si no se adapta a tu operación, cancelás. Los datos se conservan.</p>
-  <div class="aparecer delay-2" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-    <a href={`${URL_FLUX}/landing`} class="boton boton-primario" target="_blank" rel="noopener noreferrer">Crear cuenta</a>
-    <a href="https://wa.me/5491100000000" class="boton boton-secundario" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-  </div>
-</section>
-
 <FormularioContacto productoPreseleccionado="Flux" />
+
+<CierreSalix
+  titulo="30 días para probar Flux."
+  resaltado="Sin tarjeta."
+  subtitulo="Si no se adapta a tu operación, cancelás. Los datos se conservan."
+>
+  <a href={`${URL_FLUX}/landing`} class="boton boton-primario" target="_blank" rel="noopener noreferrer">Crear cuenta</a>
+  <a href="https://wa.me/5491100000000" class="boton boton-secundario" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+</CierreSalix>
 
 <style>
   .flux-hero {

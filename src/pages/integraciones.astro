@@ -5,6 +5,8 @@ import Footer from '../components/Footer.astro';
 import IconoSVG from '../components/ui/IconoSVG.astro';
 import TarjetaSesiones from '../components/TarjetaSesiones.astro';
 import FormularioContacto from '../components/FormularioContacto.astro';
+import CierreSalix from '../components/CierreSalix.astro';
+import { CORREO_CONTACTO } from '../productos';
 
 const SERVICIOS = [
   { titulo: 'Configurar el producto', desc: 'Flux, Sites, Go, Play o Book: permisos, WhatsApp, módulos y el día a día de tu equipo.', icono: 'cubo' },
@@ -139,6 +141,15 @@ const FAQ = [
     </section>
 
     <FormularioContacto productoPreseleccionado="Integraciones" />
+
+    <CierreSalix
+      titulo="¿Preferís hablarlo"
+      resaltado="directo?"
+      subtitulo="Escribinos y lo vemos juntos: qué usás hoy y qué hay que dejar andando."
+    >
+      <a href={`mailto:${CORREO_CONTACTO}`} class="boton boton-primario">{CORREO_CONTACTO}</a>
+      <a href="/flux" class="boton boton-secundario">Conocer Flux</a>
+    </CierreSalix>
 
   </main>
   <Footer />
