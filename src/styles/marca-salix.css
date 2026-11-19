@@ -228,8 +228,9 @@
    que el telón está en el HTML del servidor y se pinta con el primer cuadro, sin esperar a React.
    Menu tiene su telón largo propio (marca-menu.md §3.bis): es la excepción declarada.
    Perillas: `--msx-telon-color` (el fondo; por defecto el acento) y `--msx-telon-tinta` (el logo
-   y las letras). Estructura: `.msx-telon` (el fondo, con `.msx-telon-firma`) y, aparte porque
-   vuelan, `.msx-telon-marca` > `.msx-telon-logo` + `.msx-telon-nombre`. ── */
+   y las letras). Estructura: `.msx-telon` (el fondo, con `.msx-telon-firma` y, si el producto tiene
+   cuentas, `.msx-telon-entrar`) y, aparte porque vuelan, `.msx-telon-marca` > `.msx-telon-logo` +
+   `.msx-telon-nombre`. ── */
 .msx-telon,
 .msx-telon-marca {
   display: none;
@@ -293,6 +294,54 @@ html[data-msx-telon='sube'] :is(.msx-telon, .msx-telon-marca) {
 }
 .msx-telon-firma b {
   font-weight: 700;
+}
+/* «Iniciar sesión» sobre el telón (Sal, 2026-11-19: «más discreto del original, así si querés iniciar
+   sesión rápido te lleva ahí»): arriba a la derecha, a la altura del botón de la barra, solo el
+   contorno y la letra en la tinta del telón. Opcional: el producto que tiene cuentas lo pone adentro
+   de `.msx-telon` como `<a class="msx-telon-entrar">`. Tocarlo no levanta el telón (telon-salix.ts):
+   la pantalla sigue tapada hasta que carga la de entrar, sin mostrar la portada por un instante. */
+.msx-telon-entrar {
+  position: absolute;
+  /* Donde está el botón de la barra: 4,5 rem de alto de barra, botón de 2,25 rem centrado. */
+  top: calc(1.125rem + env(safe-area-inset-top, 0px));
+  right: max(clamp(1.25rem, 5vw, 2rem), env(safe-area-inset-right, 0px));
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.9375rem;
+  border: 1px solid color-mix(in srgb, currentColor 36%, transparent);
+  border-radius: 999px;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  opacity: 0.86;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    background-color 0.2s;
+  animation: msx-telon-aparece 0.4s cubic-bezier(0.05, 0.7, 0.1, 1) 0.2s backwards;
+}
+.msx-telon-entrar:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  opacity: 1;
+}
+@media (hover: hover) {
+  .msx-telon-entrar:hover {
+    opacity: 1;
+    background: color-mix(in srgb, currentColor 12%, transparent);
+  }
+}
+/* Con el dedo, 44 px de zona de toque sin agrandar el dibujo. */
+@media (pointer: coarse) {
+  .msx-telon-entrar::after {
+    content: '';
+    position: absolute;
+    inset: -0.25rem 0;
+  }
 }
 /* Sube: el fondo se va para arriba con el borde de abajo curvo (el logo y el nombre los vuela el
    script, que es el único que sabe dónde quedaron en la portada). */
