@@ -250,11 +250,21 @@ html[data-msx-telon='sube'] :is(.msx-telon, .msx-telon-marca) {
   justify-content: flex-end;
   padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
   cursor: pointer; /* tocarlo lo saltea */
-  background: radial-gradient(
-    120% 80% at 50% 38%,
-    var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 0%,
-    color-mix(in srgb, var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 72%, black) 100%
-  );
+  /* El techo: el tono que el degradé tiene arriba, al centro. Va como color de fondo y como una franja
+     pareja en los bordes de arriba y de abajo, porque Safari del iPhone pinta la franja de hora y batería,
+     su barra de abajo y lo que asoma al tirar de más con UN color, el `background-color` del telón: con el degradé solo, ese color no coincidía
+     con el del borde y se veía un corte (Sal, 2026-11-19: «arriba tenés un verde más claro que el de
+     abajo»). */
+  --msx-telon-techo: color-mix(in srgb, var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 86%, black);
+  background-color: var(--msx-telon-techo);
+  background-image:
+    linear-gradient(to bottom, var(--msx-telon-techo) 0, var(--msx-telon-techo) 0.5rem, transparent 34%),
+    linear-gradient(to top, var(--msx-telon-techo) 0, var(--msx-telon-techo) 0.5rem, transparent 34%),
+    radial-gradient(
+      120% 80% at 50% 38%,
+      var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 0%,
+      color-mix(in srgb, var(--msx-telon-color, var(--msx-acento, var(--texto-marca))) 72%, black) 100%
+    );
 }
 .msx-telon-marca {
   z-index: 311;

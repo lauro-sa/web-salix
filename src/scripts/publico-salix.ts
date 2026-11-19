@@ -14,11 +14,16 @@
  * Lo que hace, y nada más:
  *   - la barra de progreso de lectura (escrita en el rAF, con `transform`: sin render ni layout);
  *   - la barra se entinta apenas se baja (`.psx-barra--fija`);
+ *   - marca en `<html>` la mitad de abajo de la página (`.psx-abajo`): con eso un producto cuya página
+ *     empieza en un color y termina en otro elige el fondo de atrás, el que el navegador muestra en el
+ *     rebote al tirar de más (publico-salix.md, «El fondo de atrás»);
  *   - el menú móvil: abre y cierra con la hamburguesa, Escape o tocando un enlace; bloquea el
  *     scroll de atrás, lleva el foco adentro y lo devuelve al botón;
  *   - la cortina del pie: escribe en `--psx-pie-avance` cuánto del pie está destapado (de 0 a 1),
  *     y con eso su contenido va apareciendo; `.psx-pie--visible` cuando ya está casi entero a la
- *     vista. Un pie más alto que la pantalla no va pegado al fondo (`.psx-pie--suelto`);
+ *     vista. Un pie más alto que la pantalla no va pegado al fondo (`.psx-pie--suelto`). Mientras
+ *     el contenido lo tapa entero lleva `.psx-pie--tapado`, que lo deja sin pintar: si no, Safari del
+ *     iPhone lo encuentra pegado al borde de abajo y pinta con su color una franja detrás de su barra;
  *   - el cierre que se acomoda: el último bloque de la página (`.psx-cierre`, con su contenido en
  *     `.psx-cierre-caja`) se achica y se centra a medida que la cortina destapa el pie, para que al
  *     llegar al fondo entre entero entre la barra y el pie en vez de quedar cortado por la barra.
@@ -34,7 +39,9 @@
 const CLASE_FIJA = 'psx-barra--fija'
 const CLASE_ABIERTO = 'psx-menu--abierto'
 const CLASE_VISIBLE = 'psx-pie--visible'
+const CLASE_ABAJO = 'psx-abajo'
 const CLASE_SUELTO = 'psx-pie--suelto'
+const CLASE_TAPADO = 'psx-pie--tapado'
 const CLASE_SIN_SCROLL = 'psx-sin-scroll'
 const CLASE_ASOMA = 'psx-pie-logo--asoma'
 const CLASE_LATE = 'msx--late'
@@ -95,6 +102,7 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       ultimoProgreso = p
     }
     barra?.classList.toggle(CLASE_FIJA, window.scrollY > 12)
+    document.documentElement.classList.toggle(CLASE_ABAJO, p > 0.5)
     // Qué parte del pie destapó la cortina (0 si va suelto o no hay pie): con eso se acomoda el cierre.
     let pesoCierre = 0
     const altoBarra = barra?.offsetHeight ?? 0
@@ -125,6 +133,8 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
         pie.style.setProperty('--psx-pie-avance', String(avance))
         ultimoAvance = avance
       }
+      // Pegado al fondo y sin nada a la vista: no se pinta (ver la cabecera).
+      pie.classList.toggle(CLASE_TAPADO, cabe && aLaVista === 0)
       const destapado = reducir || aLaVista >= (cabe ? PIE_A_LA_VISTA : PIE_SUELTO_A_LA_VISTA)
       pie.classList.toggle(CLASE_VISIBLE, destapado)
       if (destapado && !pieVisible) asomar(FIRMA_TRAS_ENTRADA)
@@ -176,7 +186,8 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     window.removeEventListener('scroll', pedir)
     window.removeEventListener('resize', pedir)
     pie?.style.removeProperty('--psx-pie-avance')
-    pie?.classList.remove(CLASE_SUELTO)
+    pie?.classList.remove(CLASE_SUELTO, CLASE_TAPADO)
+    document.documentElement.classList.remove(CLASE_ABAJO)
     cierreCaja?.style.removeProperty('--psx-cierre-escala')
     cierreCaja?.style.removeProperty('--psx-cierre-corre')
     cierre?.style.removeProperty('--psx-pie-alto')

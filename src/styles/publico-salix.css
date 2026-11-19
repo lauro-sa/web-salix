@@ -519,6 +519,15 @@ html.psx-sin-scroll {
 .psx-pie--suelto {
   position: relative;
 }
+/* Pegado al fondo y tapado entero por el contenido (lo marca publico-salix.ts): no se pinta. Safari del
+   iPhone busca en cada borde de la pantalla una pieza fija o pegada, aunque esté tapada, y con su color
+   pinta una franja lisa detrás de su barra: con el pie ahí, la barra de direcciones quedaba sobre una
+   banda del color del pie que cortaba la sección de atrás (Sal, 2026-11-19: «tengo como un fondo detrás
+   de la barra donde está el link»). Una pieza con opacidad 0 no cuenta para esa búsqueda, y sigue
+   recibiendo el foco del teclado. Detalle en trampas/ios.md. */
+.psx-pie--tapado {
+  opacity: 0;
+}
 /* El contenido aparece A MEDIDA que la cortina lo destapa, no de golpe al final (Sal, 2026-11-18:
    «si voy subiendo de a poquito no va apareciendo; tendría que ser progresiva la aparición»).
    `--psx-pie-avance` es cuánto del pie está destapado, de 0 a 1: lo escribe publico-salix.ts una vez
