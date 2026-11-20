@@ -1,0 +1,248 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   casa.css — la base de la web nueva de Salix («la casa», rediseño 2026-11).
+   Los colores llevan los mismos nombres que la web anterior (variables.css), así
+   las piezas que se conservan (el logo animado, el lema, el idioma, el botón de
+   tema) y las de la familia (barra, menú, pie) siguen andando sin tocarlas.
+   Se escriben por tema con `data-tema`, no con `light-dark()`: los navegadores de
+   los televisores suelen ser viejos y `data-tema` anda en todos.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@import './marca-salix.css';
+@import './publico-salix.css';
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fuentes/archivo-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+
+:root,
+[data-tema='claro'] {
+  --fondo: #f7f5f0;
+  --fondo-alt: #ffffff;
+  --superficie: #efece4;
+  --texto: #16150f;
+  --texto-secundario: #5f5a50;
+  --texto-terciario: #8f897d;
+  --borde: #e2ddd1;
+  --borde-sutil: #ebe7dd;
+  --btn-fondo: #16150f;
+  --btn-texto: #f7f5f0;
+  --btn-hover: #33312a;
+  --salix: #b0600a;
+  /* El color de cada línea de la casa: solo en su logo y en su línea del plano. */
+  --linea-flux: #4e4eb8;
+  --linea-menu: #394a42;
+  --linea-nuvix: #136c64;
+  --linea-sites: #b0600a;
+  --linea-obra: #a8a296;
+}
+[data-tema='oscuro'] {
+  --fondo: #0d0e11;
+  --fondo-alt: #15161a;
+  --superficie: #191a1f;
+  --texto: #f2efe8;
+  --texto-secundario: #a5a299;
+  --texto-terciario: #6f7078;
+  --borde: #26282e;
+  --borde-sutil: #1b1d22;
+  --btn-fondo: #f2efe8;
+  --btn-texto: #0d0e11;
+  --btn-hover: #d6d3cb;
+  --salix: #e8922a;
+  --linea-flux: #8585f2;
+  --linea-menu: #9bb88f;
+  --linea-nuvix: #2fb5a6;
+  --linea-sites: #e8922a;
+  --linea-obra: #5d6068;
+}
+
+:root {
+  --linea-integraciones: var(--texto);
+  --fuente-principal: 'Archivo', system-ui, -apple-system, sans-serif;
+  --ancho: 72rem;
+  --margen: clamp(1.25rem, 5vw, 3rem);
+  --aire: clamp(4rem, 9vw, 7rem);
+  --curva: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Lo que leen la barra, el menú y el pie de la familia (publico-salix.css). */
+  --psx-fondo: var(--fondo);
+  --psx-texto: var(--texto);
+  --psx-texto-2: var(--texto-secundario);
+  --psx-texto-3: var(--texto-terciario);
+  --psx-borde: var(--borde);
+  --psx-marca: var(--salix);
+  --psx-cta-fondo: var(--btn-fondo);
+  --psx-cta-texto: var(--btn-texto);
+  --psx-cta-hover: var(--btn-hover);
+  --psx-fuente: var(--fuente-principal);
+  /* Lo que lee el movimiento del logo de la familia (marca-salix.css). */
+  --texto-primario: var(--texto);
+  --texto-marca: var(--salix);
+  --fuente-sans: var(--fuente-principal);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* El fondo de atrás, el que se ve al tirar de más: el mismo de la página y del pie. */
+  background: var(--fondo);
+}
+/* La letra base es la de siempre (16 px) y las piezas de la familia miden lo mismo que en los otros
+   productos. Solo en pantallas que se miran de lejos (un monitor muy grande, un televisor) todo crece
+   junto, porque todo se mide con `rem`. */
+@media (min-width: 120rem) {
+  html {
+    font-size: 112.5%;
+  }
+}
+@media (min-width: 160rem) {
+  html {
+    font-size: 137.5%;
+  }
+}
+body {
+  margin: 0;
+  font-family: var(--fuente-principal);
+  font-size: 1rem;
+  line-height: 1.55;
+  background: var(--fondo);
+  color: var(--texto);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+figure,
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+ul,
+ol {
+  list-style: none;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+img {
+  height: auto;
+}
+::selection {
+  background: #e8922a;
+  color: #1c1206;
+}
+:focus-visible {
+  outline: 2px solid var(--salix);
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+}
+
+/* ── La voz de los títulos: un renglón liviano y apagado, y el que manda en tinta ── */
+.titulo {
+  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.026em;
+  text-wrap: balance;
+}
+.titulo > span {
+  display: block;
+  font-weight: 350;
+  color: var(--texto-terciario);
+}
+.bajada {
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--texto-secundario);
+  max-inline-size: 44ch;
+  text-wrap: pretty;
+}
+
+/* ── Cajas ── */
+.ancho {
+  inline-size: min(var(--ancho), 100% - 2 * var(--margen));
+  margin-inline: auto;
+}
+.tramo {
+  padding-block: var(--aire);
+  border-top: 1px solid var(--borde-sutil);
+}
+
+/* ── Lo que se aprieta ── */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  background: var(--btn-fondo);
+  color: var(--btn-texto);
+  font-size: 0.875rem;
+  font-weight: 550;
+  white-space: nowrap;
+  transition: background-color 0.25s;
+}
+.enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 2.75rem;
+  font-size: 0.9375rem;
+  font-weight: 550;
+  background: linear-gradient(var(--salix), var(--salix)) 0 calc(100% - 0.625rem) / 100% 1.5px no-repeat;
+}
+.enlace > span {
+  transition: translate 0.3s var(--curva);
+}
+@media (hover: hover) {
+  .boton:hover {
+    background: var(--btn-hover);
+  }
+  .enlace:hover > span {
+    translate: 0.1875rem 0;
+  }
+}
+
+/* ── Una captura que tiene versión clara y oscura muestra la del tema que se está viendo ── */
+.cap--oscura,
+[data-tema='oscuro'] .cap--clara {
+  display: none;
+}
+[data-tema='oscuro'] .cap--oscura {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

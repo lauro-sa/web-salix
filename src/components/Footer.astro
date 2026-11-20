@@ -10,7 +10,14 @@ import LogoSalixAnimado from './LogoSalixAnimado.astro';
 import LemaSalix from './LemaSalix.astro';
 
 const AÑO = new Date().getFullYear();
-const COLUMNAS = [
+interface Columna { titulo: string; enlaces: { href: string; texto: string }[] }
+interface Props {
+  /** Las columnas de enlaces. Sin ellas, las de la web anterior. */
+  columnas?: Columna[];
+  /** A dónde lleva el logo. */
+  inicio?: string;
+}
+const COLUMNAS_DE_ANTES: Columna[] = [
   {
     // Solo los que existen hoy (Sal, 2026-09-28): los que vienen no se listan hasta que estén.
     titulo: 'Productos',
@@ -36,6 +43,7 @@ const COLUMNAS = [
     ],
   },
 ];
+const { columnas: COLUMNAS = COLUMNAS_DE_ANTES, inicio = '/' } = Astro.props;
 ---
 
 <footer class="psx-pie">
@@ -47,7 +55,7 @@ const COLUMNAS = [
         <!-- La envoltura del logo del pie de la familia (publico-salix.md §«El logo del pie»): repite su
              entrada cada vez que la cortina destapa el pie. Salix no lleva «by Salix»: es la madre. -->
         <div class="psx-pie-logo">
-          <a href="/" aria-label="Salix, inicio">
+          <a href={inicio} aria-label="Salix, inicio">
             <span class="msx">
               <span class="msx-icono">
                 <LogoSalixAnimado clase="msx-svg" id="copa-salix-footer" tamaño={26} />

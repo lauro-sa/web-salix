@@ -89,14 +89,18 @@ export const ENTRADAS: Entrada[] = [
   { id: 'book', nombre: 'Book', que: 'Turnos para consultorios', estado: 'En preparación', frase: '', hechos: [], url: '', dominio: '', viene: true },
 ];
 
-/** Sitios hechos por Salix que se muestran con captura real (confirmados por el dueño, 2026-11-20). */
-export const SITIOS = [
-  { archivo: 'sitio-herreelec.jpg', dominio: 'herreelec.com', que: 'Reparación de portones' },
-  { archivo: 'sitio-tph.jpg', dominio: 'tphservice.com', que: 'Servicio técnico' },
+/**
+ * Sitios hechos por Salix que se muestran con captura real (confirmados por el dueño, 2026-11-20).
+ * `oscura`: la captura del mismo sitio en modo oscuro, para los que cambian con el tema del aparato.
+ * Las saca `sitios-temas.mjs` (carpeta de pruebas), a 1440×900.
+ */
+export const SITIOS: { archivo: string; oscura?: string; dominio: string; que: string }[] = [
+  { archivo: 'sitio-herreelec.jpg', oscura: 'sitio-herreelec-oscuro.jpg', dominio: 'herreelec.com', que: 'Reparación de portones' },
+  { archivo: 'sitio-tph.jpg', oscura: 'sitio-tph-oscuro.jpg', dominio: 'tphservice.com', que: 'Servicio técnico' },
   { archivo: 'sitio-porcorosso.jpg', dominio: 'b2b.porcorosso.com.ar', que: 'Mayorista de carne porcina' },
-  { archivo: 'sitio-web-flux.jpg', dominio: 'flux.salixweb.com', que: 'La web de Flux' },
+  { archivo: 'sitio-web-flux.jpg', oscura: 'sitio-web-flux-oscuro.jpg', dominio: 'flux.salixweb.com', que: 'La web de Flux' },
   { archivo: 'sitio-web-menu.jpg', dominio: 'menu.salixweb.com', que: 'La web de Menu' },
-  { archivo: 'sitio-web-nuvix.jpg', dominio: 'nuvix.salixweb.com', que: 'La web de Nuvix' },
+  { archivo: 'sitio-web-nuvix.jpg', oscura: 'sitio-web-nuvix-oscuro.jpg', dominio: 'nuvix.salixweb.com', que: 'La web de Nuvix' },
 ];
 
 export const CORREO = 'hola@salixweb.com';

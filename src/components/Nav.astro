@@ -8,21 +8,33 @@
 import Idioma from './Idioma.astro';
 import LogoSalixAnimado from './LogoSalixAnimado.astro';
 
-const ENLACES = [
-  { href: '/#inicio', texto: 'Inicio' },
-  { href: '/#productos', texto: 'Productos' },
-  { href: '/#porque', texto: 'Por qué Salix' },
-  { href: '/#testimonios', texto: 'Clientes' },
-  { href: '/#contacto', texto: 'Contacto' },
-];
-const CTA = { href: '/#contacto', texto: 'Hablemos' };
+interface Enlace { href: string; texto: string }
+interface Props {
+  /** Los enlaces de la barra y del menú del teléfono. Sin ellos, los de la web anterior. */
+  enlaces?: Enlace[];
+  /** El botón de acción. */
+  cta?: Enlace;
+  /** A dónde lleva el logo. */
+  inicio?: string;
+}
+const {
+  enlaces: ENLACES = [
+    { href: '/#inicio', texto: 'Inicio' },
+    { href: '/#productos', texto: 'Productos' },
+    { href: '/#porque', texto: 'Por qué Salix' },
+    { href: '/#testimonios', texto: 'Clientes' },
+    { href: '/#contacto', texto: 'Contacto' },
+  ],
+  cta: CTA = { href: '/#contacto', texto: 'Hablemos' },
+  inicio = '/',
+} = Astro.props;
 ---
 
 <div class="psx-progreso" aria-hidden="true"></div>
 
 <header id="nav-principal" class="psx-barra">
   <div class="psx-barra-marca">
-    <a href="/" aria-label="Salix, inicio">
+    <a href={inicio} aria-label="Salix, inicio">
       <span class="msx">
         <span class="msx-icono">
           <LogoSalixAnimado clase="msx-svg" id="copa-salix-nav" tamaño={26} />
