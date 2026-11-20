@@ -514,19 +514,28 @@ html.psx-sin-scroll {
   font-family: var(--psx-fuente);
   color: var(--psx-texto-2);
 }
+/* El pie pegado es más angosto que la pantalla, y su contenido (`.psx-pie-caja`) vuelve a ocupar todo
+   el ancho. Safari del iPhone busca en cada borde una pieza fija o pegada, aunque esté tapada, y si
+   mide el 90 % del ancho o más pinta con su color una franja lisa detrás de su barra de direcciones;
+   una vez que encontró un <footer> ahí, no la suelta aunque después se lo esconda o se lo despegue
+   (Sal, 2026-11-20: «cuando llego abajo de todo y vuelvo a subir, se le arma de nuevo el fondo»). Una
+   pieza más angosta no cuenta nunca, así que no hay nada que esconder ni que avisarle. A la vista no
+   cambia nada: el fondo y el contenido son de la caja de adentro. Sin esa caja (un pie todavía con el
+   marcado anterior) queda como estaba. Detalle en trampas/ios.md. */
+.psx-pie:has(> .psx-pie-caja) {
+  width: 85%;
+  margin-inline: auto;
+  background: none;
+}
+.psx-pie-caja {
+  width: calc(100% / 0.85);
+  margin-inline: calc((100% - 100% / 0.85) / 2);
+  background: var(--psx-fondo);
+}
 /* Un pie más alto que la pantalla va suelto, como un pie común (lo marca publico-salix.ts): pegado
    al fondo, su parte de arriba quedaría siempre fuera de la pantalla. */
 .psx-pie--suelto {
   position: relative;
-}
-/* Pegado al fondo y tapado entero por el contenido (lo marca publico-salix.ts): no se pinta. Safari del
-   iPhone busca en cada borde de la pantalla una pieza fija o pegada, aunque esté tapada, y con su color
-   pinta una franja lisa detrás de su barra: con el pie ahí, la barra de direcciones quedaba sobre una
-   banda del color del pie que cortaba la sección de atrás (Sal, 2026-11-19: «tengo como un fondo detrás
-   de la barra donde está el link»). Una pieza con opacidad 0 no cuenta para esa búsqueda, y sigue
-   recibiendo el foco del teclado. Detalle en trampas/ios.md. */
-.psx-pie--tapado {
-  opacity: 0;
 }
 /* El contenido aparece A MEDIDA que la cortina lo destapa, no de golpe al final (Sal, 2026-11-18:
    «si voy subiendo de a poquito no va apareciendo; tendría que ser progresiva la aparición»).
@@ -709,7 +718,8 @@ html.psx-sin-scroll {
     color: var(--psx-texto);
   }
 }
-.psx-pie > :last-child {
+.psx-pie > :last-child:not(.psx-pie-caja),
+.psx-pie-caja > :last-child {
   padding-bottom: max(1.375rem, env(safe-area-inset-bottom, 0px));
 }
 

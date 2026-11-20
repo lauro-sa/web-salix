@@ -39,63 +39,67 @@ const COLUMNAS = [
 ---
 
 <footer class="psx-pie">
-  <div class="psx-pie-arriba psx-pie-animar">
-    <div class="psx-pie-marca">
-      <!-- La envoltura del logo del pie de la familia (publico-salix.md §«El logo del pie»): repite su
-           entrada cada vez que la cortina destapa el pie. Salix no lleva «by Salix»: es la madre. -->
-      <div class="psx-pie-logo">
-        <a href="/" aria-label="Salix, inicio">
-          <span class="msx">
-            <span class="msx-icono">
-              <LogoSalixAnimado clase="msx-svg" id="copa-salix-footer" tamaño={26} />
+  <!-- La caja de adentro lleva el fondo y el ancho entero: el pie pegado es más angosto para que
+       Safari del iPhone no lo tome como pieza del borde (publico-salix.css de la familia). -->
+  <div class="psx-pie-caja">
+    <div class="psx-pie-arriba psx-pie-animar">
+      <div class="psx-pie-marca">
+        <!-- La envoltura del logo del pie de la familia (publico-salix.md §«El logo del pie»): repite su
+             entrada cada vez que la cortina destapa el pie. Salix no lleva «by Salix»: es la madre. -->
+        <div class="psx-pie-logo">
+          <a href="/" aria-label="Salix, inicio">
+            <span class="msx">
+              <span class="msx-icono">
+                <LogoSalixAnimado clase="msx-svg" id="copa-salix-footer" tamaño={26} />
+              </span>
+              <span class="msx-nombre" aria-hidden="true">
+                <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
+              </span>
             </span>
-            <span class="msx-nombre" aria-hidden="true">
-              <span class="msx-letra" style="--i:0">S</span><span class="msx-letra" style="--i:1">a</span><span class="msx-letra" style="--i:2">l</span><span class="msx-letra" style="--i:3">i</span><span class="msx-letra" style="--i:4">x</span>
-            </span>
-          </span>
-        </a>
-      </div>
-      <LemaSalix clase="psx-pie-lema" sinSigla />
-    </div>
-    <nav class="psx-pie-columnas" aria-label="Enlaces del pie">
-      {COLUMNAS.map((c) => (
-        <div class="psx-pie-columna">
-          <span class="psx-pie-titulo">{c.titulo}</span>
-          {c.enlaces.map((e) => <a class="psx-pie-enlace" href={e.href}>{e.texto}</a>)}
+          </a>
         </div>
-      ))}
-    </nav>
-  </div>
-
-  <div class="psx-pie-base psx-pie-animar">
-    <span>&copy; {AÑO} Salix &middot; Buenos Aires, Argentina</span>
-    <div class="psx-pie-base-extra">
-      <Idioma id="idioma-pie" />
-      <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
-      <button id="boton-tema" class="tema-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
-        <svg class="tema-icono icono-sol-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-          <circle cx="9" cy="9" r="3.5"/>
-          <line x1="9" y1="1.5" x2="9" y2="3.5"/>
-          <line x1="9" y1="14.5" x2="9" y2="16.5"/>
-          <line x1="3.1" y1="3.1" x2="4.5" y2="4.5"/>
-          <line x1="13.5" y1="13.5" x2="14.9" y2="14.9"/>
-          <line x1="1.5" y1="9" x2="3.5" y2="9"/>
-          <line x1="14.5" y1="9" x2="16.5" y2="9"/>
-          <line x1="3.1" y1="14.9" x2="4.5" y2="13.5"/>
-          <line x1="13.5" y1="4.5" x2="14.9" y2="3.1"/>
-        </svg>
-        <svg class="tema-icono icono-luna-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15.5 9.5A7 7 0 0 1 8.5 2.5 5.5 5.5 0 1 0 15.5 9.5z"/>
-        </svg>
-        <svg class="tema-icono icono-sistema-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="2" y="2" width="14" height="10" rx="1.5"/>
-          <line x1="6" y1="15" x2="12" y2="15"/>
-          <line x1="9" y1="12" x2="9" y2="15"/>
-        </svg>
-      </button>
+        <LemaSalix clase="psx-pie-lema" sinSigla />
+      </div>
+      <nav class="psx-pie-columnas" aria-label="Enlaces del pie">
+        {COLUMNAS.map((c) => (
+          <div class="psx-pie-columna">
+            <span class="psx-pie-titulo">{c.titulo}</span>
+            {c.enlaces.map((e) => <a class="psx-pie-enlace" href={e.href}>{e.texto}</a>)}
+          </div>
+        ))}
+      </nav>
     </div>
-  </div>
 
+    <div class="psx-pie-base psx-pie-animar">
+      <span>&copy; {AÑO} Salix &middot; Buenos Aires, Argentina</span>
+      <div class="psx-pie-base-extra">
+        <Idioma id="idioma-pie" />
+        <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
+        <button id="boton-tema" class="tema-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
+          <svg class="tema-icono icono-sol-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+            <circle cx="9" cy="9" r="3.5"/>
+            <line x1="9" y1="1.5" x2="9" y2="3.5"/>
+            <line x1="9" y1="14.5" x2="9" y2="16.5"/>
+            <line x1="3.1" y1="3.1" x2="4.5" y2="4.5"/>
+            <line x1="13.5" y1="13.5" x2="14.9" y2="14.9"/>
+            <line x1="1.5" y1="9" x2="3.5" y2="9"/>
+            <line x1="14.5" y1="9" x2="16.5" y2="9"/>
+            <line x1="3.1" y1="14.9" x2="4.5" y2="13.5"/>
+            <line x1="13.5" y1="4.5" x2="14.9" y2="3.1"/>
+          </svg>
+          <svg class="tema-icono icono-luna-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15.5 9.5A7 7 0 0 1 8.5 2.5 5.5 5.5 0 1 0 15.5 9.5z"/>
+          </svg>
+          <svg class="tema-icono icono-sistema-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="14" height="10" rx="1.5"/>
+            <line x1="6" y1="15" x2="12" y2="15"/>
+            <line x1="9" y1="12" x2="9" y2="15"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
 </footer>
 
 <style>
