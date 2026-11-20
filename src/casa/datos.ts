@@ -1,4 +1,5 @@
-// Datos de las propuestas de portada (rediseño 2026-11): lo mismo para las dos direcciones.
+// Lo que hace la casa: los productos, los servicios y lo que viene, con lo que se dice de cada uno.
+// La portada, las páginas interiores, el formulario y el plano salen de acá.
 // Cada texto sale de lo que ya publica el producto en su web.
 export interface Entrada {
   id: string;
@@ -67,8 +68,8 @@ export const ENTRADAS: Entrada[] = [
       'Rápido, y preparado para que te encuentren.',
       'Presupuesto a medida.',
     ],
-    url: '/sites',
-    dominio: 'salixweb.com/sites',
+    url: '/sitios/',
+    dominio: 'salixweb.com/sitios',
   },
   {
     id: 'integraciones',
@@ -81,7 +82,7 @@ export const ENTRADAS: Entrada[] = [
       'Sesiones de 45 minutos, con alguien del equipo.',
       'US$ 70 la primera sesión.',
     ],
-    url: '/integraciones',
+    url: '/integraciones/',
     dominio: 'salixweb.com/integraciones',
   },
   { id: 'go', nombre: 'Go', que: 'Delivery para tu local', estado: 'En preparación', frase: '', hechos: [], url: '', dominio: '', viene: true },

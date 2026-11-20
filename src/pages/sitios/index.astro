@@ -1,0 +1,145 @@
+---
+// Sitios web a medida: qué hace Salix cuando le piden un sitio, qué lleva cada uno y los que ya
+// hizo, cada uno con su página. Por el costado baja la línea de los sitios.
+import Casa from '../../layouts/Casa.astro';
+import Mesa from '../../components/Mesa.astro';
+import CierreCasa from '../../components/CierreCasa.astro';
+import SitiosHechos from '../../components/SitiosHechos.astro';
+import IconoProducto from '../../components/IconoProducto.astro';
+import { ENTRADAS } from '../../casa/datos';
+import { SITIOS_HECHOS } from '../../casa/sitios';
+import type { Vista } from '../../casa/capturas';
+import { RAIZ_CASA } from '../../casa/navegacion';
+
+const e = ENTRADAS.find((x) => x.id === 'sites')!;
+const contacto = `${RAIZ_CASA}#contacto`;
+
+// En la cabecera, la primera pantalla de cada sitio de cliente, en el teléfono.
+const vistas: Vista[] = SITIOS_HECHOS.map((s) => ({
+  rotulo: s.cliente,
+  forma: 'tel',
+  tomas: s.telefono.oscura
+    ? [
+        { ...s.telefono, oscura: undefined, alt: `${s.telefono.alt} En modo claro.`, modo: 'claro' },
+        { ...s.telefono, src: s.telefono.oscura, oscura: undefined, alt: `${s.telefono.alt} En modo oscuro.`, modo: 'oscuro' },
+      ]
+    : [s.telefono],
+}));
+
+// Lo que lleva cada sitio que hacemos.
+const LLEVA = [
+  { titulo: 'Diseño a medida', texto: 'Cada sitio es único: se diseña para la marca, el rubro y lo que el negocio necesita que pase.' },
+  { titulo: 'Liviano y veloz', texto: 'Carga al instante, también con poca señal.' },
+  { titulo: 'Preparado para que te encuentren', texto: 'Títulos, descripciones, datos estructurados y mapa del sitio desde el primer día.' },
+  { titulo: 'En cualquier pantalla', texto: 'Pensado primero para el teléfono, y bien resuelto en tableta y en computadora.' },
+  { titulo: 'Claro y oscuro', texto: 'Si la marca lo pide, el sitio sigue el tema del aparato.' },
+  { titulo: 'El contacto, a un toque', texto: 'WhatsApp y formulario a mano en toda la página, para que la consulta llegue.' },
+];
+const paradas = [
+  { id: 'lleva', nombre: 'Qué lleva' },
+  { id: 'hechos', nombre: 'Los que hicimos' },
+  { id: 'presupuesto', nombre: 'Presupuesto' },
+];
+---
+
+<Casa
+  titulo="Sitios web a medida · Salix"
+  descripcion="Salix diseña y construye el sitio de tu empresa: diseño propio para tu marca y tu rubro, rápido y preparado para que te encuentren. Con los sitios que ya hicimos."
+  base={RAIZ_CASA}
+  inicio={RAIZ_CASA}
+>
+  <div style="--c:var(--linea-sites)">
+    <section class="cabeza con-riel" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--nace"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="cabeza-caja riel-cuerpo ancho">
+        <div>
+          <nav class="migas" aria-label="Dónde estás">
+            <a href={RAIZ_CASA}>Salix</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Sitios</span>
+          </nav>
+          <p class="producto-nombre">
+            <span class="producto-logo"><IconoProducto nombre="sitio" tamaño={20} /></span>
+            Sitios web
+            <span class="producto-que">A medida</span>
+            <span class="estado">{e.estado}</span>
+          </p>
+          <h1 class="titulo titulo--pagina" data-asoma><span>El sitio de tu empresa,</span> hecho por nosotros.</h1>
+          <p class="bajada" data-asoma style="--i:1">{e.hechos[0]} {e.hechos[1]}</p>
+          <div class="acciones" data-asoma style="--i:2">
+            <a class="boton" href={contacto}>Pedir un sitio</a>
+            <a class="boton boton-secundario" href="#hechos">Ver los que hicimos</a>
+          </div>
+        </div>
+        <Mesa vistas={vistas} nombre="los sitios hechos" data-asoma style="--i:2" />
+      </div>
+
+      <nav class="indice riel-cuerpo ancho" aria-label="Las partes de esta página" data-asoma style="--i:4">
+        <ol>
+          {paradas.map((p) => (
+            <li><a href={`#${p.id}`}><span class="indice-punto" aria-hidden="true"></span>{p.nombre}</a></li>
+          ))}
+        </ol>
+      </nav>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="lleva" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">Qué lleva</p>
+        <h2 class="titulo" data-asoma><span>Cada sitio,</span> con lo que tiene que tener.</h2>
+        <ul class="hechos hechos--nombre hechos--columnas" data-asoma style="--i:1">
+          {LLEVA.map((h) => <li><strong>{h.titulo}</strong> {h.texto}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="hechos" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">Los que hicimos</p>
+        <div class="dos">
+          <h2 class="titulo" data-asoma><span>Sitios web,</span> hechos por nosotros.</h2>
+          <p class="bajada" data-asoma style="--i:1">Los de nuestros clientes y los de nuestros propios productos. Cada uno tiene su página, con el sitio entero.</p>
+        </div>
+        <SitiosHechos />
+      </div>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="presupuesto" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--fin"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">Presupuesto</p>
+        <div class="dos dos--arriba">
+          <h2 class="titulo" data-asoma><span>Cada proyecto es distinto.</span> El presupuesto, a medida.</h2>
+          <div data-asoma style="--i:1">
+            <p class="bajada">Una página de presentación, un sitio institucional, una tienda. Contanos tu idea y te armamos un presupuesto, sin compromiso.</p>
+            <div class="acciones">
+              <a class="boton" href={contacto}>Pedir un sitio</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <CierreCasa
+    liviana="¿Necesitás un sitio?"
+    tinta="Hablemos."
+    bajada="Diseño propio para tu marca y tu rubro. Presupuesto a medida."
+    contacto={contacto}
+    boton="Pedir un sitio"
+  />
+</Casa>

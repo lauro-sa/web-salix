@@ -11,7 +11,7 @@ export interface DetalleSitio {
   dominio: string;
   cliente: string;
   rubro: string;
-  /** El ícono oficial de la marca (public/propuestas/iconos/). */
+  /** El ícono oficial de la marca (public/capturas/iconos/). */
   icono: string;
   /** Un logo con fondo transparente va centrado sobre este color, que es el de su marca. */
   fondo?: string;
@@ -28,7 +28,7 @@ export interface DetalleSitio {
   dosTemas: boolean;
 }
 
-const P = '/propuestas';
+const P = '/capturas';
 const larga = (id: string, alto: number, alt: string, conOscura: boolean): Toma => ({
   src: `${P}/sitio-${id}-largo.webp`,
   oscura: conOscura ? `${P}/sitio-${id}-largo-oscuro.webp` : undefined,

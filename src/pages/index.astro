@@ -1,53 +1,701 @@
 ---
-// ============================================================
-// index.astro — Pagina principal de salixweb.com
-// Aca se ensamblan todos los componentes.
-// ============================================================
-import Plantilla           from '../layouts/Plantilla.astro';
-import Nav                 from '../components/Nav.astro';
-import Hero                from '../components/Hero.astro';
-import CarruselTecnologias from '../components/CarruselTecnologias.astro';
-import SeccionProductos    from '../components/SeccionProductos.astro';
-import SeccionFeatures     from '../components/SeccionFeatures.astro';
-import SeccionPlanes       from '../components/SeccionPlanes.astro';
-import BannerCTA           from '../components/BannerCTA.astro';
-import SeccionTestimonios  from '../components/SeccionTestimonios.astro';
-import FormularioContacto  from '../components/FormularioContacto.astro';
-import CierreSalix         from '../components/CierreSalix.astro';
-import Footer              from '../components/Footer.astro';
-import { CORREO_CONTACTO } from '../productos';
+// La portada de salixweb.com («la casa»): la web ES de Salix. La primera pantalla, centrada: el isotipo, el nombre, la
+// frase y una rueda que gira de frente con todo lo que hace la casa. Después, el plano de líneas se
+// dibuja con el scroll, y las líneas de los productos siguen bajando por el costado hasta la parada de
+// cada uno. Usa la barra, el menú, el pie en cortina y el cierre que se acomoda de la familia.
+// El movimiento vive en src/scripts/casa.ts y src/scripts/rueda.ts.
+import Casa from '../layouts/Casa.astro';
+import FormularioCasa from '../components/FormularioCasa.astro';
+import Mesa from '../components/Mesa.astro';
+import CierreCasa from '../components/CierreCasa.astro';
+import LogoFlux from '../components/LogoFlux.astro';
+import LogoMenu from '../components/LogoMenu.astro';
+import LogoSalixAnimado from '../components/LogoSalixAnimado.astro';
+import Rueda from '../components/Rueda.astro';
+import SitiosHechos from '../components/SitiosHechos.astro';
+import { ENTRADAS, CORREO } from '../casa/datos';
+import { VISTAS_PORTADA } from '../casa/capturas';
+import { rutaProducto } from '../casa/navegacion';
+
+const productos = ENTRADAS.filter((e) => ['flux', 'menu', 'nuvix'].includes(e.id));
+const vienen = ENTRADAS.filter((e) => e.viene);
+const de = (id: string) => ENTRADAS.find((e) => e.id === id)!;
+const sites = de('sites');
+const integraciones = de('integraciones');
+
+// El plano. `largo`: hasta dónde baja cada línea (% del alto). `de` y `tramo`: en qué parte del
+// recorrido de la escena se dibuja (de 0 a 1), para que entren por tandas: productos, servicios,
+// lo que comparten y lo que está en obra.
+const PLANO: Record<string, { largo: number; de: number; tramo: number }> = {
+  flux: { largo: 82, de: 0.06, tramo: 0.2 },
+  menu: { largo: 100, de: 0.12, tramo: 0.22 },
+  nuvix: { largo: 70, de: 0.18, tramo: 0.18 },
+  sites: { largo: 90, de: 0.38, tramo: 0.18 },
+  integraciones: { largo: 60, de: 0.44, tramo: 0.14 },
+  go: { largo: 48, de: 0.78, tramo: 0.12 },
+  play: { largo: 38, de: 0.82, tramo: 0.1 },
+  book: { largo: 28, de: 0.86, tramo: 0.1 },
+};
+const FASES = [
+  { nombre: 'Productos', de: 0.06, tramo: 0.3 },
+  { nombre: 'Servicios', de: 0.38, tramo: 0.2 },
+  { nombre: 'En común', de: 0.6, tramo: 0.16 },
+  { nombre: 'En obra', de: 0.78, tramo: 0.18 },
+];
+const DESTINO: Record<string, string> = { sites: '#sitios', integraciones: '#integraciones' };
+
+// Una frase de dos oraciones se parte como en las webs de los productos: la primera liviana, la
+// segunda en tinta.
+const partes = (frase: string) => {
+  const corte = frase.indexOf('. ');
+  return corte === -1 ? [null, frase] : [frase.slice(0, corte + 1), frase.slice(corte + 2)];
+};
+// Testimonios de clientes (los de la web anterior; el dueño confirmó que son reales).
+const VOCES = [
+  { texto: 'Desde que migramos a Flux la gestión del consorcio es otra cosa. Todo más ordenado, los presupuestos se hacen en minutos.', quien: 'Marcela Rodríguez', de: 'Administradora de consorcios' },
+  { texto: 'Le pedimos la web a Salix y nos sorprendió la calidad. Rápida, moderna y en tiempo récord. Se nota que entienden el negocio.', quien: 'Juan Pablo Ferreira', de: 'Ferreira Inmobiliaria' },
+  { texto: 'El soporte es excelente. No es un ticket y esperar días: te responden rápido y resuelven. Eso para nosotros vale mucho.', quien: 'Valentina López', de: 'LogiCenter SA' },
+];
 ---
 
-<Plantilla
-  titulo="Salix — Software que simplifica tu negocio"
-  descripcion="Suite de apps PWA para gestionar servicios, delivery, canchas y turnos. Pensado para empresas argentinas. WhatsApp + MercadoPago integrados."
+<Casa
+  titulo="Salix · Software que simplifica"
+  descripcion="Salix hace software: Flux, el sistema de gestión; Menu, la carta digital con QR; Nuvix, la app para iPhone; sitios web a medida e integraciones."
+  base=""
+  inicio="#inicio"
 >
-  <Nav />
+  <!-- Primera pantalla, centrada: el isotipo, el nombre, la frase y la rueda con todo lo que hace la
+       casa (productos, servicios, sitios hechos y lo que viene). Cada ficha lleva a su parte. -->
+  <section class="abre" id="inicio">
+    <div class="abre-caja">
+      <div class="abre-texto ancho">
+        <span class="abre-logo" aria-hidden="true"><LogoSalixAnimado id="copa-portada" /></span>
+        <h1 class="abre-nombre">Salix</h1>
+        <p class="abre-frase">Software que simplifica. <span>Sistemas, apps y sitios web.</span></p>
+      </div>
+      <div class="abre-rueda"><Rueda /></div>
+      <div class="abre-acciones ancho">
+        <a class="boton" href="#productos">Ver lo que hacemos</a>
+        <a class="boton boton-secundario" href="#contacto">Hablemos</a>
+      </div>
+    </div>
+  </section>
 
-  <main>
-    <Hero />
-    <CarruselTecnologias />
-    <SeccionProductos />
-    <SeccionFeatures />
-    <SeccionPlanes />
-    <BannerCTA />
-    <SeccionTestimonios />
+  <!-- El plano: todo lo que cuelga de la casa. La escena queda quieta mientras se baja y el plano
+       se va dibujando: la casa, los productos, los servicios, lo que comparten y lo que viene. -->
+  <section class="escena" id="casa" data-escena>
+    <div class="escena-fija" data-escena-fija>
+      <div class="ancho">
+        <div class="casa-texto">
+          <h2 class="titulo"><span>Una casa.</span> Varias líneas.</h2>
+          <p class="bajada">
+            Cada cosa que hacemos es una línea con su nombre y su propia web. Algunas ya andan, otras
+            están en obra, y todas salen de la misma casa. Donde dos se cruzan, comparten algo.
+          </p>
+        </div>
+        <div class="plano" role="group" aria-label="Las líneas de Salix" data-plano>
+          <div class="plano-casa" aria-hidden="true"><span class="isotipo"></span> Salix</div>
+          <div class="cruce cruce--ia" style="--de:0.6;--tramo:0.1"><span>Salix IA</span></div>
+          <div class="cruce cruce--mp" style="--de:0.66;--tramo:0.1"><span>Mercado Pago</span></div>
+          {ENTRADAS.map((e, i) => (
+            <a
+              class:list={['linea', { 'linea--obra': e.viene }]}
+              href={e.viene ? '#viene' : DESTINO[e.id] ?? `#${e.id}`}
+              style={`--c:var(--linea-${e.viene ? 'obra' : e.id});--largo:${PLANO[e.id].largo}%;--de:${PLANO[e.id].de};--tramo:${PLANO[e.id].tramo};--i:${i}`}
+            >
+              <span class="linea-via" aria-hidden="true"></span>
+              <span class="linea-carro">
+                <span class="linea-fin">
+                  <span class="linea-punto" aria-hidden="true"></span>
+                  <strong>{e.nombre}</strong>
+                  <span>{e.viene ? 'En obra' : e.que}</span>
+                </span>
+              </span>
+            </a>
+          ))}
+        </div>
+        <ol class="fases" aria-hidden="true">
+          {FASES.map((f) => <li style={`--de:${f.de};--tramo:${f.tramo}`}><span>{f.nombre}</span></li>)}
+        </ol>
+      </div>
+    </div>
+  </section>
 
-    <FormularioContacto />
+  <!-- Los productos, con la estética de Salix. Por el costado siguen bajando sus líneas: cada una
+       termina en la parada de su producto. -->
+  <div id="productos">
+    {productos.map((e, k) => {
+      const [liviana, tinta] = partes(e.frase);
+      const vistas = VISTAS_PORTADA[e.id];
+      return (
+        <section class="tramo con-riel" id={e.id} style={`--c:var(--linea-${e.id});--x:${k}`} data-riel>
+          <div class="riel" aria-hidden="true">
+            {productos.slice(k).map((otro, j) => (
+              <span class:list={['riel-linea', { 'riel-linea--fin': j === 0 }]} style={`--c:var(--linea-${otro.id});--x:${k + j}`}></span>
+            ))}
+            <span class="riel-punto" data-parada></span>
+          </div>
+          <div class="producto riel-cuerpo ancho">
+            <div class="producto-texto">
+              <p class="producto-nombre">
+                <span class="producto-logo">
+                  {e.id === 'flux' && <LogoFlux tamaño={20} />}
+                  {e.id === 'menu' && <LogoMenu tamaño={20} />}
+                  {e.id === 'nuvix' && <span class="logo-nuvix"></span>}
+                </span>
+                {e.nombre}
+                <span class="producto-que">{e.que}</span>
+                <span class:list={['estado', { 'estado--vivo': e.estado === 'En uso' }]}>{e.estado}</span>
+              </p>
+              <h2 class="titulo" data-asoma>{liviana && <span>{liviana}</span>} {tinta}</h2>
+              <ul class="hechos" data-asoma style="--i:1">{e.hechos.map((h) => <li>{h}</li>)}</ul>
+              <!-- Dos salidas: la página del producto en esta web y, más callada, su web propia. -->
+              <p class="producto-enlaces">
+                <a class="enlace" href={rutaProducto(e.id)}>Todo sobre {e.nombre} <span aria-hidden="true">→</span></a>
+                <a class="enlace enlace--afuera" href={e.url} rel="noopener">{e.dominio} <span aria-hidden="true">↗</span></a>
+              </p>
+            </div>
+            <Mesa vistas={vistas} nombre={e.nombre} data-asoma style="--i:2" />
+          </div>
+        </section>
+      );
+    })}
+  </div>
 
-    <CierreSalix
-      etiqueta="Salix"
-      titulo="Software que simplifica"
-      resaltado="tu negocio."
-      subtitulo="Elegí por dónde empezar o escribinos: te respondemos rápido."
-    >
-      <a href="#productos" class="boton boton-primario">
-        Ver productos
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-      <a href={`mailto:${CORREO_CONTACTO}`} class="boton boton-secundario">{CORREO_CONTACTO}</a>
-    </CierreSalix>
-  </main>
+  <section class="tramo" id="sitios">
+    <div class="ancho">
+      <div class="sitios-texto" data-asoma>
+        <h2 class="titulo"><span>Sitios web,</span> hechos por nosotros.</h2>
+        <div>
+          <p class="bajada">{sites.hechos[0]} {sites.hechos[1]} Estos son algunos de los que hicimos, incluidos los de nuestros productos.</p>
+          <a class="enlace" href="#contacto">Pedir un sitio <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <SitiosHechos />
+    </div>
+  </section>
 
-  <Footer />
-</Plantilla>
+  <section class="tramo">
+    <div class="mas ancho">
+      <div id="integraciones" data-asoma>
+        <h2 class="titulo"><span>{integraciones.nombre}.</span> {integraciones.frase}</h2>
+        <ul class="hechos">{integraciones.hechos.map((h) => <li>{h}</li>)}</ul>
+        <a class="enlace" href={integraciones.url}>Ver las sesiones <span aria-hidden="true">→</span></a>
+      </div>
+      <div id="viene" data-asoma style="--i:1">
+        <h2 class="titulo"><span>Lo que viene.</span> En obra.</h2>
+        <ul class="hechos hechos--obra">
+          {vienen.map((e) => <li><strong>{e.nombre}</strong> {e.que}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="tramo" id="clientes">
+    <div class="ancho">
+      <h2 class="titulo" data-asoma><span>Lo dicen</span> quienes ya trabajan con nosotros.</h2>
+      <ul class="voces">
+        {VOCES.map((v, i) => (
+          <li data-asoma style={`--i:${i}`}>
+            <blockquote>{v.texto}</blockquote>
+            <p><strong>{v.quien}</strong> {v.de}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="tramo" id="contacto">
+    <div class="contacto ancho">
+      <div class="contacto-texto" data-asoma>
+        <h2 class="titulo"><span>Hablemos.</span> Contanos qué necesitás.</h2>
+        <p class="bajada">Elegí qué te interesa, dejanos cómo ubicarte y te respondemos nosotros, por correo o por WhatsApp.</p>
+        <a class="enlace" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
+      </div>
+      <!-- Sin aparición al entrar: una caja con desplazamiento no deja que el formulario ocupe la
+           pantalla entera en el teléfono (lo fijo se mediría contra ella). -->
+      <FormularioCasa />
+    </div>
+  </section>
+
+  <CierreCasa
+    liviana="¿Tenés algo en mente?"
+    tinta="Hablemos."
+    bajada="Un sistema, una app, un sitio, o una idea que todavía no tiene forma."
+    contacto="#contacto"
+  />
+</Casa>
+
+<style>
+  /* ── Primera pantalla: centrada ── */
+  .abre {
+    display: grid;
+    align-content: center;
+    min-block-size: min(100svh, 60rem);
+    padding-block: calc(var(--psx-alto-barra, 4.5rem) + 1.5rem) 3rem;
+    overflow: clip;
+    text-align: center;
+  }
+  .abre-texto {
+    display: grid;
+    justify-items: center;
+  }
+  .abre-logo :global(svg) {
+    inline-size: clamp(3rem, 2.4rem + 2vw, 4rem);
+    block-size: clamp(3rem, 2.4rem + 2vw, 4rem);
+  }
+  .abre-nombre {
+    margin-top: clamp(0.75rem, 2svh, 1.25rem);
+    font-size: clamp(2.75rem, 2rem + 2.8vw, 4.25rem);
+    font-weight: 650;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+  .abre-frase {
+    margin-top: clamp(0.875rem, 2.4svh, 1.5rem);
+    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+  }
+  .abre-frase span {
+    display: block;
+    font-weight: 400;
+    color: var(--texto-terciario);
+  }
+  .abre-rueda {
+    margin-top: clamp(1.5rem, 4.5svh, 3rem);
+    padding-inline: var(--margen);
+  }
+  .abre-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.625rem;
+    margin-top: clamp(1.25rem, 3svh, 2rem);
+  }
+  /* Un teléfono chico (poco alto, o muy angosto): todo se junta un poco para que los botones
+     entren en la primera pantalla sin bajar. */
+  @media (max-height: 40rem), (max-width: 22.5rem) {
+    .abre {
+      padding-block: calc(var(--psx-alto-barra, 4.5rem) + 0.5rem) 1.25rem;
+    }
+    .abre-logo :global(svg) {
+      inline-size: 2.5rem;
+      block-size: 2.5rem;
+    }
+    .abre-nombre {
+      margin-top: 0.625rem;
+      font-size: 2.5rem;
+    }
+    .abre-frase {
+      margin-top: 0.75rem;
+      font-size: 1.25rem;
+    }
+    .abre-rueda {
+      margin-top: 1rem;
+    }
+    .abre-acciones {
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+      margin-top: 0.875rem;
+    }
+    .abre-acciones .boton {
+      padding-inline: 1rem;
+      font-size: 0.8125rem;
+    }
+  }
+  /* Teléfono acostado: poco alto. La pantalla no pide alto y el isotipo se guarda. */
+  @media (max-height: 30rem) and (min-width: 34rem) {
+    .abre {
+      min-block-size: auto;
+      padding-block: calc(var(--psx-alto-barra, 4.5rem) + 1rem) 2rem;
+    }
+    .abre-logo {
+      display: none;
+    }
+  }
+  /* La aparición al cargar, en un solo gesto de arriba hacia abajo: el isotipo (sus ramas bajan
+     solas), el nombre, la frase renglón por renglón, las fichas que se abren desde el centro
+     (rueda.ts) y, al final, los botones. Todo termina antes de los dos segundos. */
+  @media (prefers-reduced-motion: no-preference) {
+    .abre-logo {
+      animation: asoma-logo 0.9s var(--curva) both;
+    }
+    .abre-nombre {
+      animation: asoma 0.9s var(--curva) 0.12s both;
+    }
+    .abre-frase {
+      animation: asoma 0.9s var(--curva) 0.26s both;
+    }
+    .abre-frase span {
+      animation: asoma 0.9s var(--curva) 0.38s both;
+    }
+    .abre-acciones {
+      animation: asoma 0.8s var(--curva) 1.15s both;
+    }
+    /* Al seguir bajando, la primera pantalla se retira: se apaga y queda un poco atrás. */
+    @supports (animation-timeline: view()) {
+      .abre-caja {
+        animation: se-retira linear both;
+        animation-timeline: view();
+        animation-range: exit 10% exit 90%;
+      }
+    }
+  }
+  @keyframes asoma-logo {
+    from {
+      opacity: 0;
+      scale: 0.8;
+    }
+  }
+  @keyframes asoma {
+    from {
+      opacity: 0;
+      translate: 0 1rem;
+      filter: blur(6px);
+    }
+  }
+  @keyframes se-retira {
+    to {
+      opacity: 0;
+      translate: 0 4rem;
+      scale: 0.97;
+    }
+  }
+
+  /* ── La casa: la escena del plano ── */
+  .escena {
+    /* `--p`: cuánto de la escena se recorrió (lo escribe casa.ts). Sin JavaScript vale 1 y el plano
+       está entero. Lo leen el plano y las tandas de abajo. */
+    --p: 1;
+    border-top: 1px solid var(--borde-sutil);
+  }
+  .escena-fija {
+    padding-block: var(--aire);
+  }
+  /* Con alto suficiente, la escena queda quieta mientras se baja y el plano se dibuja (casa.ts
+     escribe `--p`). Solo con JavaScript y sin «reducir movimiento»: si no, es un tramo común. */
+  @media (min-height: 37.5rem) and (prefers-reduced-motion: no-preference) {
+    :global(.con-js) .escena {
+      block-size: 215svh;
+    }
+    :global(.con-js) .escena-fija {
+      position: sticky;
+      inset-block-start: 0;
+      display: grid;
+      align-content: center;
+      block-size: 100svh;
+      padding-block: calc(var(--psx-alto-barra, 4.5rem) + 1.25rem) 1.5rem;
+    }
+    :global(.con-js) .escena .plano {
+      block-size: clamp(16rem, 100svh - 27rem, 27rem);
+    }
+  }
+  .casa-texto,
+  .sitios-texto {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 56rem) {
+    .casa-texto,
+    .sitios-texto {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(2rem, 6vw, 5rem);
+      align-items: end;
+    }
+  }
+  .plano {
+    --via: 0.3125rem;
+    --pastilla: 1.625rem;
+    --etiqueta: 3.5rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    block-size: clamp(21rem, 54svh, 27rem);
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    padding-top: 1.875rem;
+  }
+  /* Cada pieza del plano reparte el avance de la escena en su propio tramo: `--t` va de 0 a 1 entre
+     `--de` y `--de + --tramo`, y `--fin` marca el final de ese tramo (cuando ya llegó). */
+  .plano-casa,
+  .linea,
+  .cruce,
+  .fases li {
+    --t: clamp(0, calc((var(--p) - var(--de)) / var(--tramo)), 1);
+    --fin: clamp(0, calc((var(--t) - 0.88) * 8.4), 1);
+  }
+  .plano-casa {
+    --de: 0;
+    --tramo: 0.07;
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.4375rem;
+    block-size: 1.875rem;
+    padding-inline: 0.75rem;
+    border-radius: 999px;
+    background: var(--texto);
+    color: var(--fondo);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    clip-path: inset(0 calc((1 - var(--t)) * (100% - 5.5rem)) 0 0 round 999px);
+  }
+  /* Cada línea ocupa el alto del plano menos el lugar de su nombre, que cuelga del final. */
+  .linea {
+    position: relative;
+    display: block;
+    align-self: start;
+    min-inline-size: 0;
+    block-size: calc(100% - var(--etiqueta));
+  }
+  .linea-via {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: calc(50% - var(--via) / 2);
+    inline-size: var(--via);
+    block-size: var(--largo);
+    background: var(--c);
+    clip-path: inset(0 0 calc((1 - var(--t)) * 100%) 0);
+  }
+  .linea--obra .linea-via {
+    background: repeating-linear-gradient(to bottom, var(--c) 0 0.375rem, transparent 0.375rem 0.75rem);
+  }
+  /* El pulso: un brillo que recorre cada línea que ya anda, de la casa a la parada. */
+  .linea:not(.linea--obra) .linea-via::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--fondo) 78%, transparent), transparent) 0 -3rem / 100% 3rem no-repeat;
+    opacity: var(--fin);
+  }
+  /* El carro mide lo que mide la línea y viaja con su punta: lleva el punto y, al llegar, el nombre. */
+  .linea-carro {
+    position: absolute;
+    inset: 0 0 auto;
+    block-size: var(--largo);
+    transform: translateY(calc((var(--t) - 1) * 100%));
+    pointer-events: none;
+  }
+  .linea-fin {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline: 0;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    pointer-events: auto;
+  }
+  .linea-punto {
+    inline-size: 1rem;
+    block-size: 1rem;
+    margin-top: -0.5rem;
+    border-radius: 50%;
+    background: var(--fondo);
+    border: 0.1875rem solid var(--c);
+    opacity: clamp(0, calc(var(--t) * 14), 1);
+    scale: calc(0.7 + 0.3 * var(--fin));
+    transition: scale 0.3s var(--curva);
+  }
+  .linea-fin strong,
+  .linea-fin span:last-child {
+    opacity: var(--fin);
+    translate: 0 calc((1 - var(--fin)) * 0.375rem);
+  }
+  .linea-fin strong {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .linea-fin span:last-child {
+    margin-top: 0.125rem;
+    max-inline-size: 8rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: var(--texto-secundario);
+    text-wrap: balance;
+  }
+  @media (hover: hover) {
+    .linea:hover .linea-punto {
+      scale: 1.35;
+    }
+    .linea:hover .linea-via {
+      filter: brightness(1.15);
+    }
+  }
+  /* Los cruces: lo que comparten dos o tres líneas. Van de la primera línea a la última que tocan y
+     se trazan de izquierda a derecha. */
+  .cruce {
+    position: absolute;
+    z-index: 1;
+    inset-inline-start: calc(100% / 16 - var(--pastilla) / 2);
+    block-size: var(--pastilla);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Mide de línea a línea; si el nombre no entra (un teléfono angosto), se estira lo justo. */
+    inline-size: max-content;
+    padding-inline: 0.5rem;
+    border-radius: 999px;
+    background: var(--fondo);
+    border: 1.5px solid var(--texto);
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: clamp(0, calc(var(--t) * 20), 1);
+    clip-path: inset(0 calc((1 - var(--t)) * 100%) 0 0 round 999px);
+  }
+  .cruce span {
+    opacity: var(--fin);
+  }
+  .cruce--ia {
+    inset-block-start: 24%;
+    min-inline-size: calc(100% / 8 * 2 + var(--pastilla));
+  }
+  .cruce--mp {
+    inset-block-start: 42%;
+    min-inline-size: calc(100% / 8 * 1 + var(--pastilla));
+  }
+  /* Las tandas: de qué se trata lo que se está dibujando. Cada una se llena en su tramo. */
+  .fases {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+  .fases li {
+    position: relative;
+    padding-top: 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 550;
+    letter-spacing: 0.01em;
+    color: var(--texto);
+    border-top: 1px solid var(--borde);
+  }
+  .fases li::before {
+    content: '';
+    position: absolute;
+    inset: -1px 0 auto;
+    block-size: 2px;
+    background: var(--salix);
+    transform: scaleX(var(--t));
+    transform-origin: 0 50%;
+  }
+  .fases span {
+    opacity: calc(0.38 + 0.62 * clamp(0, calc(var(--t) * 6), 1));
+  }
+  @media (max-width: 47.99rem) {
+    .plano {
+      --via: 0.25rem;
+      --pastilla: 1.5rem;
+      --etiqueta: 6.75rem;
+      block-size: clamp(23rem, 62svh, 28rem);
+    }
+    .linea-fin strong {
+      writing-mode: vertical-rl;
+      font-size: 0.75rem;
+    }
+    .linea-fin span:last-child {
+      display: none;
+    }
+    .linea-punto {
+      inline-size: 0.875rem;
+      block-size: 0.875rem;
+      margin-top: -0.4375rem;
+    }
+    .cruce {
+      font-size: 0.625rem;
+    }
+    .fases li {
+      font-size: 0.6875rem;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.plano--vivo) .linea-via::after {
+      animation: pulso 3.4s linear infinite;
+      animation-delay: calc(var(--i) * -0.83s);
+    }
+  }
+  @keyframes pulso {
+    to {
+      background-position: 0 calc(100% + 3rem);
+    }
+  }
+
+  /* ── Productos, con la estética de Salix ── */
+  .producto {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .producto {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    }
+  }
+  .producto .titulo {
+    margin-top: 1.125rem;
+    max-inline-size: 16ch;
+  }
+  .sitios-texto .enlace {
+    margin-top: 0.75rem;
+  }
+  .producto-enlaces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin-top: 0.75rem;
+  }
+  /* La salida a la web propia del producto: el mismo enlace, sin el subrayado de la casa. */
+  .enlace--afuera {
+    font-weight: 500;
+    color: var(--texto-secundario);
+    background-image: linear-gradient(var(--borde), var(--borde));
+  }
+  .mas {
+    display: grid;
+    gap: clamp(3rem, 6vw, 5rem);
+  }
+  @media (min-width: 40rem) {
+    .mas {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ── Voces ── */
+  .voces {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+  }
+  @media (min-width: 56rem) {
+    .voces {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .voces blockquote {
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+  .voces li p {
+    margin-top: 1.125rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--salix);
+    font-size: 0.875rem;
+    color: var(--texto-secundario);
+  }
+  .voces li p strong {
+    display: block;
+    font-weight: 600;
+    color: var(--texto);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .linea-punto {
+      transition: none;
+    }
+  }
+</style>

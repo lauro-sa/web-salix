@@ -3,16 +3,16 @@
 // con la estética de la casa. No es donde se contrata: los botones llevan a la web del producto.
 // Por el costado baja la línea del producto, con una parada en cada parte. Los textos y las capturas
 // están en src/casa/productos.ts; el movimiento, en src/scripts/casa.ts.
-import Casa from '../../../layouts/Casa.astro';
-import Mesa from '../../../components/Mesa.astro';
-import CierreCasa from '../../../components/CierreCasa.astro';
-import OtrasDeLaCasa from '../../../components/OtrasDeLaCasa.astro';
-import LogoFlux from '../../../components/LogoFlux.astro';
-import LogoMenu from '../../../components/LogoMenu.astro';
-import { ENTRADAS } from '../../../propuestas/datos';
-import { DETALLES } from '../../../casa/productos';
-import { VISTAS_PORTADA } from '../../../casa/capturas';
-import { RAIZ_CASA } from '../../../casa/navegacion';
+import Casa from '../layouts/Casa.astro';
+import Mesa from '../components/Mesa.astro';
+import CierreCasa from '../components/CierreCasa.astro';
+import OtrasDeLaCasa from '../components/OtrasDeLaCasa.astro';
+import LogoFlux from '../components/LogoFlux.astro';
+import LogoMenu from '../components/LogoMenu.astro';
+import { ENTRADAS } from '../casa/datos';
+import { DETALLES } from '../casa/productos';
+import { VISTAS_PORTADA } from '../casa/capturas';
+import { RAIZ_CASA } from '../casa/navegacion';
 
 export function getStaticPaths() {
   return Object.keys(DETALLES).map((id) => ({ params: { id } }));
@@ -32,7 +32,7 @@ const paradas = [
 ];
 ---
 
-<Casa titulo={`${e.nombre} · ${e.que} · Salix`} descripcion={d.bajada} base={RAIZ_CASA} inicio={RAIZ_CASA} sinIndexar>
+<Casa titulo={`${e.nombre} · ${e.que} · Salix`} descripcion={d.bajada} base={RAIZ_CASA} inicio={RAIZ_CASA}>
   <div style={`--c:var(--linea-${id})`}>
     <section class="cabeza con-riel" data-riel>
       <div class="riel" aria-hidden="true">
@@ -154,7 +154,7 @@ const paradas = [
           <h2 class="titulo" data-asoma>{d.donde.liviana && <span>{d.donde.liviana}</span>} {d.donde.tinta}</h2>
           {d.donde.bajada && <p class="bajada" data-asoma style="--i:1">{d.donde.bajada}</p>}
         </div>
-        <ul class="hechos hechos--nombre hechos--columnas" data-asoma style="--i:1">
+        <ul class="hechos hechos--nombre hechos--columnas" data-asoma style={`--i:1;--columnas:${Math.min(4, d.donde.hechos.length)}`}>
           {d.donde.hechos.map((h) => <li><strong>{h.titulo}</strong> {h.texto}</li>)}
         </ul>
       </div>
@@ -194,69 +194,6 @@ const paradas = [
 </Casa>
 
 <style>
-  /* ── El índice de paradas: la línea del producto, acostada ── */
-  .indice {
-    margin-top: clamp(2.5rem, 6vw, 4rem);
-  }
-  .indice ol {
-    display: flex;
-    overflow-x: auto;
-    scrollbar-width: none;
-    scroll-snap-type: x proximity;
-    /* El foco y el punto de cada parada necesitan un poco de aire para no cortarse. */
-    padding-block: 0.25rem;
-  }
-  .indice ol::-webkit-scrollbar {
-    display: none;
-  }
-  .indice li {
-    position: relative;
-    flex: 1 0 auto;
-    min-inline-size: 6.5rem;
-    scroll-snap-align: start;
-  }
-  /* El tramo de línea que une cada parada con la siguiente. */
-  .indice li::before {
-    content: '';
-    position: absolute;
-    inset-block-start: 0.34375rem;
-    inset-inline: 0;
-    block-size: 0.1875rem;
-    background: var(--c);
-  }
-  .indice li:last-child::before {
-    inset-inline-end: calc(100% - 0.875rem);
-  }
-  .indice a {
-    position: relative;
-    display: grid;
-    gap: 0.625rem;
-    justify-items: start;
-    min-block-size: 2.75rem;
-    padding-inline-end: 1.25rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    line-height: 1.3;
-    color: var(--texto-secundario);
-    transition: color 0.2s;
-  }
-  .indice-punto {
-    inline-size: 0.875rem;
-    block-size: 0.875rem;
-    border-radius: 50%;
-    background: var(--fondo);
-    border: 0.1875rem solid var(--c);
-    transition: scale 0.3s var(--curva);
-  }
-  @media (hover: hover) {
-    .indice a:hover {
-      color: var(--texto);
-    }
-    .indice a:hover .indice-punto {
-      scale: 1.3;
-    }
-  }
-
   /* ── Un bloque: el título, las capturas y la lista ──
      En una columna van en ese orden. Con lugar, el texto a la izquierda y la mesa a la derecha, que
      acompaña mientras se lee la lista. */
@@ -384,35 +321,12 @@ const paradas = [
     color: var(--texto-secundario);
   }
 
-  /* ── Dónde funciona: los hechos, en columnas ── */
-  .hechos--columnas {
-    display: grid;
-    margin-top: clamp(2rem, 5vw, 3rem);
-    max-inline-size: none;
-    border-bottom: 1px solid var(--borde);
-  }
-  .hechos--columnas li:last-child {
-    border-bottom: 0;
-  }
-  @media (min-width: 40rem) {
-    .hechos--columnas {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: clamp(1.5rem, 4vw, 3rem);
-    }
-  }
-  @media (min-width: 64rem) {
-    .hechos--columnas {
-      grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-    }
-  }
-
   .planes-texto + .planes-texto {
     margin-top: 0.75rem;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .paso,
-    .indice-punto {
+    .paso {
       transition: none;
     }
   }

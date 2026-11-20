@@ -2,14 +2,14 @@
 // La página de un sitio hecho por Salix para un cliente: quién es, qué tiene su sitio y el sitio
 // entero, de punta a punta, en capturas reales (por si el sitio en línea no responde). Por el costado
 // baja la línea de los sitios. Los textos y las capturas están en src/casa/sitios.ts.
-import Casa from '../../../../layouts/Casa.astro';
-import Captura from '../../../../components/Captura.astro';
-import Mesa from '../../../../components/Mesa.astro';
-import CierreCasa from '../../../../components/CierreCasa.astro';
-import OtrasDeLaCasa from '../../../../components/OtrasDeLaCasa.astro';
-import { SITIOS_HECHOS } from '../../../../casa/sitios';
-import type { Vista } from '../../../../casa/capturas';
-import { RAIZ_CASA } from '../../../../casa/navegacion';
+import Casa from '../../layouts/Casa.astro';
+import Captura from '../../components/Captura.astro';
+import Mesa from '../../components/Mesa.astro';
+import CierreCasa from '../../components/CierreCasa.astro';
+import OtrasDeLaCasa from '../../components/OtrasDeLaCasa.astro';
+import { SITIOS_HECHOS } from '../../casa/sitios';
+import type { Vista } from '../../casa/capturas';
+import { RAIZ_CASA } from '../../casa/navegacion';
 
 export function getStaticPaths() {
   return SITIOS_HECHOS.map((s) => ({ params: { id: s.id } }));
@@ -39,7 +39,7 @@ const ficha = [
 ];
 ---
 
-<Casa titulo={`${s.dominio} · Sitio web hecho por Salix`} descripcion={s.bajada} base={RAIZ_CASA} inicio={RAIZ_CASA} sinIndexar>
+<Casa titulo={`${s.dominio} · Sitio web hecho por Salix`} descripcion={s.bajada} base={RAIZ_CASA} inicio={RAIZ_CASA}>
   <div style="--c:var(--linea-sites)">
     <section class="cabeza con-riel" data-riel>
       <div class="riel" aria-hidden="true">
@@ -51,7 +51,7 @@ const ficha = [
           <nav class="migas" aria-label="Dónde estás">
             <a href={RAIZ_CASA}>Salix</a>
             <span aria-hidden="true">/</span>
-            <a href={`${RAIZ_CASA}#sitios`}>Sitios</a>
+            <a href={`${RAIZ_CASA}sitios/`}>Sitios</a>
             <span aria-hidden="true">/</span>
             <span aria-current="page">{s.dominio}</span>
           </nav>

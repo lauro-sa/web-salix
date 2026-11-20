@@ -1,109 +1,68 @@
 ---
-// ============================================================
-// privacidad.astro — Politica de privacidad
-// ============================================================
-import Plantilla from '../layouts/Plantilla.astro';
-import Nav       from '../components/Nav.astro';
-import Footer    from '../components/Footer.astro';
+// Política de privacidad de salixweb.com. Dice lo que este sitio hace de verdad con los datos (medido
+// en el código el 2026-11-20): lo único que recibe es lo que se escribe en el formulario de contacto
+// (public/contacto.php, que lo manda por correo), no hay analítica ni cookies, y en el navegador solo
+// queda la preferencia de tema. Cada producto publica su propia política en su web.
+// Si el sitio empieza a hacer otra cosa con los datos (analítica, un boletín), se cambia acá primero.
+import PaginaLegal from '../components/PaginaLegal.astro';
+import { CORREO } from '../casa/datos';
+
+const SECCIONES = [
+  { id: 'que-datos', titulo: 'Qué datos recibimos en este sitio' },
+  { id: 'para-que', titulo: 'Para qué los usamos' },
+  { id: 'productos', titulo: 'Los datos en nuestros productos' },
+  { id: 'con-quien', titulo: 'Con quién se comparten' },
+  { id: 'navegador', titulo: 'Cookies y lo que queda en tu navegador' },
+  { id: 'seguridad', titulo: 'Cómo los cuidamos' },
+  { id: 'derechos', titulo: 'Tus derechos' },
+  { id: 'cambios', titulo: 'Cambios en esta política' },
+  { id: 'contacto', titulo: 'Contacto' },
+];
 ---
 
-<Plantilla
-  titulo="Privacidad — Salix"
-  descripcion="Politica de privacidad de Salix. Como recopilamos, usamos y protegemos tu informacion personal."
+<PaginaLegal
+  titulo="Política de privacidad"
+  descripcion="Qué datos recibe salixweb.com, para qué se usan, con quién se comparten y cómo ejercer tus derechos."
+  actualizado="noviembre de 2026"
+  secciones={SECCIONES}
 >
-  <Nav />
-  <main>
-    <div class="seccion legal">
-      <span class="etiqueta">Legal</span>
-      <h1 class="titulo-seccion" style="margin-top:1.5rem">Politica de Privacidad</h1>
-      <p class="subtitulo" style="max-width:100%;margin-top:1rem">Ultima actualizacion: Marzo 2026</p>
+  <h2 id="que-datos">Qué datos recibimos en este sitio</h2>
+  <p>Este sitio muestra lo que hace Salix. Lo único que recibimos de vos es lo que escribís en el formulario de contacto:</p>
+  <ul>
+    <li>Tu nombre.</li>
+    <li>Tu correo electrónico y, si querés que te respondamos por ahí, tu número de WhatsApp.</li>
+    <li>Qué te interesa y el mensaje que nos dejás.</li>
+    <li>Desde qué página del sitio lo enviaste.</li>
+  </ul>
+  <p>Para frenar envíos automáticos, el servidor lleva por un rato la cuenta de los envíos que llegan desde una misma conexión.</p>
 
-      <div class="legal-contenido">
-        <h2>1. Informacion que recopilamos</h2>
-        <p>Recopilamos informacion que nos proporcionas directamente al usar nuestros servicios, incluyendo:</p>
-        <ul>
-          <li>Nombre y apellido</li>
-          <li>Direccion de correo electronico</li>
-          <li>Numero de telefono</li>
-          <li>Informacion de tu empresa o negocio</li>
-          <li>Datos de facturacion</li>
-        </ul>
+  <h2 id="para-que">Para qué los usamos</h2>
+  <p>Para responderte la consulta por el medio que elegiste, y para seguir la conversación si avanzamos con un proyecto. No te sumamos a listas de envío ni te mandamos publicidad por haber escrito.</p>
 
-        <h2>2. Como usamos tu informacion</h2>
-        <p>Utilizamos la informacion recopilada para:</p>
-        <ul>
-          <li>Proveer, mantener y mejorar nuestros servicios</li>
-          <li>Procesar transacciones y enviar notificaciones relacionadas</li>
-          <li>Responder a tus consultas y brindar soporte tecnico</li>
-          <li>Enviarte comunicaciones sobre productos, servicios y novedades</li>
-        </ul>
+  <h2 id="productos">Los datos en nuestros productos</h2>
+  <p>Flux, Menu y Nuvix tratan otros datos, los que hacen falta para que cada uno funcione, y cada uno publica su propia política en su web:</p>
+  <ul>
+    <li><a href="https://flux.salixweb.com/privacidad" rel="noopener">Privacidad de Flux</a></li>
+    <li><a href="https://menu.salixweb.com/privacidad" rel="noopener">Privacidad de Menu</a></li>
+    <li><a href="https://nuvix.salixweb.com/privacidad" rel="noopener">Privacidad de Nuvix</a></li>
+  </ul>
 
-        <h2>3. Proteccion de datos</h2>
-        <p>Implementamos medidas de seguridad tecnicas y organizativas para proteger tu informacion personal contra acceso no autorizado, alteracion, divulgacion o destruccion. Todos los datos se transmiten mediante conexiones cifradas (HTTPS/TLS).</p>
+  <h2 id="con-quien">Con quién se comparten</h2>
+  <p>No vendemos ni cedemos tus datos. Solo los ven los proveedores que nos prestan el servicio para operar el sitio y recibir tu mensaje (el alojamiento y el correo electrónico), y nada más que para eso.</p>
 
-        <h2>4. Compartir informacion</h2>
-        <p>No vendemos, comercializamos ni transferimos tu informacion personal a terceros, excepto proveedores de servicios que nos asisten en la operacion del sitio (como procesadores de pago), siempre bajo acuerdos de confidencialidad.</p>
+  <h2 id="navegador">Cookies y lo que queda en tu navegador</h2>
+  <p>Este sitio no usa cookies de seguimiento ni herramientas de analítica o de publicidad. En tu navegador queda guardada una sola preferencia, si la cambiás: el tema claro u oscuro. Si elegís sesiones en la página de Integraciones, ese pedido se recuerda hasta que cerrás la pestaña, para completarte el mensaje.</p>
 
-        <h2>5. Cookies</h2>
-        <p>Utilizamos cookies y tecnologias similares para mejorar la experiencia de usuario, recordar preferencias (como el tema claro/oscuro) y analizar el uso del sitio.</p>
+  <h2 id="seguridad">Cómo los cuidamos</h2>
+  <p>El sitio y el formulario viajan siempre por una conexión cifrada (HTTPS). Aplicamos medidas técnicas y de organización razonables para evitar el acceso no autorizado, la alteración o la pérdida de los datos.</p>
 
-        <h2>6. Tus derechos</h2>
-        <p>Podes ejercer tus derechos de acceso, rectificacion, supresion y oposicion sobre tus datos personales contactandonos a <a href="mailto:hola@salixweb.com">hola@salixweb.com</a>.</p>
+  <h2 id="derechos">Tus derechos</h2>
+  <p>Podés pedirnos en cualquier momento que te mostremos los datos tuyos que tenemos, que los corrijamos o que los borremos, escribiendo a <a href={`mailto:${CORREO}`}>{CORREO}</a>. Son los derechos de acceso, rectificación y supresión de la Ley 25.326 de Protección de los Datos Personales de la República Argentina.</p>
+  <p>La Agencia de Acceso a la Información Pública, en su carácter de órgano de control de la Ley 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales.</p>
 
-        <h2>7. Cambios en esta politica</h2>
-        <p>Nos reservamos el derecho de actualizar esta politica de privacidad. Cualquier cambio sera publicado en esta pagina con la fecha de actualizacion correspondiente.</p>
+  <h2 id="cambios">Cambios en esta política</h2>
+  <p>Si cambiamos lo que hacemos con los datos, lo vamos a publicar en esta página, con la fecha de actualización arriba.</p>
 
-        <h2>8. Contacto</h2>
-        <p>Si tenes preguntas sobre esta politica de privacidad, escribinos a <a href="mailto:hola@salixweb.com">hola@salixweb.com</a>.</p>
-      </div>
-    </div>
-  </main>
-  <Footer />
-</Plantilla>
-
-<style>
-  .legal {
-    padding-top: clamp(8rem, 15vw, 12rem);
-  }
-
-  .legal-contenido {
-    margin-top: 3rem;
-    max-width: 720px;
-  }
-
-  .legal-contenido h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-top: 2.5rem;
-    margin-bottom: 0.75rem;
-    color: var(--texto);
-  }
-
-  .legal-contenido p {
-    font-size: 0.95rem;
-    line-height: 1.8;
-    color: var(--texto-secundario);
-    margin-bottom: 1rem;
-  }
-
-  .legal-contenido ul {
-    margin: 0.5rem 0 1rem 1.5rem;
-    list-style: disc;
-  }
-
-  .legal-contenido li {
-    font-size: 0.95rem;
-    line-height: 1.8;
-    color: var(--texto-secundario);
-  }
-
-  .legal-contenido a {
-    color: var(--salix);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  .legal-contenido a:hover {
-    opacity: 0.8;
-  }
-</style>
+  <h2 id="contacto">Contacto</h2>
+  <p>Por cualquier duda sobre esta política, escribinos a <a href={`mailto:${CORREO}`}>{CORREO}</a>.</p>
+</PaginaLegal>

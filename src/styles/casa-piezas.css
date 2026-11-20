@@ -17,8 +17,8 @@
   flex: none;
 }
 .logo-nuvix {
-  -webkit-mask-image: url('/propuestas/nuvix-isotipo.svg');
-  mask-image: url('/propuestas/nuvix-isotipo.svg');
+  -webkit-mask-image: url('/capturas/nuvix-isotipo.svg');
+  mask-image: url('/capturas/nuvix-isotipo.svg');
 }
 
 /* ── El riel: las líneas de la casa, que siguen bajando por el costado ──
@@ -547,4 +547,117 @@
 /* Cuando lo de la derecha es más alto que el título, los dos arrancan arriba. */
 .dos--arriba {
   align-items: start;
+}
+
+/* ── El índice de paradas: la línea del producto, acostada ── */
+.indice {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+}
+.indice ol {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  /* El foco y el punto de cada parada necesitan un poco de aire para no cortarse. */
+  padding-block: 0.25rem;
+}
+.indice ol::-webkit-scrollbar {
+  display: none;
+}
+.indice li {
+  position: relative;
+  flex: 1 0 auto;
+  min-inline-size: 6.5rem;
+  scroll-snap-align: start;
+}
+/* El tramo de línea que une cada parada con la siguiente. */
+.indice li::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0.34375rem;
+  inset-inline: 0;
+  block-size: 0.1875rem;
+  background: var(--c);
+}
+.indice li:last-child::before {
+  inset-inline-end: calc(100% - 0.875rem);
+}
+.indice a {
+  position: relative;
+  display: grid;
+  gap: 0.625rem;
+  justify-items: start;
+  min-block-size: 2.75rem;
+  padding-inline-end: 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--texto-secundario);
+  transition: color 0.2s;
+}
+.indice-punto {
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+  border-radius: 50%;
+  background: var(--fondo);
+  border: 0.1875rem solid var(--c);
+  transition: scale 0.3s var(--curva);
+}
+@media (hover: hover) {
+  .indice a:hover {
+    color: var(--texto);
+  }
+  .indice a:hover .indice-punto {
+    scale: 1.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .indice-punto {
+    transition: none;
+  }
+}
+
+/* ── Los hechos, repartidos en columnas ── */
+.hechos--columnas {
+  display: grid;
+  margin-top: clamp(2rem, 5vw, 3rem);
+  max-inline-size: none;
+  border-bottom: 1px solid var(--borde);
+}
+.hechos--columnas li:last-child {
+  border-bottom: 0;
+}
+@media (min-width: 40rem) {
+  .hechos--columnas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 4vw, 3rem);
+  }
+}
+@media (min-width: 64rem) {
+  .hechos--columnas {
+    /* Tantas columnas como pida la lista (`--columnas`): así no queda un renglón suelto abajo. */
+    grid-template-columns: repeat(var(--columnas, 3), minmax(0, 1fr));
+  }
+}
+
+/* ── Contacto: el formulario por pasos de siempre, con la letra y los colores de la casa ── */
+.contacto {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+@media (min-width: 56rem) {
+  .contacto {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+  .contacto-texto {
+    position: sticky;
+    inset-block-start: calc(var(--psx-alto-barra, 4.5rem) + 2rem);
+  }
+}
+.contacto-texto .bajada {
+  margin-top: 1.25rem;
+}
+.contacto-texto .enlace {
+  margin-top: 0.75rem;
 }

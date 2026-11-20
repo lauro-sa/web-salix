@@ -1,121 +1,81 @@
 ---
-// ============================================================
-// terminos.astro — Terminos y condiciones
-// ============================================================
-import Plantilla from '../layouts/Plantilla.astro';
-import Nav       from '../components/Nav.astro';
-import Footer    from '../components/Footer.astro';
+// Términos y condiciones de Salix (la casa). Las cláusulas son las de agosto de 2026, sin cambios de
+// fondo: en noviembre de 2026 solo se puso al día la descripción de lo que Salix ofrece (ya no nombra
+// productos que todavía no existen) y se sumó dónde están los términos propios de cada producto.
+// ⚠️ La cláusula de cambios de precio, de planes y de límites la cuida, del lado de Flux, la prueba
+// `terminos-cubren-los-cambios.test.ts`: los términos tienen que decir lo que el sistema hace.
+import PaginaLegal from '../components/PaginaLegal.astro';
+import { CORREO } from '../casa/datos';
+
+const SECCIONES = [
+  { id: 'aceptacion', titulo: 'Aceptación de los términos' },
+  { id: 'servicio', titulo: 'Descripción del servicio' },
+  { id: 'cuentas', titulo: 'Cuentas de usuario' },
+  { id: 'uso', titulo: 'Uso aceptable' },
+  { id: 'pagos', titulo: 'Pagos y facturación' },
+  { id: 'cambios-de-precio', titulo: 'Cambios de precio, de planes y de límites' },
+  { id: 'propiedad', titulo: 'Propiedad intelectual' },
+  { id: 'responsabilidad', titulo: 'Limitación de responsabilidad' },
+  { id: 'cancelacion', titulo: 'Cancelación' },
+  { id: 'modificaciones', titulo: 'Modificaciones de estos términos' },
+  { id: 'ley', titulo: 'Ley aplicable' },
+  { id: 'contacto', titulo: 'Contacto' },
+];
 ---
 
-<Plantilla
-  titulo="Términos y Condiciones — Salix"
-  descripcion="Términos y condiciones de uso de los servicios de Salix. Leé nuestras condiciones antes de usar la plataforma."
+<PaginaLegal
+  titulo="Términos y condiciones"
+  descripcion="Términos y condiciones de uso de los servicios de Salix: cuentas, pagos, cambios de precio y de planes, cancelación y ley aplicable."
+  actualizado="noviembre de 2026"
+  secciones={SECCIONES}
 >
-  <Nav />
-  <main>
-    <div class="seccion legal">
-      <span class="etiqueta">Legal</span>
-      <h1 class="titulo-seccion" style="margin-top:1.5rem">Términos y Condiciones</h1>
-      <p class="subtitulo" style="max-width:100%;margin-top:1rem">Última actualización: agosto de 2026</p>
+  <h2 id="aceptacion">Aceptación de los términos</h2>
+  <p>Al acceder y utilizar los servicios de Salix, aceptás estos términos y condiciones en su totalidad. Si no estás de acuerdo con alguna parte de estos términos, no deberías utilizar nuestros servicios.</p>
 
-      <div class="legal-contenido">
-        <h2>1. Aceptación de los términos</h2>
-        <p>Al acceder y utilizar los servicios de Salix, aceptás estos términos y condiciones en su totalidad. Si no estás de acuerdo con alguna parte de estos términos, no deberías utilizar nuestros servicios.</p>
+  <h2 id="servicio">Descripción del servicio</h2>
+  <p>Salix desarrolla y ofrece software: Flux, un sistema de gestión para empresas; Menu, una carta digital con QR; Nuvix, una aplicación para iPhone; sitios web a medida, y sesiones de integración y configuración.</p>
+  <p>Cada producto publica además sus propios términos en su web: <a href="https://flux.salixweb.com/terminos" rel="noopener">Flux</a>, <a href="https://menu.salixweb.com/terminos" rel="noopener">Menu</a> y <a href="https://nuvix.salixweb.com/terminos" rel="noopener">Nuvix</a>.</p>
 
-        <h2>2. Descripción del servicio</h2>
-        <p>Salix proporciona una suite de aplicaciones web progresivas (PWA) para la gestión empresarial, incluyendo pero no limitado a: gestión de contactos, facturación, delivery, turnos online, gestión de canchas y creación de sitios web.</p>
+  <h2 id="cuentas">Cuentas de usuario</h2>
+  <p>Para acceder a ciertos servicios, deberás crear una cuenta proporcionando información precisa y completa. Sos responsable de mantener la confidencialidad de tus credenciales de acceso y de todas las actividades que ocurran bajo tu cuenta.</p>
 
-        <h2>3. Cuentas de usuario</h2>
-        <p>Para acceder a ciertos servicios, deberás crear una cuenta proporcionando información precisa y completa. Sos responsable de mantener la confidencialidad de tus credenciales de acceso y de todas las actividades que ocurran bajo tu cuenta.</p>
+  <h2 id="uso">Uso aceptable</h2>
+  <p>Te comprometés a utilizar los servicios de Salix únicamente para fines legales y de acuerdo con estos términos. No debés:</p>
+  <ul>
+    <li>Usar los servicios para actividades ilegales o no autorizadas.</li>
+    <li>Intentar acceder a sistemas o datos sin autorización.</li>
+    <li>Transmitir virus, malware o código malicioso.</li>
+    <li>Interferir con el funcionamiento normal de los servicios.</li>
+  </ul>
 
-        <h2>4. Uso aceptable</h2>
-        <p>Te comprometés a utilizar los servicios de Salix únicamente para fines legales y de acuerdo con estos términos. No debés:</p>
-        <ul>
-          <li>Usar los servicios para actividades ilegales o no autorizadas</li>
-          <li>Intentar acceder a sistemas o datos sin autorización</li>
-          <li>Transmitir virus, malware o código malicioso</li>
-          <li>Interferir con el funcionamiento normal de los servicios</li>
-        </ul>
+  <h2 id="pagos">Pagos y facturación</h2>
+  <p>Los planes de pago se facturan de forma mensual o anual según el plan elegido. Los precios se expresan en dólares estadounidenses y pueden cobrarse en pesos argentinos a la cotización vigente al momento de cada cobro, por lo que el importe en pesos puede variar entre períodos. Los pagos se procesan a través de Mercado Pago y otros procesadores de pago autorizados.</p>
 
-        <h2>5. Pagos y facturación</h2>
-        <p>Los planes de pago se facturan de forma mensual o anual según el plan elegido. Los precios se expresan en dólares estadounidenses y pueden cobrarse en pesos argentinos a la cotización vigente al momento de cada cobro, por lo que el importe en pesos puede variar entre períodos. Los pagos se procesan a través de MercadoPago y otros procesadores de pago autorizados.</p>
+  <h2 id="cambios-de-precio">Cambios de precio, de planes y de límites</h2>
+  <p>Nuestros productos evolucionan. Nos reservamos el derecho de modificar los precios, la composición de los planes —qué funciones o módulos incluye cada uno— y los límites de uso publicados (usuarios, cuentas conectadas, casillas, volúmenes y cualquier otro tope), así como de lanzar, discontinuar o reemplazar planes.</p>
+  <ul>
+    <li><strong>Aviso previo:</strong> los cambios que te afecten se comunican con al menos 30 días de anticipación, por email y dentro de la aplicación.</li>
+    <li><strong>Tu precio no cambia solo:</strong> si tenés una suscripción paga vigente, el precio contratado se mantiene hasta que el cambio comunicado entre en vigencia en tu próximo período de facturación.</li>
+    <li><strong>Promociones:</strong> los precios promocionales o de lanzamiento son por tiempo determinado y se anuncian como tales. Al vencer se aplica el precio de lista publicado.</li>
+    <li><strong>Si una función pasa a un plan superior,</strong> dejará de estar disponible en tu plan cuando el cambio entre en vigencia. Tus datos se conservan y vuelven a estar accesibles si contratás un plan que la incluya.</li>
+    <li><strong>Podés cancelar:</strong> si no estás de acuerdo con un cambio, podés cancelar antes de que entre en vigencia, sin penalidad ni permanencia. El uso continuado después de esa fecha implica su aceptación.</li>
+  </ul>
 
-        <h2>6. Cambios de precio, de planes y de límites</h2>
-        <p>Nuestros productos evolucionan. Nos reservamos el derecho de modificar los precios, la composición de los planes —qué funciones o módulos incluye cada uno— y los límites de uso publicados (usuarios, cuentas conectadas, casillas, volúmenes y cualquier otro tope), así como de lanzar, discontinuar o reemplazar planes.</p>
-        <ul>
-          <li><strong>Aviso previo:</strong> los cambios que te afecten se comunican con al menos 30 días de anticipación, por email y dentro de la aplicación.</li>
-          <li><strong>Tu precio no cambia solo:</strong> si tenés una suscripción paga vigente, el precio contratado se mantiene hasta que el cambio comunicado entre en vigencia en tu próximo período de facturación.</li>
-          <li><strong>Promociones:</strong> los precios promocionales o de lanzamiento son por tiempo determinado y se anuncian como tales. Al vencer se aplica el precio de lista publicado.</li>
-          <li><strong>Si una función pasa a un plan superior,</strong> dejará de estar disponible en tu plan cuando el cambio entre en vigencia. Tus datos se conservan y vuelven a estar accesibles si contratás un plan que la incluya.</li>
-          <li><strong>Podés cancelar:</strong> si no estás de acuerdo con un cambio, podés cancelar antes de que entre en vigencia, sin penalidad ni permanencia. El uso continuado después de esa fecha implica su aceptación.</li>
-        </ul>
+  <h2 id="propiedad">Propiedad intelectual</h2>
+  <p>Todo el contenido, diseño, código y funcionalidades de Salix son propiedad exclusiva de Salix y están protegidos por las leyes de propiedad intelectual aplicables. No se otorga ningún derecho de propiedad sobre el software.</p>
 
-        <h2>7. Propiedad intelectual</h2>
-        <p>Todo el contenido, diseño, código y funcionalidades de Salix son propiedad exclusiva de Salix y están protegidos por las leyes de propiedad intelectual aplicables. No se otorga ningún derecho de propiedad sobre el software.</p>
+  <h2 id="responsabilidad">Limitación de responsabilidad</h2>
+  <p>Salix no será responsable por daños indirectos, incidentales, especiales o consecuentes que resulten del uso o la imposibilidad de uso de los servicios. Nuestra responsabilidad total no excederá el monto pagado por el usuario en los últimos 12 meses.</p>
 
-        <h2>8. Limitación de responsabilidad</h2>
-        <p>Salix no será responsable por daños indirectos, incidentales, especiales o consecuentes que resulten del uso o la imposibilidad de uso de los servicios. Nuestra responsabilidad total no excederá el monto pagado por el usuario en los últimos 12 meses.</p>
+  <h2 id="cancelacion">Cancelación</h2>
+  <p>Podés cancelar tu suscripción en cualquier momento. La cancelación será efectiva al final del período de facturación vigente. No se realizan reembolsos por períodos parciales.</p>
 
-        <h2>9. Cancelación</h2>
-        <p>Podés cancelar tu suscripción en cualquier momento. La cancelación será efectiva al final del período de facturación vigente. No se realizan reembolsos por períodos parciales.</p>
+  <h2 id="modificaciones">Modificaciones de estos términos</h2>
+  <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios serán notificados por email y publicados en esta página. El uso continuado de los servicios después de los cambios constituye aceptación de los nuevos términos.</p>
 
-        <h2>10. Modificaciones de estos términos</h2>
-        <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios serán notificados por email y publicados en esta página. El uso continuado de los servicios después de los cambios constituye aceptación de los nuevos términos.</p>
+  <h2 id="ley">Ley aplicable</h2>
+  <p>Estos términos se rigen por las leyes de la República Argentina. Cualquier disputa será sometida a la jurisdicción de los tribunales ordinarios de la Ciudad Autónoma de Buenos Aires.</p>
 
-        <h2>11. Ley aplicable</h2>
-        <p>Estos términos se rigen por las leyes de la República Argentina. Cualquier disputa será sometida a la jurisdicción de los tribunales ordinarios de la Ciudad Autónoma de Buenos Aires.</p>
-
-        <h2>12. Contacto</h2>
-        <p>Para consultas sobre estos términos, escribinos a <a href="mailto:hola@salixweb.com">hola@salixweb.com</a>.</p>
-      </div>
-    </div>
-  </main>
-  <Footer />
-</Plantilla>
-
-<style>
-  .legal {
-    padding-top: clamp(8rem, 15vw, 12rem);
-  }
-
-  .legal-contenido {
-    margin-top: 3rem;
-    max-width: 720px;
-  }
-
-  .legal-contenido h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-top: 2.5rem;
-    margin-bottom: 0.75rem;
-    color: var(--texto);
-  }
-
-  .legal-contenido p {
-    font-size: 0.95rem;
-    line-height: 1.8;
-    color: var(--texto-secundario);
-    margin-bottom: 1rem;
-  }
-
-  .legal-contenido ul {
-    margin: 0.5rem 0 1rem 1.5rem;
-    list-style: disc;
-  }
-
-  .legal-contenido li {
-    font-size: 0.95rem;
-    line-height: 1.8;
-    color: var(--texto-secundario);
-  }
-
-  .legal-contenido a {
-    color: var(--salix);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  .legal-contenido a:hover {
-    opacity: 0.8;
-  }
-</style>
+  <h2 id="contacto">Contacto</h2>
+  <p>Para consultas sobre estos términos, escribinos a <a href={`mailto:${CORREO}`}>{CORREO}</a>.</p>
+</PaginaLegal>

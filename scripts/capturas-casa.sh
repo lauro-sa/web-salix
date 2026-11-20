@@ -1,12 +1,12 @@
 #!/bin/bash
-# Trae a public/propuestas/ las capturas que muestran las páginas de la casa (portada, productos y
+# Trae a public/capturas/ las capturas que muestran las páginas de la casa (portada, productos y
 # sitios). Todas son las que cada producto ya publica en su web: se copian tal cual, sin retoques.
 # Las de los sitios de clientes las saca `pruebas/sitios-largo.mjs` (carpeta de pruebas) y se pasan
 # con el segundo argumento. Uso: bash scripts/capturas-casa.sh [carpeta-con-capturas-de-sitios]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 DEV="${DEV:-$HOME/dev}"
-DEST=public/propuestas
+DEST=public/capturas
 FLUX="$DEV/soft-salix/productos/flux/public/vitrina/capturas"
 MENU="$DEV/soft-salix/productos/menu/public/video"
 NUVIX="$DEV/soft-nuvia/web/public/capturas/es"

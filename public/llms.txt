@@ -1,0 +1,27 @@
+# Salix
+
+> Salix hace software: sistemas de gestión, apps y sitios web. salixweb.com muestra todo lo que hace Salix; cada producto se contrata en su propia web.
+
+Salix es de Buenos Aires, Argentina. Contacto: hola@salixweb.com.
+
+## Productos
+
+- [Flux](https://salixweb.com/flux/): sistema de gestión para empresas. Mensajes (WhatsApp, Instagram, Messenger y correo), presupuestos, visitas, órdenes de trabajo, facturación electrónica de ARCA y equipo, en la computadora y en el teléfono. Web propia: https://flux.salixweb.com
+- [Menu](https://salixweb.com/menu/): carta digital con QR para bares, cafés, restaurantes y casas de comida. Web propia: https://menu.salixweb.com
+- [Nuvix](https://salixweb.com/nuvix/): app para iPhone; registro personal de un tratamiento inyectable semanal o diario. Todavía no está publicada en el App Store. Web propia: https://nuvix.salixweb.com
+
+## Servicios
+
+- [Sitios web a medida](https://salixweb.com/sitios/): diseño y desarrollo de sitios, con los que ya se hicieron.
+- [Integraciones](https://salixweb.com/integraciones/): sesiones de 45 minutos para configurar, conectar o implementar un sistema, sea de Salix o no.
+
+## Sitios hechos
+
+- [herreelec.com](https://salixweb.com/sitios/herreelec/): reparación y automatización de portones.
+- [tphservice.com](https://salixweb.com/sitios/tph/): técnicos en portones y herrería de obra.
+- [b2b.porcorosso.com.ar](https://salixweb.com/sitios/porcorosso/): mayorista de carne porcina.
+
+## Legal
+
+- [Política de privacidad](https://salixweb.com/privacidad/)
+- [Términos y condiciones](https://salixweb.com/terminos/)

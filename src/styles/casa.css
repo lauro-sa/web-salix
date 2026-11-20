@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    casa.css — la base de la web nueva de Salix («la casa», rediseño 2026-11).
-   Los colores llevan los mismos nombres que la web anterior (variables.css), así
+   Los colores llevan los mismos nombres que tenía la web anterior, así
    las piezas que se conservan (el logo animado, el lema, el idioma, el botón de
    tema) y las de la familia (barra, menú, pie) siguen andando sin tocarlas.
    Se escriben por tema con `data-tema`, no con `light-dark()`: los navegadores de

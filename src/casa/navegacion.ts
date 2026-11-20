@@ -4,8 +4,8 @@ export interface Enlace { href: string; texto: string }
 
 export interface Columna { titulo: string; enlaces: Enlace[] }
 
-/** Dónde vive la casa mientras es una propuesta. Al publicarla pasa a '/', y las rutas de abajo con ella. */
-export const RAIZ_CASA = '/propuestas/salix/';
+/** La raíz del sitio. Las rutas de las páginas interiores salen de acá. */
+export const RAIZ_CASA = '/';
 /** La página de un producto dentro de la web de Salix. */
 export const rutaProducto = (id: string) => `${RAIZ_CASA}${id}/`;
 /** La página de un sitio hecho por Salix. */
@@ -30,16 +30,16 @@ export function columnasPie(base = ''): Columna[] {
     {
       titulo: 'Productos',
       enlaces: [
-        { href: 'https://flux.salixweb.com', texto: 'Flux' },
-        { href: 'https://menu.salixweb.com', texto: 'Menu' },
-        { href: 'https://nuvix.salixweb.com', texto: 'Nuvix' },
+        { href: rutaProducto('flux'), texto: 'Flux' },
+        { href: rutaProducto('menu'), texto: 'Menu' },
+        { href: rutaProducto('nuvix'), texto: 'Nuvix' },
       ],
     },
     {
       titulo: 'Servicios',
       enlaces: [
-        { href: `${base}#sitios`, texto: 'Sitios web' },
-        { href: `${base}#integraciones`, texto: 'Integraciones' },
+        { href: `${RAIZ_CASA}sitios/`, texto: 'Sitios web' },
+        { href: `${RAIZ_CASA}integraciones/`, texto: 'Integraciones' },
       ],
     },
     {

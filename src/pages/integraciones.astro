@@ -1,264 +1,307 @@
 ---
-import Plantilla from '../layouts/Plantilla.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
-import IconoSVG from '../components/ui/IconoSVG.astro';
+// Integraciones: sesiones de 45 minutos para dejar andando un sistema, sea de Salix o no. Cómo
+// funciona, en qué ayudamos, la tarjeta para elegir cuántas sesiones (la misma de /planes de Flux),
+// las preguntas y el formulario, que ya sabe de qué se trata la consulta.
+// Los precios y las reglas son los que se publican desde siempre: primera US$ 70, cada extra US$ 50,
+// hasta 10 por pedido. Están escritos una vez, en TarjetaSesiones.astro, y acá se nombran.
+import Casa from '../layouts/Casa.astro';
+import CierreCasa from '../components/CierreCasa.astro';
+import FormularioCasa from '../components/FormularioCasa.astro';
 import TarjetaSesiones from '../components/TarjetaSesiones.astro';
-import FormularioContacto from '../components/FormularioContacto.astro';
-import CierreSalix from '../components/CierreSalix.astro';
-import { CORREO_CONTACTO } from '../productos';
+import IconoProducto from '../components/IconoProducto.astro';
+import { ENTRADAS, CORREO } from '../casa/datos';
+import { RAIZ_CASA } from '../casa/navegacion';
 
-const SERVICIOS = [
-  { titulo: 'Configurar el producto', desc: 'Flux, Sites, Go, Play o Book: permisos, WhatsApp, módulos y el día a día de tu equipo.', icono: 'cubo' },
-  { titulo: 'Conectar sistemas', desc: 'WhatsApp, Mercado Pago, Google, planillas o una API. El dato entra una vez y viaja.', icono: 'link' },
-  { titulo: 'Sitios y landings', desc: 'Una web que carga rápido, con SEO y un formulario que llega a tu operación.', icono: 'sitio' },
-  { titulo: 'Migrar lo que ya tenés', desc: 'Excel, otro software, contactos en el teléfono. Lo traemos sin una migración masiva.', icono: 'flecha' },
-  { titulo: 'Automatizaciones', desc: 'Avisos, menús de WhatsApp, flujos al cambiar un estado. Menos trabajo repetido.', icono: 'rayo' },
-  { titulo: 'Consultoría técnica', desc: 'Arquitectura, herramientas y el recorte justo: qué conviene hacer ahora y qué después.', icono: 'ia' },
+const e = ENTRADAS.find((x) => x.id === 'integraciones')!;
+
+const CIFRAS = [
+  { cifra: '45 min', que: 'dura cada sesión' },
+  { cifra: 'US$ 70', que: 'la primera sesión' },
+  { cifra: 'US$ 50', que: 'cada sesión extra' },
+  { cifra: '10', que: 'sesiones como máximo por pedido' },
 ];
 
 const PASOS = [
-  { num: '01', titulo: 'Contanos el software', desc: 'Puede ser Flux, un producto Salix o una herramienta que ya uses. WhatsApp, mail o el formulario de abajo.' },
-  { num: '02', titulo: 'Elegís las sesiones', desc: 'Cada una dura 45 minutos. Primera US$ 70. Cada extra US$ 50. Hasta 10. La tarjeta de al lado se actualiza al sumar.' },
-  { num: '03', titulo: 'Coordinamos y lo dejamos andando', desc: 'Si es Flux, también podés pagar directo en flux.salixweb.com/planes. Si no, te pasamos el link y agendamos.' },
+  { titulo: 'Contanos el software', texto: 'Puede ser Flux, otro producto de Salix o una herramienta que ya uses. Por WhatsApp, por correo o con el formulario de abajo.' },
+  { titulo: 'Elegís las sesiones', texto: 'Cada una dura 45 minutos. La primera, US$ 70; cada extra, US$ 50. Hasta 10. La tarjeta de abajo se actualiza al sumar.' },
+  { titulo: 'Coordinamos y lo dejamos andando', texto: 'Si es Flux, también podés pagar directo en flux.salixweb.com/planes. Si no, te pasamos el link y agendamos.' },
 ];
 
-const FAQ = [
-  { q: '¿Sirve para cualquier software?', a: 'Sí. Configuramos productos Salix (Flux, Sites, Go, Play, Book) y también conectamos lo que ya tengas: WhatsApp, Mercado Pago, planillas, APIs. No hace falta que sea nuestro.' },
-  { q: '¿Cuánto dura cada sesión?', a: '45 minutos de trabajo enfocado. No es una hora corrida ni una demo: es implementación.' },
-  { q: '¿Cuánto sale?', a: 'Primera sesión US$ 70. Cada extra US$ 50. Se cobra en pesos al cambio del día. Hasta 10 sesiones por pedido.' },
-  { q: '¿Está incluido en la suscripción de Flux?', a: 'No. La prueba y el plan son el producto. Esto es configuración a demanda, aparte.' },
-  { q: '¿Cómo se paga?', a: 'Si es implementación de Flux, pagás en flux.salixweb.com/planes. Para el resto, pedís las sesiones acá y te pasamos el link.' },
+const SERVICIOS = [
+  { titulo: 'Configurar el producto', texto: 'Flux o Menu: permisos, WhatsApp, módulos y el día a día de tu equipo.' },
+  { titulo: 'Conectar sistemas', texto: 'WhatsApp, Mercado Pago, Google, planillas o una API. El dato entra una vez y viaja.' },
+  { titulo: 'Sitios y landings', texto: 'Una web que carga rápido, preparada para que te encuentren y con un formulario que llega a tu operación.' },
+  { titulo: 'Migrar lo que ya tenés', texto: 'Excel, otro software, contactos en el teléfono. Lo traemos sin una migración masiva.' },
+  { titulo: 'Automatizaciones', texto: 'Avisos, menús de WhatsApp, flujos al cambiar un estado. Menos trabajo repetido.' },
+  { titulo: 'Consultoría técnica', texto: 'Arquitectura, herramientas y el recorte justo: qué conviene hacer ahora y qué después.' },
+];
+
+const PREGUNTAS = [
+  { p: '¿Sirve para cualquier software?', r: 'Sí. Configuramos los productos de Salix y también conectamos lo que ya tengas: WhatsApp, Mercado Pago, planillas, APIs. No hace falta que sea nuestro.' },
+  { p: '¿Cuánto dura cada sesión?', r: '45 minutos de trabajo enfocado. No es una hora corrida ni una demostración: es implementación.' },
+  { p: '¿Cuánto sale?', r: 'La primera sesión, US$ 70. Cada extra, US$ 50. Se cobra en pesos al cambio del día. Hasta 10 sesiones por pedido.' },
+  { p: '¿Está incluido en la suscripción de Flux?', r: 'No. La prueba y el plan son el producto. Esto es configuración a pedido, aparte.' },
+  { p: '¿Cómo se paga?', r: 'Si es implementación de Flux, pagás en flux.salixweb.com/planes. Para el resto, pedís las sesiones acá y te pasamos el link.' },
+];
+
+const paradas = [
+  { id: 'como', nombre: 'Cómo funciona' },
+  { id: 'en-que', nombre: 'En qué' },
+  { id: 'sesiones', nombre: 'Sesiones' },
+  { id: 'preguntas', nombre: 'Preguntas' },
+  { id: 'contacto', nombre: 'Contacto' },
 ];
 ---
 
-<Plantilla
-  titulo="Integraciones — Te lo dejamos andando"
-  descripcion="Sesiones de 45 minutos para configurar, conectar o implementar cualquier software. Primera US$ 70. Cada extra US$ 50. Flux, Sites o lo que ya uses."
-  keywords="implementacion software, configuracion WhatsApp, MercadoPago, consultoria tecnica Argentina, onboarding Flux, integracion sistemas"
+<Casa
+  titulo="Integraciones · Te lo dejamos andando · Salix"
+  descripcion="Sesiones de 45 minutos para configurar, conectar o implementar un sistema: Flux, tu sitio o el software que ya uses. La primera, US$ 70; cada extra, US$ 50."
+  base={RAIZ_CASA}
+  inicio={RAIZ_CASA}
 >
-  <Nav />
-  <main>
-
-    <section class="servicio-hero">
-      <div class="servicio-hero-inner">
-        <div class="hero-badge aparecer">
-          <span class="punto-pulso"></span>
-          Sesiones de 45 min
+  <div style="--c:var(--linea-integraciones)">
+    <section class="cabeza con-riel" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--nace"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="cabeza-caja riel-cuerpo ancho">
+        <div>
+          <nav class="migas" aria-label="Dónde estás">
+            <a href={RAIZ_CASA}>Salix</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Integraciones</span>
+          </nav>
+          <p class="producto-nombre">
+            <span class="producto-logo"><IconoProducto nombre="link" tamaño={20} /></span>
+            {e.nombre}
+            <span class="producto-que">{e.que}</span>
+            <span class="estado">{e.estado}</span>
+          </p>
+          <h1 class="titulo titulo--pagina" data-asoma><span>Te lo dejamos andando.</span> En el software que uses.</h1>
+          <p class="bajada" data-asoma style="--i:1">
+            Configuramos Flux, tu sitio o lo que ya tengas: WhatsApp, Mercado Pago, una planilla, una API. No hace falta que sea nuestro.
+          </p>
+          <div class="acciones" data-asoma style="--i:2">
+            <a class="boton" href="#sesiones">Elegir sesiones</a>
+            <a class="boton boton-secundario" href="#contacto">Hablemos</a>
+          </div>
         </div>
-        <h1 class="servicio-titulo aparecer delay-1">
-          Te lo dejamos andando.<br />
-          <span>En el software que uses.</span>
-        </h1>
-        <p class="servicio-sub aparecer delay-2">
-          Configuramos Flux, Sites o lo que ya tengas. WhatsApp, Mercado Pago, una planilla, una API. No hace falta que sea nuestro.
-        </p>
-        <div class="servicio-ctas aparecer delay-3">
-          <a href="#sesiones" class="boton boton-verde">
-            Elegir sesiones
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="/#productos" class="boton boton-secundario">Ver productos</a>
+        <ul class="cifras" data-asoma style="--i:2">
+          {CIFRAS.map((c) => <li><strong>{c.cifra}</strong><span>{c.que}</span></li>)}
+        </ul>
+      </div>
+
+      <nav class="indice riel-cuerpo ancho" aria-label="Las partes de esta página" data-asoma style="--i:4">
+        <ol>
+          {paradas.map((p) => (
+            <li><a href={`#${p.id}`}><span class="indice-punto" aria-hidden="true"></span>{p.nombre}</a></li>
+          ))}
+        </ol>
+      </nav>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="como" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">Cómo funciona</p>
+        <h2 class="titulo" data-asoma><span>Tres pasos.</span> Sin letra chica.</h2>
+        <ol class="hechos hechos--nombre hechos--columnas pasos-numerados" data-asoma style="--i:1;--columnas:3">
+          {PASOS.map((p, i) => <li><span class="paso-numero" aria-hidden="true">{i + 1}</span><strong>{p.titulo}</strong> {p.texto}</li>)}
+        </ol>
+      </div>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="en-que" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">En qué</p>
+        <h2 class="titulo" data-asoma><span>Cualquier sistema.</span> El recorte justo.</h2>
+        <ul class="hechos hechos--nombre hechos--columnas" data-asoma style="--i:1;--columnas:3">
+          {SERVICIOS.map((s) => <li><strong>{s.titulo}</strong> {s.texto}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="sesiones" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">Sesiones</p>
+        <div class="dos">
+          <h2 class="titulo" data-asoma><span>Elegí las sesiones.</span> La tarjeta cambia.</h2>
+          <p class="bajada" data-asoma style="--i:1">La primera, US$ 70. Cada extra, US$ 50. Hasta 10. Se cobra en pesos al cambio del día.</p>
         </div>
-      </div>
-    </section>
-
-    <section class="seccion">
-      <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
-        <span class="etiqueta">Cómo funciona</span>
-        <h2 class="titulo-seccion">Tres pasos. Sin letra chica.</h2>
-      </div>
-      <div class="pasos-grilla">
-        {PASOS.map((p, i) => (
-          <div class={`paso-card aparecer delay-${i + 1}`}>
-            <span class="paso-numero">{p.num}</span>
-            <h3 class="paso-titulo">{p.titulo}</h3>
-            <p class="paso-desc">{p.desc}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <section class="seccion">
-      <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
-        <span class="etiqueta">En qué</span>
-        <h2 class="titulo-seccion">Cualquier sistema. El recorte justo.</h2>
-      </div>
-      <div class="servicios-grilla">
-        {SERVICIOS.map((s, i) => (
-          <div class={`card-servicio aparecer delay-${(i % 3) + 1}`}>
-            <div class="icono-contenedor item-producto">
-              <IconoSVG nombre={s.icono} tamaño={22} grosor={1.5} />
-            </div>
-            <h3 class="servicio-nombre">{s.titulo}</h3>
-            <p class="servicio-texto">{s.desc}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <div class="fondo-puntos" id="sesiones">
-      <div class="panel-interior">
-        <section class="seccion">
-          <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
-            <span class="etiqueta">Precios</span>
-            <h2 class="titulo-seccion">Elegí las sesiones. <span style="color:var(--salix)">La tarjeta cambia.</span></h2>
-            <p class="subtitulo" style="text-align:center">Primera US$ 70. Cada extra US$ 50. Hasta 10. Se cobra en pesos al cambio del día.</p>
-          </div>
+        <div class="sesiones" data-asoma style="--i:1">
           <TarjetaSesiones
             marca="Salix"
             codigo="SLX"
             titulo="¿Necesitás que te configuremos el sistema?"
-            texto="Cada sesión dura 45 minutos. Te ayudamos a cargar datos, conectar WhatsApp, permisos y los módulos que uses — en Flux o en otra herramienta. Primera sesión US$ 70. Cada extra US$ 50."
+            texto="Cada sesión dura 45 minutos. Te ayudamos a cargar datos, conectar WhatsApp, permisos y los módulos que uses, en Flux o en otra herramienta."
             ctaTexto="Pedir estas sesiones"
             ctaModo="contacto"
             nota="Si es implementación de Flux, también podés pagar directo en flux.salixweb.com/planes."
           />
-        </section>
+        </div>
       </div>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="preguntas" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--fin"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">Preguntas</p>
+        <div class="dos dos--arriba">
+          <h2 class="titulo" data-asoma><span>Antes</span> de escribirnos.</h2>
+          <div class="preguntas" data-asoma style="--i:1">
+            {PREGUNTAS.map((q) => (
+              <details>
+                <summary>{q.p}<span class="preguntas-marca" aria-hidden="true"></span></summary>
+                <p>{q.r}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="tramo" id="contacto">
+    <div class="contacto ancho">
+      <div class="contacto-texto" data-asoma>
+        <h2 class="titulo"><span>Contanos</span> qué hay que dejar andando.</h2>
+        <p class="bajada">Flux, tu sitio o una herramienta que ya uses. Sin compromiso.</p>
+        <a class="enlace" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
+      </div>
+      <FormularioCasa preseleccionado="Integraciones" />
     </div>
+  </section>
 
-    <section class="seccion">
-      <div class="encabezado-seccion aparecer" style="text-align:center;align-items:center">
-        <span class="etiqueta">Preguntas</span>
-        <h2 class="titulo-seccion">Antes de escribirnos.</h2>
-      </div>
-      <div class="faq-lista">
-        {FAQ.map((item, i) => (
-          <details class={`faq-item aparecer delay-${(i % 3) + 1}`}>
-            <summary>{item.q}</summary>
-            <p>{item.a}</p>
-          </details>
-        ))}
-      </div>
-    </section>
-
-    <section class="seccion" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
-      <h2 class="titulo-seccion aparecer">Contanos qué hay que dejar andando.</h2>
-      <p class="subtitulo aparecer delay-1" style="text-align:center">
-        Flux, Sites o una herramienta que ya uses. Sin compromiso.
-      </p>
-    </section>
-
-    <FormularioContacto productoPreseleccionado="Integraciones" />
-
-    <CierreSalix
-      titulo="¿Preferís hablarlo"
-      resaltado="directo?"
-      subtitulo="Escribinos y lo vemos juntos: qué usás hoy y qué hay que dejar andando."
-    >
-      <a href={`mailto:${CORREO_CONTACTO}`} class="boton boton-primario">{CORREO_CONTACTO}</a>
-      <a href="/flux" class="boton boton-secundario">Conocer Flux</a>
-    </CierreSalix>
-
-  </main>
-  <Footer />
-</Plantilla>
+  <CierreCasa
+    liviana="¿Preferís hablarlo directo?"
+    tinta="Escribinos."
+    bajada="Lo vemos juntos: qué usás hoy y qué hay que dejar andando."
+    contacto="#contacto"
+  />
+</Casa>
 
 <style>
-  .servicio-hero {
-    min-height: 78vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 120px 24px 72px;
-    background: var(--gradiente-hero);
+  /* Las cifras de la cabecera: cuatro datos, en la mesa neutra de la casa. */
+  .cifras {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: 0.875rem;
+    background: var(--fondo-alt);
+    box-shadow: inset 0 0 0 1px var(--borde);
+    overflow: hidden;
   }
-  .servicio-hero-inner {
-    max-width: 720px; text-align: center;
-    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  .cifras li {
+    display: grid;
+    align-content: center;
+    gap: 0.25rem;
+    min-block-size: clamp(7rem, 14vw, 10rem);
+    padding: clamp(1rem, 2.5vw, 1.75rem);
+    border-top: 1px solid var(--borde);
+    border-inline-start: 1px solid var(--borde);
+    /* El borde de arriba y el de la izquierda de las celdas del borde quedan fuera de la caja. */
+    margin: -1px 0 0 -1px;
   }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--card); border: 1px solid var(--borde);
-    color: var(--texto-secundario); font-size: 13px; font-weight: 500;
-    padding: 6px 16px; border-radius: 100px;
-  }
-  .punto-pulso {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--salix);
-  }
-  .servicio-titulo {
-    font-size: clamp(2rem, 5vw, 3.15rem);
-    font-weight: 600; line-height: 1.08; letter-spacing: -0.04em; color: var(--texto);
-    max-width: 100%;
-  }
-  .servicio-titulo span {
-    display: block;
-    font-size: clamp(1.2rem, 2.8vw, 1.85rem);
+  .cifras strong {
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
     font-weight: 600;
+    line-height: 1;
     letter-spacing: -0.03em;
-    line-height: 1.2;
-    margin-top: 0.18em;
-    color: color-mix(in srgb, var(--salix) 55%, var(--gris-titulo));
     white-space: nowrap;
   }
-  @media (max-width: 520px) {
-    .servicio-titulo span { white-space: normal; }
-  }
-  .servicio-sub {
-    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-    color: var(--texto-secundario); line-height: 1.7; max-width: 520px;
-  }
-  .servicio-ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 0.25rem; }
-
-  .encabezado-seccion {
-    margin-bottom: 3rem;
-    display: flex; flex-direction: column; gap: 0.75rem;
+  .cifras span {
+    font-size: 0.875rem;
+    line-height: 1.35;
+    color: var(--texto-secundario);
+    text-wrap: balance;
   }
 
-  .pasos-grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .paso-card {
-    background: var(--card); border: 1px solid var(--borde);
-    border-radius: var(--radio-card);
-    padding: clamp(1.5rem, 3vw, 2rem);
-    display: flex; flex-direction: column; gap: 0.75rem;
-    transition: border-color var(--transicion), transform var(--transicion);
-  }
-  .paso-card:hover { border-color: var(--salix-borde); transform: translateY(-2px); }
+  /* Los pasos llevan su número, como una parada. */
   .paso-numero {
-    font-size: 2rem; font-weight: 600; color: var(--salix);
-    letter-spacing: -0.03em; line-height: 1;
-  }
-  .paso-titulo { font-size: 1.05rem; font-weight: 600; color: var(--texto); }
-  .paso-desc { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; }
-
-  .servicios-grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-  .card-servicio {
-    background: var(--card); border: 1px solid var(--borde);
-    border-radius: var(--radio-card);
-    padding: clamp(1.25rem, 2.5vw, 1.75rem);
-    display: flex; flex-direction: column; gap: 0.75rem;
-    transition: border-color var(--transicion), transform var(--transicion);
-  }
-  .card-servicio:hover {
-    border-color: var(--salix-borde); transform: translateY(-2px);
-  }
-  .card-servicio:hover :global(.icono-contenedor) { transform: scale(1.08) rotate(-4deg); }
-  .servicio-nombre { font-size: 1rem; font-weight: 600; color: var(--texto); }
-  .servicio-texto { font-size: 0.85rem; color: var(--texto-secundario); line-height: 1.7; }
-
-  .faq-lista {
-    max-width: 720px; margin: 0 auto;
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .faq-item {
-    background: var(--card); border: 1px solid var(--borde);
-    border-radius: 14px; padding: 0 1.25rem;
-  }
-  .faq-item summary {
-    cursor: pointer; list-style: none;
-    font-size: 1rem; font-weight: 600; color: var(--texto);
-    padding: 1.1rem 0;
-  }
-  .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item p {
-    font-size: 0.9rem; color: var(--texto-secundario); line-height: 1.7;
-    padding: 0 0 1.15rem; margin: 0;
+    display: grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px var(--texto);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texto);
   }
 
-  @media (max-width: 1024px) {
-    .pasos-grilla { grid-template-columns: 1fr; }
-    .servicios-grilla { grid-template-columns: repeat(2, 1fr); }
+  .sesiones {
+    margin-top: clamp(2rem, 5vw, 3rem);
   }
-  @media (max-width: 640px) {
-    .servicios-grilla { grid-template-columns: 1fr; }
+
+  /* Las preguntas: se abren de a una, con la misma línea fina de los hechos. */
+  .preguntas details {
+    border-top: 1px solid var(--borde);
+  }
+  .preguntas details:last-child {
+    border-bottom: 1px solid var(--borde);
+  }
+  .preguntas summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-block-size: 3.25rem;
+    padding-block: 0.75rem;
+    font-size: 1rem;
+    font-weight: 550;
+    cursor: pointer;
+    list-style: none;
+  }
+  .preguntas summary::-webkit-details-marker {
+    display: none;
+  }
+  /* El más que gira a por: dos trazos del color del texto. */
+  .preguntas-marca {
+    position: relative;
+    flex: none;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    transition: rotate 0.35s var(--curva);
+  }
+  .preguntas-marca::before,
+  .preguntas-marca::after {
+    content: '';
+    position: absolute;
+    inset: calc(50% - 0.75px) 0 auto;
+    block-size: 1.5px;
+    background: var(--texto-secundario);
+  }
+  .preguntas-marca::after {
+    rotate: 90deg;
+  }
+  details[open] .preguntas-marca {
+    rotate: 45deg;
+  }
+  .preguntas p {
+    padding-bottom: 1.125rem;
+    max-inline-size: 52ch;
+    font-size: 0.9375rem;
+    color: var(--texto-secundario);
+    text-wrap: pretty;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .preguntas-marca {
+      transition: none;
+    }
   }
 </style>

@@ -19,7 +19,7 @@ export interface Vista {
   tomas: Toma[];
 }
 
-const P = '/propuestas';
+const P = '/capturas';
 
 /** La captura de un teléfono (660 × 1434 si no se dice otra cosa). */
 export const tel = (archivo: string, alt: string, conOscura = false, ancho = 660, alto = 1434): Toma => ({
