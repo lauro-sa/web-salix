@@ -42,8 +42,12 @@ html:has(.psx-barra) {
    angosta y baja, Safari la descarta y no sigue buscando, así que la página pasa por detrás de su barra.
    Es de <html> (un pseudoelemento cuenta como su dueño, que no es fijo). No se ve: su fondo es un
    degradé transparente, que hace falta para que Safari no la tome por escondida y pruebe de nuevo sin
-   ella; ni se toca: los toques la atraviesan. Detalle y fuente en trampas/ios.md. */
-html:has(.psx-barra)::after {
+   ella; ni se toca: los toques la atraviesan. Detalle y fuente en trampas/ios.md.
+   Mientras el telón de entrada está puesto, el tapón no va: ahí sí hace falta que Safari encuentre
+   una pieza fija en el borde, el telón, y pinte su barra con ese color; sin eso el telón no llegaba
+   hasta abajo y la página asomaba por detrás de la barra (Sal, 2026-11-20). Al irse el telón deja de
+   existir para Safari y el tapón vuelve. Un producto con telón propio lo apaga igual con su marca. */
+html:has(.psx-barra):not([data-msx-telon='activo'], [data-msx-telon='sube'])::after {
   content: '';
   position: fixed;
   left: calc(50% - 0.5rem);
