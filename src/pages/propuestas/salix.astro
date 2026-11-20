@@ -1,15 +1,16 @@
 ---
-// Propuesta C · «La casa»: la web ES de Salix. La primera pantalla dice quiénes somos y muestra, en la
-// órbita de la familia, lo que hace la casa girando alrededor del isotipo. Después, el plano de líneas
-// se dibuja con el scroll, y las líneas de los productos siguen bajando por el costado hasta la parada
-// de cada uno. Usa la barra, el menú, el pie en cortina y el cierre que se acomoda de la familia.
-// El movimiento vive en src/scripts/casa.ts.
+// Propuesta C · «La casa»: la web ES de Salix. La primera pantalla, centrada: el isotipo, el nombre, la
+// frase y una rueda que gira de frente con todo lo que hace la casa. Después, el plano de líneas se
+// dibuja con el scroll, y las líneas de los productos siguen bajando por el costado hasta la parada de
+// cada uno. Usa la barra, el menú, el pie en cortina y el cierre que se acomoda de la familia.
+// El movimiento vive en src/scripts/casa.ts y src/scripts/rueda.ts.
 import Casa from '../../layouts/Casa.astro';
 import Captura from '../../components/Captura.astro';
 import FormularioCasa from '../../components/FormularioCasa.astro';
 import LogoFlux from '../../components/LogoFlux.astro';
 import LogoMenu from '../../components/LogoMenu.astro';
-import Orbita from '../../components/Orbita.astro';
+import LogoSalixAnimado from '../../components/LogoSalixAnimado.astro';
+import Rueda from '../../components/Rueda.astro';
 import { ENTRADAS, SITIOS, CORREO } from '../../propuestas/datos';
 
 const productos = ENTRADAS.filter((e) => ['flux', 'menu', 'nuvix'].includes(e.id));
@@ -116,23 +117,20 @@ const VOCES = [
   inicio="#inicio"
   sinIndexar
 >
-  <!-- Primera pantalla. A un lado, quiénes somos y por dónde seguir. Al otro, la órbita de la
-       familia: lo que hace la casa gira alrededor del isotipo, y cada burbuja lleva a su parte. -->
+  <!-- Primera pantalla, centrada: el isotipo, el nombre, la frase y la rueda con todo lo que hace la
+       casa (productos, servicios, sitios hechos y lo que viene). Cada ficha lleva a su parte. -->
   <section class="abre" id="inicio">
-    <div class="abre-caja ancho">
-      <div class="abre-texto">
+    <div class="abre-caja">
+      <div class="abre-texto ancho">
+        <span class="abre-logo" aria-hidden="true"><LogoSalixAnimado id="copa-portada" /></span>
         <h1 class="abre-nombre">Salix</h1>
         <p class="abre-frase">Software que simplifica. <span>Sistemas, apps y sitios web.</span></p>
-        <p class="bajada">
-          Somos una casa de software de Buenos Aires. Pensamos cada producto, lo hacemos y lo dejamos
-          andando.
-        </p>
-        <div class="abre-acciones">
-          <a class="boton" href="#productos">Ver lo que hacemos</a>
-          <a class="boton boton-secundario" href="#contacto">Hablemos</a>
-        </div>
       </div>
-      <Orbita />
+      <div class="abre-rueda"><Rueda /></div>
+      <div class="abre-acciones ancho">
+        <a class="boton" href="#productos">Ver lo que hacemos</a>
+        <a class="boton boton-secundario" href="#contacto">Hablemos</a>
+      </div>
     </div>
   </section>
 
@@ -334,26 +332,32 @@ const VOCES = [
     mask-image: url('/propuestas/nuvix-isotipo.svg');
   }
 
-  /* ── Primera pantalla ── */
+  /* ── Primera pantalla: centrada ── */
   .abre {
     display: grid;
     align-content: center;
     min-block-size: min(100svh, 60rem);
-    padding-block: calc(var(--psx-alto-barra, 4.5rem) + 2rem) 3.5rem;
+    padding-block: calc(var(--psx-alto-barra, 4.5rem) + 1.5rem) 3rem;
     overflow: clip;
+    text-align: center;
   }
-  .abre-caja {
+  .abre-texto {
     display: grid;
-    gap: 2.75rem;
+    justify-items: center;
+  }
+  .abre-logo :global(svg) {
+    inline-size: clamp(3rem, 2.4rem + 2vw, 4rem);
+    block-size: clamp(3rem, 2.4rem + 2vw, 4rem);
   }
   .abre-nombre {
+    margin-top: clamp(0.75rem, 2svh, 1.25rem);
     font-size: clamp(2.75rem, 2rem + 2.8vw, 4.25rem);
     font-weight: 650;
     line-height: 1;
     letter-spacing: -0.035em;
   }
   .abre-frase {
-    margin-top: clamp(0.875rem, 2svh, 1.25rem);
+    margin-top: clamp(0.875rem, 2.4svh, 1.5rem);
     font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
     font-weight: 500;
     line-height: 1.18;
@@ -364,40 +368,36 @@ const VOCES = [
     font-weight: 400;
     color: var(--texto-terciario);
   }
-  .abre .bajada {
-    margin-top: clamp(1rem, 2.5svh, 1.375rem);
-    max-inline-size: 38ch;
+  .abre-rueda {
+    margin-top: clamp(1.5rem, 4.5svh, 3rem);
+    padding-inline: var(--margen);
   }
   .abre-acciones {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.625rem;
-    margin-top: clamp(1.5rem, 3.5svh, 2rem);
+    margin-top: clamp(1.25rem, 3svh, 2rem);
   }
-
-  /* Tableta ancha, computadora y televisor: el texto a un lado y la órbita al otro. */
-  @media (min-width: 56rem) and (min-height: 30rem) {
-    .abre-caja {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      column-gap: clamp(2rem, 6vw, 5rem);
-    }
-  }
-  /* Teléfono acostado: poco alto. Texto y órbita lado a lado, y la pantalla no pide alto. */
+  /* Teléfono acostado: poco alto. La pantalla no pide alto y el isotipo se guarda. */
   @media (max-height: 30rem) and (min-width: 34rem) {
     .abre {
       min-block-size: auto;
       padding-block: calc(var(--psx-alto-barra, 4.5rem) + 1rem) 2rem;
     }
-    .abre-caja {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      column-gap: 2rem;
+    .abre-logo {
+      display: none;
     }
   }
   @media (prefers-reduced-motion: no-preference) {
     .abre-texto {
-      animation: asoma 0.8s var(--curva) 0.2s both;
+      animation: asoma 0.8s var(--curva) 0.15s both;
+    }
+    .abre-rueda {
+      animation: asoma 1s var(--curva) 0.45s both;
+    }
+    .abre-acciones {
+      animation: asoma 0.8s var(--curva) 0.75s both;
     }
     /* Al seguir bajando, la primera pantalla se retira: se apaga y queda un poco atrás. */
     @supports (animation-timeline: view()) {
@@ -411,7 +411,7 @@ const VOCES = [
   @keyframes asoma {
     from {
       opacity: 0;
-      translate: 0 0.5rem;
+      translate: 0 0.75rem;
     }
   }
   @keyframes se-retira {
