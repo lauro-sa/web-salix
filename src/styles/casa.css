@@ -211,6 +211,14 @@ img {
   border-top: 1px solid var(--borde-sutil);
 }
 
+/* Los íconos de trazo (IconoSVG.astro): de línea, con el color del texto. */
+.icono-svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* ── Lo que se aprieta ── */
 .boton {
   display: inline-flex;

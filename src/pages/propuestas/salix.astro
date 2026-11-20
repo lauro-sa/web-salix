@@ -1,15 +1,15 @@
 ---
-// Propuesta C · «La casa»: la web ES de Salix. La primera pantalla es solo la marca (el isotipo con
-// sus ramas, el nombre y qué somos). Después, el plano de líneas se dibuja con el scroll: todo lo que
-// cuelga de la casa. Las líneas de los productos siguen bajando por el costado hasta la parada de
-// cada uno. Usa la barra, el menú, el pie en cortina y el cierre que se acomoda de la familia.
+// Propuesta C · «La casa»: la web ES de Salix. La primera pantalla dice quiénes somos y muestra, en la
+// órbita de la familia, lo que hace la casa girando alrededor del isotipo. Después, el plano de líneas
+// se dibuja con el scroll, y las líneas de los productos siguen bajando por el costado hasta la parada
+// de cada uno. Usa la barra, el menú, el pie en cortina y el cierre que se acomoda de la familia.
 // El movimiento vive en src/scripts/casa.ts.
 import Casa from '../../layouts/Casa.astro';
 import Captura from '../../components/Captura.astro';
 import FormularioCasa from '../../components/FormularioCasa.astro';
 import LogoFlux from '../../components/LogoFlux.astro';
 import LogoMenu from '../../components/LogoMenu.astro';
-import ramas from '../../ramas-salix.json';
+import Orbita from '../../components/Orbita.astro';
 import { ENTRADAS, SITIOS, CORREO } from '../../propuestas/datos';
 
 const productos = ENTRADAS.filter((e) => ['flux', 'menu', 'nuvix'].includes(e.id));
@@ -38,18 +38,6 @@ const FASES = [
   { nombre: 'En obra', de: 0.78, tramo: 0.18 },
 ];
 const DESTINO: Record<string, string> = { sites: '#sitios', integraciones: '#integraciones' };
-
-// El sauce de la portada: de cada rama del isotipo cuelga una línea de la casa. `x` y `fin` salen de
-// la geometría del isotipo (ramas-salix.json, lienzo de 24): el centro de la rama y dónde termina.
-// Van de la más larga a la más corta, así el nombre de cada una tiene lugar libre a su derecha.
-const BROTES = [
-  { id: 'flux', nombre: 'Flux', que: 'Sistema de gestión', href: '#flux', x: 1.92, fin: 13.92 },
-  { id: 'menu', nombre: 'Menu', que: 'Carta digital con QR', href: '#menu', x: 5.28, fin: 18.24 },
-  { id: 'nuvix', nombre: 'Nuvix', que: 'App para iPhone', href: '#nuvix', x: 8.64, fin: 21.6 },
-  { id: 'sites', nombre: 'Sitios web', que: 'A medida', href: '#sitios', x: 12, fin: 23.04 },
-  { id: 'integraciones', nombre: 'Integraciones', que: 'Sesiones de 45 minutos', href: '#integraciones', x: 15.36, fin: 21.6 },
-  { id: 'obra', nombre: 'Lo que viene', que: 'Go · Play · Book', href: '#viene', x: 18.72, fin: 18.24 },
-];
 
 // Las capturas de cada producto, agrupadas en vistas que se eligen con los rótulos de abajo. Una vista
 // lleva una captura o dos teléfonos lado a lado. Todas son capturas reales.
@@ -119,7 +107,6 @@ const VOCES = [
   { texto: 'Le pedimos la web a Salix y nos sorprendió la calidad. Rápida, moderna y en tiempo récord. Se nota que entienden el negocio.', quien: 'Juan Pablo Ferreira', de: 'Ferreira Inmobiliaria' },
   { texto: 'El soporte es excelente. No es un ticket y esperar días: te responden rápido y resuelven. Eso para nosotros vale mucho.', quien: 'Valentina López', de: 'LogiCenter SA' },
 ];
-const { cx, cy, r } = ramas.copa;
 ---
 
 <Casa
@@ -129,8 +116,8 @@ const { cx, cy, r } = ramas.copa;
   inicio="#inicio"
   sinIndexar
 >
-  <!-- Primera pantalla. A un lado, quiénes somos y por dónde seguir. Al otro, el sauce: del isotipo
-       cuelga cada cosa que hacemos, y cada nombre lleva a su parte de la página. -->
+  <!-- Primera pantalla. A un lado, quiénes somos y por dónde seguir. Al otro, la órbita de la
+       familia: lo que hace la casa gira alrededor del isotipo, y cada burbuja lleva a su parte. -->
   <section class="abre" id="inicio">
     <div class="abre-caja ancho">
       <div class="abre-texto">
@@ -145,27 +132,7 @@ const { cx, cy, r } = ramas.copa;
           <a class="boton boton-secundario" href="#contacto">Hablemos</a>
         </div>
       </div>
-      <div class="sauce">
-        <svg class="copa" viewBox="0 0 24 24" role="img" aria-label="El isotipo de Salix: la copa de un sauce hecha de ramas verticales" style={`--curva-ramas:${ramas.curva}`}>
-          <defs><clipPath id="copa-recorte"><circle cx={cx} cy={cy} r={r} /></clipPath></defs>
-          <g clip-path="url(#copa-recorte)" fill="currentColor">
-            {ramas.ramas.map((rama, i) => (
-              <path class="rama" d={rama.d} style={`--desde:${rama.desde}px;--retraso:${rama.retraso}s;--duracion:${rama.duracion}s;--i:${i}`} />
-            ))}
-          </g>
-        </svg>
-        <ul class="brotes" aria-label="Lo que hace Salix">
-          {BROTES.map((b, k) => (
-            <li class:list={['brote', { 'brote--obra': b.id === 'obra' }]} style={`--c:var(--linea-${b.id});--x:${b.x};--fin:${b.fin};--k:${k}`}>
-              <span class="brote-linea" aria-hidden="true"></span>
-              <a class="brote-fin" href={b.href}>
-                <span class="brote-punto" aria-hidden="true"></span>
-                <span class="brote-nombre"><strong>{b.nombre}</strong> <span>{b.que}</span></span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Orbita />
     </div>
   </section>
 
@@ -335,15 +302,17 @@ const { cx, cy, r } = ramas.copa;
   <!-- El cierre: el último bloque, el que se acomoda entre la barra y el pie cuando la cortina lo
        destapa. Las ramas cuelgan de arriba, y una invitación corta. -->
   <section class="cierre psx-cierre">
-    <div class="cierre-caja psx-cierre-caja">
+    <div class="cierre-caja psx-cierre-caja ancho">
+      <div class="cierre-texto">
+        <h2 class="titulo"><span>¿Tenés algo en mente?</span> Hablemos.</h2>
+        <p class="bajada psx-cierre-extra">Un sistema, una app, un sitio, o una idea que todavía no tiene forma.</p>
+        <div class="cierre-acciones">
+          <a class="boton" href="#contacto">Escribinos</a>
+          <a class="enlace" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
       <div class="cierre-ramas psx-cierre-extra" aria-hidden="true" data-asoma>
         {[30, 54, 72, 86, 92, 86, 72, 54, 30].map((largo, i) => <span style={`--largo:${largo}%;--i:${i}`}></span>)}
-      </div>
-      <h2 class="titulo"><span>¿Tenés algo en mente?</span> Hablemos.</h2>
-      <p class="bajada psx-cierre-extra">Un sistema, una app, un sitio, o una idea que todavía no tiene forma.</p>
-      <div class="cierre-acciones">
-        <a class="boton" href="#contacto">Hablemos</a>
-        <a class="enlace psx-cierre-extra" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
@@ -406,101 +375,15 @@ const { cx, cy, r } = ramas.copa;
     margin-top: clamp(1.5rem, 3.5svh, 2rem);
   }
 
-  /* El sauce: la copa del isotipo y, colgando de cada rama, una línea de la casa. `--w` es el ancho de
-     la copa y `--paso` cuánto más baja cada línea que la de su derecha. */
-  .sauce {
-    --w: 9.5rem;
-    --paso: 2.125rem;
-    position: relative;
-    inline-size: var(--w);
-    block-size: calc(var(--w) + 6 * var(--paso) + 1.25rem);
-  }
-  .copa {
-    position: absolute;
-    inset: 0 auto auto 0;
-    inline-size: var(--w);
-    block-size: var(--w);
-    color: var(--texto);
-    overflow: visible;
-  }
-  /* Cada brote arranca donde termina su rama y baja hasta su nombre. */
-  .brote {
-    position: absolute;
-    inset-inline-start: calc(var(--w) * var(--x) / 24);
-    inset-block-start: calc(var(--w) * var(--fin) / 24);
-    block-size: calc(var(--w) * (24 - var(--fin)) / 24 + (6 - var(--k)) * var(--paso) - 0.75rem);
-    transform-origin: 0 0;
-  }
-  .brote-linea {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: -0.09375rem;
-    inline-size: 0.1875rem;
-    background: var(--c);
-  }
-  .brote--obra .brote-linea {
-    background: repeating-linear-gradient(to bottom, var(--c) 0 0.375rem, transparent 0.375rem 0.75rem);
-  }
-  .brote-fin {
-    position: absolute;
-    inset-block-start: 100%;
-    inset-inline-start: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-block-size: 2.75rem;
-    margin-block: -1.375rem;
-    margin-inline-start: -0.5rem;
-    white-space: nowrap;
-  }
-  .brote-punto {
-    flex: none;
-    inline-size: 1rem;
-    block-size: 1rem;
-    border-radius: 50%;
-    background: var(--fondo);
-    border: 0.1875rem solid var(--c);
-    transition: scale 0.3s var(--curva);
-  }
-  .brote-nombre {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4375rem;
-    font-size: 0.75rem;
-    color: var(--texto-secundario);
-  }
-  .brote-nombre strong {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--texto);
-  }
-  @media (hover: hover) {
-    .brote-fin:hover .brote-punto {
-      scale: 1.3;
-      background: var(--c);
-    }
-  }
-  /* En un teléfono angosto quedan los nombres solos: la aclaración no entra al lado. */
-  @media (max-width: 24rem) {
-    .brote-nombre span {
-      display: none;
-    }
-  }
-  /* Tableta, computadora y televisor: el texto a un lado y el sauce al otro. */
-  @media (min-width: 48rem) and (min-height: 30rem) {
+  /* Tableta ancha, computadora y televisor: el texto a un lado y la órbita al otro. */
+  @media (min-width: 56rem) and (min-height: 30rem) {
     .abre-caja {
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       column-gap: clamp(2rem, 6vw, 5rem);
     }
-    .sauce {
-      --w: clamp(11rem, 19vw, 15.5rem);
-      --paso: clamp(2.125rem, 4.2svh, 2.75rem);
-      /* Lugar para los nombres, que salen hacia la derecha. */
-      margin-inline-end: clamp(7.5rem, 11vw, 10rem);
-    }
   }
-  /* Teléfono acostado: poco alto. Queda la copa sola, chica, al costado. */
+  /* Teléfono acostado: poco alto. Texto y órbita lado a lado, y la pantalla no pide alto. */
   @media (max-height: 30rem) and (min-width: 34rem) {
     .abre {
       min-block-size: auto;
@@ -511,36 +394,10 @@ const { cx, cy, r } = ramas.copa;
       align-items: center;
       column-gap: 2rem;
     }
-    .sauce {
-      --w: min(38svh, 8rem);
-      block-size: var(--w);
-    }
-    .brotes {
-      display: none;
-    }
   }
-
-  /* El momento de la página: las ramas del sauce bajan, cada una a su tiempo, y de cada una sigue
-     bajando su línea hasta su nombre. Después todo queda meciéndose apenas, como al viento.
-     La entrada usa `transform` y el vaivén `translate` o `rotate`: no se pisan. */
   @media (prefers-reduced-motion: no-preference) {
-    .copa .rama {
-      animation:
-        rama-baja var(--duracion) var(--curva-ramas) var(--retraso) both,
-        rama-mece 5.5s ease-in-out calc(1.8s + var(--i) * 0.37s) infinite alternate;
-    }
     .abre-texto {
       animation: asoma 0.8s var(--curva) 0.2s both;
-    }
-    .brote {
-      --retraso: calc(1.05s + var(--k) * 0.13s);
-      animation: brote-mece 6.5s ease-in-out calc(3s + var(--k) * 0.6s) infinite alternate;
-    }
-    .brote-linea {
-      animation: brote-baja 1.1s var(--curva) var(--retraso) both;
-    }
-    .brote-fin {
-      animation: brote-llega 0.6s var(--curva) calc(var(--retraso) + 0.75s) both;
     }
     /* Al seguir bajando, la primera pantalla se retira: se apaga y queda un poco atrás. */
     @supports (animation-timeline: view()) {
@@ -549,41 +406,6 @@ const { cx, cy, r } = ramas.copa;
         animation-timeline: view();
         animation-range: exit 10% exit 90%;
       }
-    }
-  }
-  @keyframes rama-baja {
-    from {
-      transform: translateY(var(--desde));
-    }
-  }
-  @keyframes rama-mece {
-    from {
-      translate: 0 -0.22px;
-    }
-    to {
-      translate: 0 0.3px;
-    }
-  }
-  @keyframes brote-baja {
-    from {
-      clip-path: inset(0 0 100% 0);
-    }
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-  @keyframes brote-llega {
-    from {
-      opacity: 0;
-      translate: 0 -0.5rem;
-    }
-  }
-  @keyframes brote-mece {
-    from {
-      rotate: -0.45deg;
-    }
-    to {
-      rotate: 0.55deg;
     }
   }
   @keyframes asoma {
@@ -992,7 +814,11 @@ const { cx, cy, r } = ramas.copa;
   }
   .hechos {
     margin-top: 1.5rem;
-    max-inline-size: 30rem;
+  }
+  @media (min-width: 56rem) {
+    .hechos {
+      max-inline-size: 30rem;
+    }
   }
   .hechos li {
     padding-block: 0.75rem;
@@ -1209,7 +1035,7 @@ const { cx, cy, r } = ramas.copa;
     display: grid;
     gap: clamp(3rem, 6vw, 5rem);
   }
-  @media (min-width: 56rem) {
+  @media (min-width: 40rem) {
     .mas {
       grid-template-columns: 1fr 1fr;
     }
@@ -1263,25 +1089,36 @@ const { cx, cy, r } = ramas.copa;
     margin-top: 1.25rem;
   }
 
-  /* ── El cierre (se acomoda solo: publico-salix.css) ── */
+  /* ── El cierre (se acomoda solo: publico-salix.css) ──
+     Va alineado como el resto de la página y usa todo el ancho: el texto a la izquierda y, donde hay
+     lugar, las ramas a la derecha. Centrado y angosto quedaba un bloque chico en el medio de la
+     pantalla (Sal, 2026-11-20). */
   .cierre {
-    align-items: center;
-    padding: 0 var(--margen) clamp(3rem, 8vw, 5rem);
+    padding-block: clamp(2.5rem, 7vw, 4.5rem);
     border-top: 1px solid var(--borde-sutil);
-    text-align: center;
   }
   .cierre-caja {
     display: grid;
-    justify-items: center;
-    gap: 1.5rem;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (min-width: 48rem) {
+    .cierre-caja {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
   }
   /* Las ramas: cuelgan del borde de arriba, como la copa del isotipo y las líneas del plano. */
+  /* Solo donde van al costado del texto: debajo, sueltas, no dicen nada. */
   .cierre-ramas {
-    display: flex;
+    display: none;
     justify-content: center;
     gap: 0.875rem;
-    block-size: clamp(5rem, 14svh, 8rem);
-    margin-bottom: 0.5rem;
+    block-size: clamp(7rem, 20svh, 11rem);
+  }
+  @media (min-width: 48rem) {
+    .cierre-ramas {
+      display: flex;
+    }
   }
   .cierre-ramas span {
     inline-size: 0.1875rem;
@@ -1304,18 +1141,18 @@ const { cx, cy, r } = ramas.copa;
     }
   }
   .cierre .titulo {
-    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
-    max-inline-size: 16ch;
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
   }
   .cierre .bajada {
-    max-inline-size: 36ch;
+    margin-top: 1.125rem;
+    max-inline-size: 40ch;
   }
   .cierre-acciones {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
     gap: 0.5rem 1.5rem;
+    margin-top: 1.5rem;
   }
 
   @media (prefers-reduced-motion: reduce) {
