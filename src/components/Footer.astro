@@ -16,6 +16,8 @@ interface Props {
   columnas?: Columna[];
   /** A dónde lleva el logo. */
   inicio?: string;
+  /** Sin la frase del nombre bajo el logo: la web nueva la explica en el cierre, justo arriba. */
+  sinLema?: boolean;
 }
 const COLUMNAS_DE_ANTES: Columna[] = [
   {
@@ -43,7 +45,7 @@ const COLUMNAS_DE_ANTES: Columna[] = [
     ],
   },
 ];
-const { columnas: COLUMNAS = COLUMNAS_DE_ANTES, inicio = '/' } = Astro.props;
+const { columnas: COLUMNAS = COLUMNAS_DE_ANTES, inicio = '/', sinLema = false } = Astro.props;
 ---
 
 <footer class="psx-pie">
@@ -66,7 +68,7 @@ const { columnas: COLUMNAS = COLUMNAS_DE_ANTES, inicio = '/' } = Astro.props;
             </span>
           </a>
         </div>
-        <LemaSalix clase="psx-pie-lema" sinSigla />
+        {!sinLema && <LemaSalix clase="psx-pie-lema" sinSigla />}
       </div>
       <nav class="psx-pie-columnas" aria-label="Enlaces del pie">
         {COLUMNAS.map((c) => (

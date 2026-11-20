@@ -6,7 +6,7 @@
 // El movimiento vive en src/scripts/casa.ts.
 import Casa from '../../layouts/Casa.astro';
 import Captura from '../../components/Captura.astro';
-import FormularioContacto from '../../components/FormularioContacto.astro';
+import FormularioCasa from '../../components/FormularioCasa.astro';
 import LogoFlux from '../../components/LogoFlux.astro';
 import LogoMenu from '../../components/LogoMenu.astro';
 import ramas from '../../ramas-salix.json';
@@ -121,13 +121,10 @@ const { cx, cy, r } = ramas.copa;
         </g>
       </svg>
       <div class="abre-texto">
-        <h1 class="abre-titulo">Salix. <span>Software que simplifica tu negocio.</span></h1>
+        <h1 class="abre-titulo">Salix. <span>Software que simplifica.</span></h1>
         <p class="bajada">
-          Somos una casa de software de Buenos Aires. Hacemos sistemas de gestión, apps y sitios web
-          para negocios de verdad, y los dejamos andando.
-        </p>
-        <p class="lema" aria-label="Salix: Software And Logic for eXcellence">
-          <span aria-hidden="true"><b>S</b>oftware <b>A</b>nd <b>L</b>og<b>i</b>c for e<b>X</b>cellence</span>
+          Somos una casa de software de Buenos Aires. Hacemos sistemas de gestión, apps y sitios web,
+          y los dejamos andando.
         </p>
       </div>
     </div>
@@ -291,23 +288,33 @@ const { cx, cy, r } = ramas.copa;
         <p class="bajada">Elegí qué te interesa, dejanos cómo ubicarte y te respondemos nosotros, por correo o por WhatsApp.</p>
         <a class="enlace" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
       </div>
-      <div data-asoma style="--i:1">
-        <FormularioContacto sinEncabezado id="formulario" />
-      </div>
+      <!-- Sin aparición al entrar: una caja con desplazamiento no deja que el formulario ocupe la
+           pantalla entera en el teléfono (lo fijo se mediría contra ella). -->
+      <FormularioCasa />
     </div>
   </section>
 
-  <!-- El cierre: el último bloque, el que se acomoda entre la barra y el pie cuando la cortina lo destapa. -->
+  <!-- El cierre: el último bloque, el que se acomoda entre la barra y el pie cuando la cortina lo
+       destapa. Es donde el nombre se explica: las letras de Salix se encienden dentro de su frase. -->
   <section class="cierre psx-cierre">
     <div class="cierre-caja psx-cierre-caja">
-      <svg class="copa-chica psx-cierre-extra" viewBox="0 0 24 24" aria-hidden="true">
-        <g clip-path="url(#copa-recorte)" fill="currentColor">
-          {ramas.ramas.map((rama) => <path d={rama.d} />)}
-        </g>
-      </svg>
-      <h2 class="titulo"><span>Salix.</span> Software que simplifica tu negocio.</h2>
-      <p class="lema psx-cierre-extra" aria-hidden="true"><b>S</b>oftware <b>A</b>nd <b>L</b>og<b>i</b>c for e<b>X</b>cellence</p>
-      <a class="boton" href="#contacto">Hablemos</a>
+      <div class="cierre-ramas psx-cierre-extra" aria-hidden="true" data-asoma>
+        {[30, 54, 72, 86, 92, 86, 72, 54, 30].map((largo, i) => <span style={`--largo:${largo}%;--i:${i}`}></span>)}
+      </div>
+      <h2 class="sigla" aria-label="Salix: Software And Logic for eXcellence" data-asoma>
+        <span aria-hidden="true">
+          <span class="sigla-palabra"><b style="--n:0">S</b><i>oftware</i></span>
+          <span class="sigla-palabra"><b style="--n:1">A</b><i>nd</i></span>
+          <span class="sigla-palabra"><b style="--n:2">L</b><i>og</i><b style="--n:3">i</b><i>c</i></span>
+          <span class="sigla-palabra"><i>for</i></span>
+          <span class="sigla-palabra"><i>e</i><b style="--n:4">X</b><i>cellence</i></span>
+        </span>
+      </h2>
+      <p class="bajada psx-cierre-extra">Software y lógica para hacer las cosas bien. De ahí viene el nombre, y es lo que hacemos.</p>
+      <div class="cierre-acciones">
+        <a class="boton" href="#contacto">Hablemos</a>
+        <a class="enlace psx-cierre-extra" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
+      </div>
     </div>
   </section>
 </Casa>
@@ -361,16 +368,6 @@ const { cx, cy, r } = ramas.copa;
   }
   .abre .bajada {
     margin-top: clamp(1.125rem, 3svh, 1.5rem);
-  }
-  .lema {
-    margin-top: 1.5rem;
-    font-size: 0.8125rem;
-    letter-spacing: 0.02em;
-    color: var(--texto-secundario);
-  }
-  .lema b {
-    font-weight: 700;
-    color: var(--salix);
   }
   .abre-baja {
     position: absolute;
@@ -1136,27 +1133,102 @@ const { cx, cy, r } = ramas.copa;
   /* ── El cierre (se acomoda solo: publico-salix.css) ── */
   .cierre {
     align-items: center;
-    padding: clamp(3rem, 8vw, 5rem) var(--margen);
+    padding: 0 var(--margen) clamp(3rem, 8vw, 5rem);
     border-top: 1px solid var(--borde-sutil);
     text-align: center;
   }
   .cierre-caja {
     display: grid;
     justify-items: center;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
-  .copa-chica {
-    inline-size: 2.75rem;
-    color: var(--salix);
+  /* Las ramas: cuelgan del borde de arriba, como la copa del isotipo y las líneas del plano. */
+  .cierre-ramas {
+    display: flex;
+    justify-content: center;
+    gap: 0.875rem;
+    block-size: clamp(5rem, 14svh, 8rem);
+    margin-bottom: 0.5rem;
   }
-  .cierre .titulo {
-    max-inline-size: 16ch;
+  .cierre-ramas span {
+    inline-size: 0.1875rem;
+    block-size: var(--largo);
+    border-radius: 0 0 999px 999px;
+    background: var(--texto);
+    transform-origin: top;
   }
-  .cierre .lema {
-    margin-top: 0;
+  .cierre-ramas[data-asoma] {
+    opacity: 1;
+    translate: none;
   }
-  .cierre .boton {
-    margin-top: 0.5rem;
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.con-js) .cierre-ramas span {
+      transform: scaleY(0);
+      transition: transform 1s var(--curva) calc(var(--i) * 55ms);
+    }
+    :global(.con-js) .cierre-ramas.visto span {
+      transform: scaleY(1);
+    }
+  }
+  /* La sigla: las cinco letras del nombre van en tinta y el resto de la frase, liviano y apagado.
+     Los mismos dos tonos de todos los títulos de la página, sin un tercer color. */
+  .sigla {
+    font-size: clamp(1.75rem, 1.1rem + 2.7vw, 3.25rem);
+    font-weight: 300;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    max-inline-size: 14em;
+    text-wrap: balance;
+  }
+  .sigla-palabra {
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .sigla b {
+    font-weight: 650;
+    color: var(--texto);
+  }
+  .sigla i {
+    font-style: normal;
+    color: var(--texto-terciario);
+  }
+  .sigla[data-asoma] {
+    opacity: 1;
+    translate: none;
+  }
+  /* Al entrar en pantalla se encienden primero las cinco letras, una por una, y después aparece el
+     resto de la frase alrededor. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.con-js) .sigla b,
+    :global(.con-js) .sigla i {
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    :global(.con-js) .sigla b {
+      translate: 0 0.35em;
+      transition:
+        opacity 0.5s ease calc(0.15s + var(--n) * 0.11s),
+        translate 0.7s var(--curva) calc(0.15s + var(--n) * 0.11s);
+    }
+    :global(.con-js) .sigla.visto b {
+      opacity: 1;
+      translate: 0 0;
+    }
+    :global(.con-js) .sigla.visto i {
+      opacity: 1;
+      transition-delay: 0.95s;
+      transition-duration: 0.9s;
+    }
+  }
+  .cierre .bajada {
+    max-inline-size: 36ch;
+  }
+  .cierre-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 1.5rem;
   }
 
   @media (prefers-reduced-motion: reduce) {

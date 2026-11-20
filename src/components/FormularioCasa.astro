@@ -1,0 +1,796 @@
+---
+// ============================================================
+// FormularioCasa.astro — el formulario de contacto de la web nueva, por pasos.
+//
+//   1 · Qué te interesa      2 · Cómo te ubicamos      3 · El mensaje      · Listo
+//
+// El indicador es una línea con paradas, como el plano de la casa. En el teléfono, al tocarlo se
+// abre a pantalla completa (sin scroll de la página) y vuelve a su lugar con el botón, tirando hacia
+// abajo o yendo atrás. El comportamiento vive en src/scripts/formulario-casa.ts.
+//
+// Envía a /contacto.php (public/contacto.php), el mismo de siempre: producto, nombre, email,
+// whatsapp, preferencia, mensaje, pagina, demora y la trampa `sitio_web`. Si el envío falla, lo dice
+// y muestra el correo: nunca da por enviado algo que no salió.
+//
+// Nuvix no se ofrece acá: su web no junta correos de interesados (regla de Nuvix, productos.ts).
+// ============================================================
+import ramas from '../ramas-salix.json';
+import { ENTRADAS, CORREO } from '../propuestas/datos';
+import { PRODUCTOS } from '../productos';
+
+interface Props {
+  /** El producto ya elegido, si la página lo sabe (una página de producto). */
+  preseleccionado?: string;
+}
+const { preseleccionado } = Astro.props;
+
+// La ayuda del mensaje para cada opción sale de la lista de productos de siempre (productos.ts).
+const pista = (id: string) => PRODUCTOS.find((p) => p.id.toLowerCase() === id)?.pista ?? '';
+const valor = (id: string) => PRODUCTOS.find((p) => p.id.toLowerCase() === id)?.id ?? id;
+const de = (id: string) => ENTRADAS.find((e) => e.id === id)!;
+
+const OPCIONES = ['flux', 'menu', 'sites', 'integraciones'].map((id) => ({
+  id,
+  valor: valor(id),
+  nombre: id === 'sites' ? 'Un sitio web' : de(id).nombre,
+  que: id === 'sites' ? 'A medida, hecho por nosotros' : de(id).que,
+  pista: pista(id),
+}));
+const VIENEN = ENTRADAS.filter((e) => e.viene).map((e) => ({ id: e.id, valor: valor(e.id), nombre: e.nombre, que: e.que, pista: pista(e.id) }));
+const OTRA = { valor: 'Otra consulta', nombre: 'Otra cosa', que: 'Una idea, un software a medida, una duda', pista: 'Contanos qué tenés en mente, con tus palabras.' };
+const PARADAS = ['Qué', 'Quién', 'Mensaje'];
+const { cx, cy, r } = ramas.copa;
+---
+
+<div class="fc-lugar">
+  <div class="fc" data-fc data-pre={preseleccionado ?? ''} aria-label="Formulario de contacto">
+    <div class="fc-tope">
+      <span class="fc-asa" aria-hidden="true"></span>
+      <ol class="fc-paradas" aria-label="Pasos">
+        {PARADAS.map((p, i) => (
+          <li class:list={['fc-parada', { 'fc-parada--actual': i === 0 }]} aria-current={i === 0 ? 'step' : undefined}>
+            <span class="fc-parada-punto" aria-hidden="true"></span>
+            <span class="fc-parada-nombre"><span class="fc-parada-num">{i + 1}</span> {p}</span>
+          </li>
+        ))}
+      </ol>
+      <button type="button" class="fc-cerrar" data-fc-cerrar aria-label="Volver a la página">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </button>
+    </div>
+
+    <form class="fc-form" novalidate>
+      <div class="fc-cuerpo">
+        <!-- Paso 1: qué te interesa -->
+        <fieldset class="fc-paso" data-paso="1">
+          <legend class="fc-pregunta">¿Qué te interesa?</legend>
+          <div class="fc-opciones">
+            {OPCIONES.map((o) => (
+              <label class="fc-opcion" style={`--c:var(--linea-${o.id})`}>
+                <input type="radio" name="producto" value={o.valor} data-nombre={o.nombre} data-pista={o.pista} />
+                <span class="fc-opcion-punto" aria-hidden="true"></span>
+                <span class="fc-opcion-texto"><strong>{o.nombre}</strong> <span>{o.que}</span></span>
+                <span class="fc-opcion-marca" aria-hidden="true"></span>
+              </label>
+            ))}
+            <label class="fc-opcion" style="--c:var(--texto-terciario)">
+              <input type="radio" name="producto" value={OTRA.valor} data-nombre={OTRA.nombre} data-pista={OTRA.pista} />
+              <span class="fc-opcion-punto" aria-hidden="true"></span>
+              <span class="fc-opcion-texto"><strong>{OTRA.nombre}</strong> <span>{OTRA.que}</span></span>
+              <span class="fc-opcion-marca" aria-hidden="true"></span>
+            </label>
+          </div>
+          <p class="fc-grupo" id="fc-viene">Lo que viene: avisame cuando salga</p>
+          <div class="fc-chips" role="group" aria-labelledby="fc-viene">
+            {VIENEN.map((o) => (
+              <label class="fc-chip">
+                <input type="radio" name="producto" value={o.valor} data-nombre={o.nombre} data-pista={o.pista} />
+                <span><strong>{o.nombre}</strong> {o.que}</span>
+              </label>
+            ))}
+          </div>
+          <p class="fc-aviso" data-aviso="producto" role="alert"></p>
+        </fieldset>
+
+        <!-- Paso 2: cómo te ubicamos -->
+        <fieldset class="fc-paso" data-paso="2" hidden>
+          <legend class="fc-pregunta">¿Cómo te ubicamos?</legend>
+          <div class="fc-campo">
+            <label for="fc-nombre">Nombre</label>
+            <input type="text" id="fc-nombre" name="nombre" placeholder="El tuyo o el de tu empresa" autocomplete="name" maxlength="120" aria-describedby="fc-aviso-nombre" />
+            <p class="fc-aviso" id="fc-aviso-nombre" data-aviso="nombre" role="alert"></p>
+          </div>
+          <div class="fc-campo">
+            <label for="fc-email">Correo</label>
+            <input type="email" id="fc-email" name="email" placeholder="tu@correo.com" autocomplete="email" inputmode="email" maxlength="200" spellcheck="false" aria-describedby="fc-aviso-email" />
+            <p class="fc-aviso" id="fc-aviso-email" data-aviso="email" role="alert"></p>
+          </div>
+          <div class="fc-campo">
+            <label for="fc-whatsapp">WhatsApp <span class="fc-opcional">opcional</span></label>
+            <input type="tel" id="fc-whatsapp" name="whatsapp" placeholder="+54 9 11 1234-5678" autocomplete="tel" inputmode="tel" maxlength="40" aria-describedby="fc-aviso-whatsapp" />
+            <p class="fc-aviso" id="fc-aviso-whatsapp" data-aviso="whatsapp" role="alert"></p>
+          </div>
+          <div class="fc-campo" role="radiogroup" aria-labelledby="fc-pref">
+            <span class="fc-rotulo" id="fc-pref">¿Por dónde te respondemos?</span>
+            <div class="fc-tramos">
+              <label><input type="radio" name="preferencia" value="email" checked /><span>Correo</span></label>
+              <label><input type="radio" name="preferencia" value="whatsapp" /><span>WhatsApp</span></label>
+              <label><input type="radio" name="preferencia" value="cualquiera" /><span>Cualquiera</span></label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Paso 3: el mensaje -->
+        <fieldset class="fc-paso" data-paso="3" hidden>
+          <legend class="fc-pregunta">Contanos un poco más</legend>
+          <div class="fc-campo">
+            <label for="fc-mensaje">Mensaje <span class="fc-opcional">opcional</span></label>
+            <textarea id="fc-mensaje" name="mensaje" rows="5" maxlength="5000" aria-describedby="fc-pista"></textarea>
+            <p class="fc-pista" id="fc-pista"></p>
+          </div>
+          <!-- Trampa para robots: una persona no la ve ni la completa. -->
+          <div class="fc-trampa" aria-hidden="true">
+            <label>Sitio web <input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label>
+          </div>
+        </fieldset>
+
+        <!-- Listo: solo después de que el servidor confirmó. -->
+        <div class="fc-paso fc-listo" data-paso="4" hidden>
+          <svg class="fc-listo-copa" viewBox="0 0 24 24" aria-hidden="true" style={`--curva-ramas:${ramas.curva}`}>
+            <defs><clipPath id="fc-copa"><circle cx={cx} cy={cy} r={r} /></clipPath></defs>
+            <g clip-path="url(#fc-copa)" fill="currentColor">
+              {ramas.ramas.map((rama) => (
+                <path d={rama.d} style={`--desde:${rama.desde}px;--retraso:${rama.retraso}s;--duracion:${rama.duracion}s`} />
+              ))}
+            </g>
+          </svg>
+          <h3 class="fc-listo-titulo" tabindex="-1">Listo. Ya nos llegó.</h3>
+          <p class="fc-listo-sub"></p>
+          <dl class="fc-resumen">
+            <div><dt>Sobre</dt><dd data-res="producto"></dd></div>
+            <div><dt>De</dt><dd data-res="nombre"></dd></div>
+            <div><dt>Te escribimos a</dt><dd data-res="contacto"></dd></div>
+          </dl>
+          <button type="button" class="fc-otra" data-fc-otra>Enviar otra consulta</button>
+        </div>
+      </div>
+
+      <p class="fc-error" role="alert" hidden>
+        <span data-fc-error></span> Si sigue fallando, escribinos a <a href={`mailto:${CORREO}`}>{CORREO}</a>.
+      </p>
+
+      <div class="fc-pie">
+        <button type="button" class="fc-atras" data-fc-atras disabled>Atrás</button>
+        <span class="fc-cuenta" aria-hidden="true"><span data-fc-n>1</span> de 3</span>
+        <button type="submit" class="boton fc-sigue">
+          <span data-fc-sigue>Seguir</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  import { montarFormularioCasa } from '../scripts/formulario-casa';
+  document.addEventListener('DOMContentLoaded', montarFormularioCasa);
+</script>
+
+<style>
+  .fc-lugar {
+    min-inline-size: 0;
+  }
+  .fc {
+    --fc-margen: clamp(1.125rem, 3.5vw, 1.75rem);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border-radius: 0.875rem;
+    background: var(--fondo-alt);
+    box-shadow: inset 0 0 0 1px var(--borde);
+    overflow: hidden;
+  }
+
+  /* ── Arriba: las paradas. Una línea con tres puntos, como el plano de la casa. ── */
+  .fc-tope {
+    position: relative;
+    padding: var(--fc-margen) var(--fc-margen) 0;
+  }
+  .fc-paradas {
+    --avance: 0;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .fc-paradas::before,
+  .fc-paradas::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.375rem;
+    inset-inline: 0.4375rem;
+    block-size: 0.1875rem;
+    border-radius: 999px;
+    background: var(--borde);
+  }
+  /* Lo recorrido: crece de parada en parada (formulario-casa.ts escribe `--avance`, de 0 a 1). */
+  .fc-paradas::after {
+    background: var(--salix);
+    transform: scaleX(var(--avance));
+    transform-origin: 0 50%;
+    transition: transform 0.6s var(--curva);
+  }
+  .fc-parada {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--texto-terciario);
+    transition: color 0.3s;
+  }
+  .fc-parada:nth-child(2) {
+    justify-items: center;
+  }
+  .fc-parada:nth-child(3) {
+    justify-items: end;
+  }
+  .fc-parada-punto {
+    inline-size: 0.9375rem;
+    block-size: 0.9375rem;
+    border-radius: 50%;
+    background: var(--fondo-alt);
+    border: 0.1875rem solid var(--borde);
+    transition:
+      border-color 0.3s 0.25s,
+      background-color 0.3s 0.25s,
+      scale 0.4s var(--curva) 0.25s;
+  }
+  .fc-parada-num {
+    opacity: 0.6;
+  }
+  .fc-parada--hecha {
+    color: var(--texto-secundario);
+  }
+  .fc-parada--hecha .fc-parada-punto {
+    border-color: var(--salix);
+    background: var(--salix);
+  }
+  .fc-parada--actual {
+    color: var(--texto);
+  }
+  .fc-parada--actual .fc-parada-punto {
+    border-color: var(--salix);
+    scale: 1.2;
+  }
+  .fc-asa,
+  .fc-cerrar {
+    display: none;
+  }
+
+  /* ── Los pasos ── */
+  .fc-form {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    min-block-size: 0;
+  }
+  .fc-cuerpo {
+    min-block-size: 23.5rem;
+    padding: clamp(1.25rem, 3vw, 1.75rem) var(--fc-margen) 0.5rem;
+  }
+  .fc-paso {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+  }
+  .fc-paso[hidden] {
+    display: none;
+  }
+  .fc-pregunta {
+    padding: 0;
+    margin-bottom: 0.875rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fc-paso:not([hidden]) {
+      animation: fc-entra 0.45s var(--curva) both;
+    }
+    .fc[data-dir='atras'] .fc-paso:not([hidden]) {
+      animation-name: fc-entra-atras;
+    }
+  }
+  @keyframes fc-entra {
+    from {
+      opacity: 0;
+      translate: 1rem 0;
+    }
+  }
+  @keyframes fc-entra-atras {
+    from {
+      opacity: 0;
+      translate: -1rem 0;
+    }
+  }
+
+  /* Paso 1: las opciones, en renglones. Cada una con el punto de su línea. */
+  .fc-opcion {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    min-block-size: 3.25rem;
+    padding: 0.5rem 0.75rem;
+    margin-inline: -0.75rem;
+    border-radius: 0.625rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fc-opcion + .fc-opcion::before {
+    content: '';
+    position: absolute;
+    inset: 0 0.75rem auto;
+    block-size: 1px;
+    background: var(--borde);
+  }
+  .fc-opcion input,
+  .fc-chip input,
+  .fc-tramos input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fc-opcion-punto {
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    border-radius: 50%;
+    border: 0.1875rem solid var(--c);
+    transition: background-color 0.25s;
+  }
+  .fc-opcion-texto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.5rem;
+    min-inline-size: 0;
+    font-size: 0.875rem;
+    color: var(--texto-secundario);
+  }
+  .fc-opcion-texto strong {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--texto);
+  }
+  .fc-opcion-marca {
+    position: relative;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px var(--borde);
+    transition:
+      background-color 0.25s,
+      box-shadow 0.25s;
+  }
+  .fc-opcion-marca::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--fondo-alt);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5l3 3 6-6.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5l3 3 6-6.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    scale: 0;
+    transition: scale 0.3s var(--curva);
+  }
+  .fc-opcion:has(input:checked) {
+    background: var(--superficie);
+  }
+  .fc-opcion:has(input:checked) .fc-opcion-punto {
+    background: var(--c);
+  }
+  .fc-opcion:has(input:checked) .fc-opcion-marca {
+    background: var(--texto);
+    box-shadow: none;
+  }
+  .fc-opcion:has(input:checked) .fc-opcion-marca::after {
+    scale: 1;
+  }
+  .fc-opcion:has(input:checked)::before,
+  .fc-opcion:has(input:checked) + .fc-opcion::before {
+    opacity: 0;
+  }
+  .fc-opcion:has(input:focus-visible),
+  .fc-chip:has(input:focus-visible) span,
+  .fc-tramos label:has(input:focus-visible) span {
+    outline: 2px solid var(--salix);
+    outline-offset: 2px;
+  }
+  @media (hover: hover) {
+    .fc-opcion:hover {
+      background: var(--superficie);
+    }
+  }
+  .fc-grupo {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--texto-terciario);
+  }
+  .fc-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+  }
+  .fc-chip {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fc-chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-block-size: 2.25rem;
+    padding: 0 0.75rem;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--borde);
+    font-size: 0.75rem;
+    color: var(--texto-secundario);
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .fc-chip strong {
+    font-weight: 600;
+    color: var(--texto);
+  }
+  .fc-chip input:checked + span {
+    background: var(--texto);
+    color: var(--fondo-alt);
+    box-shadow: none;
+  }
+  .fc-chip input:checked + span strong {
+    color: inherit;
+  }
+
+  /* Paso 2 y 3: los campos, con una sola línea abajo. 16 px de letra: con menos, el iPhone acerca
+     la página al tocar el campo. */
+  .fc-campo {
+    display: grid;
+    gap: 0.25rem;
+    margin-bottom: 0.875rem;
+  }
+  .fc-campo label,
+  .fc-rotulo {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--texto-secundario);
+  }
+  .fc-opcional {
+    font-weight: 400;
+    color: var(--texto-terciario);
+  }
+  .fc-campo input,
+  .fc-campo textarea {
+    inline-size: 100%;
+    padding: 0.5rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--borde);
+    border-radius: 0;
+    background: none;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--texto);
+    outline: none;
+    transition: border-color 0.25s;
+  }
+  .fc-campo textarea {
+    display: block;
+    min-block-size: 7.5rem;
+    padding: 0.75rem;
+    border: 1px solid var(--borde);
+    border-radius: 0.625rem;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  .fc-campo input::placeholder {
+    color: var(--texto-terciario);
+  }
+  .fc-campo input:focus,
+  .fc-campo textarea:focus {
+    border-color: var(--texto);
+  }
+  .fc-campo [aria-invalid='true'] {
+    border-color: var(--peligro);
+  }
+  .fc-aviso {
+    min-block-size: 0;
+    font-size: 0.75rem;
+    color: var(--peligro);
+  }
+  .fc-aviso:empty {
+    display: none;
+  }
+  .fc-pista {
+    font-size: 0.8125rem;
+    color: var(--texto-secundario);
+    text-wrap: pretty;
+  }
+  .fc-pista:empty {
+    display: none;
+  }
+  .fc-tramos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.1875rem;
+    margin-top: 0.25rem;
+    padding: 0.1875rem;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--borde);
+  }
+  .fc-tramos label {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fc-tramos span {
+    display: grid;
+    place-items: center;
+    min-block-size: 2.25rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--texto-secundario);
+    transition:
+      background-color 0.25s,
+      color 0.25s;
+  }
+  .fc-tramos input:checked + span {
+    background: var(--texto);
+    color: var(--fondo-alt);
+  }
+  .fc-trampa {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  /* Listo */
+  .fc-listo {
+    display: grid;
+    justify-items: start;
+    gap: 0.75rem;
+  }
+  .fc-listo[hidden] {
+    display: none;
+  }
+  .fc-listo-copa {
+    inline-size: 3.25rem;
+    color: var(--salix);
+    overflow: visible;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fc-listo:not([hidden]) .fc-listo-copa path {
+      animation: fc-rama var(--duracion) var(--curva-ramas) var(--retraso) both;
+    }
+  }
+  @keyframes fc-rama {
+    from {
+      transform: translateY(var(--desde));
+    }
+  }
+  .fc-listo-titulo {
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    outline: none;
+  }
+  .fc-listo-sub {
+    font-size: 0.9375rem;
+    color: var(--texto-secundario);
+    text-wrap: pretty;
+  }
+  .fc-resumen {
+    inline-size: 100%;
+    margin: 0.5rem 0 0;
+  }
+  .fc-resumen div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.625rem;
+    border-top: 1px solid var(--borde);
+    font-size: 0.875rem;
+  }
+  .fc-resumen dt {
+    color: var(--texto-secundario);
+  }
+  .fc-resumen dd {
+    margin: 0;
+    font-weight: 500;
+    text-align: end;
+    overflow-wrap: anywhere;
+  }
+  .fc-otra {
+    min-block-size: 2.75rem;
+    font-size: 0.875rem;
+    font-weight: 550;
+    text-decoration: underline;
+    text-decoration-color: var(--salix);
+    text-underline-offset: 0.3em;
+  }
+
+  .fc-error {
+    margin: 0 var(--fc-margen) 0.5rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.625rem;
+    background: var(--peligro-suave);
+    font-size: 0.8125rem;
+    color: var(--texto);
+  }
+  .fc-error a {
+    text-decoration: underline;
+  }
+
+  /* ── Abajo: atrás, la cuenta y seguir ── */
+  .fc-pie {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem var(--fc-margen) var(--fc-margen);
+    border-top: 1px solid var(--borde);
+  }
+  .fc-atras {
+    justify-self: start;
+    min-block-size: 2.75rem;
+    padding-inline: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--texto-secundario);
+    transition: opacity 0.25s;
+  }
+  .fc-atras:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fc-cuenta {
+    font-size: 0.75rem;
+    color: var(--texto-terciario);
+    font-variant-numeric: tabular-nums;
+  }
+  .fc-sigue {
+    justify-self: end;
+  }
+  .fc-sigue svg {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: translate 0.3s var(--curva);
+  }
+  .fc-sigue[aria-busy='true'] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  @media (hover: hover) {
+    .fc-sigue:hover svg {
+      translate: 0.1875rem 0;
+    }
+    .fc-atras:hover {
+      color: var(--texto);
+    }
+  }
+  .fc[data-paso='4'] .fc-pie {
+    display: none;
+  }
+
+  /* ── En el teléfono: a pantalla completa ──
+     Al tocarlo, el formulario deja su lugar en la página y ocupa toda la pantalla, como si se
+     entrara a otro lugar; la página de atrás no se mueve. Vuelve a su lugar con el botón de arriba,
+     tirando hacia abajo o yendo atrás. `--fc-alto` y `--fc-arriba` los escribe formulario-casa.ts
+     con lo que queda a la vista (el teclado del iPhone achica esa parte). */
+  .fc--pantalla {
+    position: fixed;
+    z-index: 600;
+    inset: 0 0 auto;
+    block-size: var(--fc-alto, 100dvh);
+    transform: translateY(calc(var(--fc-arriba, 0px) + var(--fc-tira, 0px)));
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--fondo);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .fc--pantalla .fc-tope {
+    padding-top: 2.75rem;
+  }
+  .fc--pantalla .fc-asa {
+    display: block;
+    position: absolute;
+    inset-block-start: 0.625rem;
+    inset-inline-start: calc(50% - 1.125rem);
+    inline-size: 2.25rem;
+    block-size: 0.25rem;
+    border-radius: 999px;
+    background: var(--borde);
+  }
+  .fc--pantalla .fc-cerrar {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0.375rem;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    color: var(--texto-secundario);
+  }
+  .fc-cerrar svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .fc--pantalla .fc-cuerpo {
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .fc--pantalla .fc-opcion + .fc-opcion::before {
+    background: var(--borde);
+  }
+  .fc--pantalla .fc-parada-punto {
+    background: var(--fondo);
+  }
+  .fc--suelta {
+    transition: transform 0.35s var(--curva);
+  }
+  /* Sin la transición entre vistas del navegador, entra subiendo desde abajo. */
+  @media (prefers-reduced-motion: no-preference) {
+    .fc--sube {
+      animation: fc-sube 0.4s var(--curva) both;
+    }
+  }
+  @keyframes fc-sube {
+    from {
+      opacity: 0;
+      translate: 0 2rem;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Mientras el formulario ocupa la pantalla, la página de atrás no se mueve. */
+  html.fc-abierto,
+  html.fc-abierto body {
+    overflow: hidden;
+  }
+  /* El cuerpo de la página pasa por encima de la barra de arriba, así el formulario la tapa también. */
+  html.fc-abierto .psx-cuerpo {
+    z-index: 700;
+  }
+  html.fc-abierto .psx-progreso {
+    opacity: 0;
+  }
+  /* El paso de «parte de la página» a «pantalla completa» y la vuelta: el navegador estira la caja
+     de un lugar al otro (transición entre vistas). */
+  ::view-transition-group(formulario-casa) {
+    animation-duration: 0.45s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  ::view-transition-old(formulario-casa),
+  ::view-transition-new(formulario-casa) {
+    block-size: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+</style>
