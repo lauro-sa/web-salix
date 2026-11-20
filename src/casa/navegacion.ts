@@ -1,7 +1,15 @@
 // Los enlaces de la barra y del pie de la web nueva. Una sola lista: la barra, el menú del teléfono y
 // el pie salen de acá. `base` es '' en la portada (los saltos son de la misma página) y '/' en el resto.
 export interface Enlace { href: string; texto: string }
+
 export interface Columna { titulo: string; enlaces: Enlace[] }
+
+/** Dónde vive la casa mientras es una propuesta. Al publicarla pasa a '/', y las rutas de abajo con ella. */
+export const RAIZ_CASA = '/propuestas/salix/';
+/** La página de un producto dentro de la web de Salix. */
+export const rutaProducto = (id: string) => `${RAIZ_CASA}${id}/`;
+/** La página de un sitio hecho por Salix. */
+export const rutaSitio = (id: string) => `${RAIZ_CASA}sitios/${id}/`;
 
 export function enlacesBarra(base = ''): Enlace[] {
   return [

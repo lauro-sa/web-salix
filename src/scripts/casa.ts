@@ -7,6 +7,8 @@
 //     en `--y` hasta dónde llegó la punta dentro de cada tramo y marca `.llego` al tocar la parada.
 //   · Lo que lleva `data-asoma` aparece una vez, al entrar en pantalla.
 //   · Las capturas con selector (`data-vistas`) muestran la vista que se elige con su rótulo.
+//   · Lo que se despliega (`data-desplegable`, la captura entera de un sitio) se abre y se pliega con
+//     su botón (`data-desplegar`).
 //
 // Sin este archivo la página se ve entera y quieta: todo lo que acá se mueve arranca visible.
 // Con «reducir movimiento» no se ata nada al scroll ni hay recorridos.
@@ -123,8 +125,29 @@ function montarVistas(): void {
   });
 }
 
+function montarDesplegables(): void {
+  document.querySelectorAll<HTMLElement>('[data-desplegable]').forEach((caja) => {
+    const boton = caja.querySelector<HTMLButtonElement>('[data-desplegar]');
+    const rotulo = boton?.querySelector<HTMLElement>('[data-desplegar-rotulo]') ?? boton;
+    if (!boton || !rotulo) return;
+    const abrir = boton.dataset.abrir ?? rotulo.textContent ?? '';
+    const cerrar = boton.dataset.cerrar ?? abrir;
+    boton.addEventListener('click', () => {
+      const abierta = caja.toggleAttribute('data-abierta');
+      boton.setAttribute('aria-expanded', String(abierta));
+      rotulo.textContent = abierta ? cerrar : abrir;
+      // Al plegar desde abajo, la caja vuelve a quedar a la vista: si no, la página saltaría a lo
+      // que viene después.
+      if (!abierta && caja.getBoundingClientRect().top < 0) {
+        caja.scrollIntoView({ block: 'start', behavior: QUIETO.matches ? 'auto' : 'smooth' });
+      }
+    });
+  });
+}
+
 export function montarCasa(): void {
   montarScroll();
   montarAsoma();
   montarVistas();
+  montarDesplegables();
 }

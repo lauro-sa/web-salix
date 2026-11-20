@@ -14,6 +14,9 @@
  * Lo que hace, y nada más:
  *   - la barra de progreso de lectura (escrita en el rAF, con `transform`: sin render ni layout);
  *   - la barra se entinta apenas se baja (`.psx-barra--fija`);
+ *   - la barra de scroll de la página (`.psx-scroll`): con mouse o trackpad esconde la del navegador
+ *     y dibuja una flotante, que arranca debajo de la barra fija, aparece al mover la página o al
+ *     acercar el puntero al borde, y se arrastra. No ocupa lugar: no deja carril al costado;
  *   - marca en `<html>` la mitad de abajo de la página (`.psx-abajo`): con eso un producto cuya página
  *     empieza en un color y termina en otro elige el fondo de atrás, el que el navegador muestra en el
  *     rebote al tirar de más (publico-salix.md, «El fondo de atrás»);
@@ -42,6 +45,16 @@ const CLASE_SUELTO = 'psx-pie--suelto'
 const CLASE_SIN_SCROLL = 'psx-sin-scroll'
 const CLASE_ASOMA = 'psx-pie-logo--asoma'
 const CLASE_LATE = 'msx--late'
+const CLASE_SCROLL_VISIBLE = 'psx-scroll--visible'
+const CLASE_SCROLL_ARRASTRA = 'psx-scroll--arrastra'
+/** Cuándo la pieza dibuja la barra de scroll: la misma condición con la que el CSS esconde la del navegador. */
+const CON_SCROLL_PROPIO = '(hover: hover) and (pointer: fine) and (scripting: enabled)'
+/** El pulgar de la barra de scroll no baja de este alto (en px), para que siempre se pueda agarrar. */
+const PULGAR_MINIMO = 36
+/** Cuánto queda a la vista la barra de scroll después del último movimiento (en ms). */
+const SCROLL_SE_VA = 900
+/** A qué distancia del borde derecho el puntero la hace aparecer (en px). */
+const BORDE_SCROLL = 18
 /** Qué parte del pie tiene que estar destapada para darlo por «a la vista» (el logo repite su entrada). */
 const PIE_A_LA_VISTA = 0.7
 /** Lo mismo para un pie suelto, que entra desde abajo como cualquier bloque. */
@@ -87,6 +100,34 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     pieLogo.style.setProperty('--psx-firma-retraso', retraso)
     reiniciar(pieLogo, CLASE_ASOMA)
   }
+
+  // ── La barra de scroll de la página, dibujada por la pieza (publico-salix.css, `.psx-scroll`) ──
+  // Va en <body>, fuera de la raíz: es fija y de un gris propio, no depende de los colores del producto.
+  let riel: HTMLElement | null = null
+  let pulgar: HTMLElement | null = null
+  if (barra && window.matchMedia(CON_SCROLL_PROPIO).matches) {
+    riel = document.createElement('div')
+    riel.className = 'psx-scroll'
+    riel.setAttribute('aria-hidden', 'true')
+    pulgar = document.createElement('span')
+    pulgar.className = 'psx-scroll-pulgar'
+    riel.append(pulgar)
+    document.body.append(riel)
+  }
+  let ultimoPulgar = ''
+  /** Cuántos px puede recorrer el pulgar: con eso el arrastre se convierte en scroll. */
+  let recorridoPulgar = 0
+  let arrastrando = false
+  let sobreElBorde = false
+  let seVa = 0
+  const mostrarScroll = () => {
+    if (!riel) return
+    riel.classList.add(CLASE_SCROLL_VISIBLE)
+    window.clearTimeout(seVa)
+    seVa = window.setTimeout(() => {
+      if (!arrastrando && !sobreElBorde) riel?.classList.remove(CLASE_SCROLL_VISIBLE)
+    }, SCROLL_SE_VA)
+  }
   const medir = () => {
     raf = 0
     const alto = document.documentElement.scrollHeight
@@ -100,9 +141,24 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     }
     barra?.classList.toggle(CLASE_FIJA, window.scrollY > 12)
     document.documentElement.classList.toggle(CLASE_ABAJO, p > 0.5)
+    const altoBarra = barra?.offsetHeight ?? 0
+    if (pulgar) {
+      // El riel va de la barra fija al borde de abajo. Si la página no tiene scroll, no hay pulgar.
+      const largo = window.innerHeight - altoBarra
+      const altoPulgar = max > 0 ? Math.max(PULGAR_MINIMO, Math.round((largo * window.innerHeight) / alto)) : 0
+      recorridoPulgar = Math.max(0, largo - altoPulgar)
+      const y = Math.round((altoBarra + recorridoPulgar * p) * 10) / 10
+      const valor = `${altoPulgar}|${y}`
+      if (valor !== ultimoPulgar) {
+        pulgar.style.setProperty('--psx-scroll-alto', `${altoPulgar}px`)
+        pulgar.style.setProperty('--psx-scroll-y', `${y}px`)
+        // Aparece cuando la página se mueve, no al cargar.
+        if (ultimoPulgar && altoPulgar > 0) mostrarScroll()
+        ultimoPulgar = valor
+      }
+    }
     // Qué parte del pie destapó la cortina (0 si va suelto o no hay pie): con eso se acomoda el cierre.
     let pesoCierre = 0
-    const altoBarra = barra?.offsetHeight ?? 0
     if (pie) {
       const altoPie = pie.offsetHeight
       // Un pie más alto que la pantalla no puede ir pegado al fondo: su parte de arriba no se
@@ -176,6 +232,54 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   medir()
   window.addEventListener('scroll', pedir, { passive: true })
   window.addEventListener('resize', pedir)
+  if (riel && pulgar) {
+    const elRiel = riel
+    const elPulgar = pulgar
+    let inicioY = 0
+    let inicioScroll = 0
+    // Acercar el puntero al borde derecho la muestra; al alejarlo, se va sola.
+    const alMover = (e: PointerEvent) => {
+      const cerca = e.clientX >= window.innerWidth - BORDE_SCROLL
+      if (cerca === sobreElBorde) return
+      sobreElBorde = cerca
+      mostrarScroll()
+    }
+    const alAgarrar = (e: PointerEvent) => {
+      if (e.button !== 0) return
+      e.preventDefault() // sin seleccionar texto mientras se arrastra
+      arrastrando = true
+      inicioY = e.clientY
+      inicioScroll = window.scrollY
+      elPulgar.setPointerCapture(e.pointerId)
+      elRiel.classList.add(CLASE_SCROLL_ARRASTRA)
+    }
+    const alArrastrar = (e: PointerEvent) => {
+      if (!arrastrando || recorridoPulgar <= 0) return
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      // Sin suavizado, aunque la página lo tenga: el pulgar va con el puntero.
+      window.scrollTo({ top: inicioScroll + (e.clientY - inicioY) * (max / recorridoPulgar), behavior: 'instant' as ScrollBehavior })
+    }
+    const alSoltar = () => {
+      if (!arrastrando) return
+      arrastrando = false
+      elRiel.classList.remove(CLASE_SCROLL_ARRASTRA)
+      mostrarScroll()
+    }
+    // El alto de la página cambia sin que nadie mueva el scroll (una imagen que carga, algo que se despliega).
+    const alCrecer = 'ResizeObserver' in window ? new ResizeObserver(pedir) : null
+    alCrecer?.observe(document.body)
+    window.addEventListener('pointermove', alMover, { passive: true })
+    elPulgar.addEventListener('pointerdown', alAgarrar)
+    elPulgar.addEventListener('pointermove', alArrastrar)
+    elPulgar.addEventListener('pointerup', alSoltar)
+    elPulgar.addEventListener('pointercancel', alSoltar)
+    soltar.push(() => {
+      alCrecer?.disconnect()
+      window.clearTimeout(seVa)
+      window.removeEventListener('pointermove', alMover)
+      elRiel.remove()
+    })
+  }
   soltar.push(() => {
     cancelAnimationFrame(raf)
     window.removeEventListener('scroll', pedir)

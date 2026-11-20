@@ -42,6 +42,8 @@ export interface Pieza {
   que: string;
   /** La parte de la portada a la que lleva. */
   ancla: string;
+  /** Su página dentro de la casa, si la tiene (desde la raíz de la casa: `flux`, `sitios/tph`). */
+  pagina?: string;
   obra?: boolean;
 }
 
@@ -52,14 +54,14 @@ export interface Pieza {
 // `apple-touch-icon.png`; tph, su logo oficial en blanco (`public/logos/Logo-B-01.png`).
 const I = '/propuestas/iconos';
 export const RUEDA: Pieza[] = [
-  { id: 'flux', imagen: `${I}/flux.png`, nombre: 'Flux', que: 'Sistema de gestión', ancla: 'flux' },
-  { id: 'sites', imagen: `${I}/herreelec.png`, nombre: 'herreelec.com', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
-  { id: 'menu', imagen: `${I}/menu.png`, nombre: 'Menu', que: 'Carta digital con QR', ancla: 'menu' },
+  { id: 'flux', imagen: `${I}/flux.png`, nombre: 'Flux', que: 'Sistema de gestión', ancla: 'flux', pagina: 'flux' },
+  { id: 'sites', imagen: `${I}/herreelec.png`, nombre: 'herreelec.com', que: 'Sitio web hecho por Salix', ancla: 'sitios', pagina: 'sitios/herreelec' },
+  { id: 'menu', imagen: `${I}/menu.png`, nombre: 'Menu', que: 'Carta digital con QR', ancla: 'menu', pagina: 'menu' },
   { id: 'obra', icono: 'delivery', nombre: 'Go', que: 'Delivery para tu local · En obra', ancla: 'viene', obra: true },
-  { id: 'nuvix', imagen: `${I}/nuvix.png`, nombre: 'Nuvix', que: 'App para iPhone', ancla: 'nuvix' },
-  { id: 'sites', imagen: `${I}/tph.png`, fondo: '#0a0a0b', nombre: 'tphservice.com', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
+  { id: 'nuvix', imagen: `${I}/nuvix.png`, nombre: 'Nuvix', que: 'App para iPhone', ancla: 'nuvix', pagina: 'nuvix' },
+  { id: 'sites', imagen: `${I}/tph.png`, fondo: '#0a0a0b', nombre: 'tphservice.com', que: 'Sitio web hecho por Salix', ancla: 'sitios', pagina: 'sitios/tph' },
   { id: 'integraciones', icono: 'link', nombre: 'Integraciones', que: 'Sesiones de 45 minutos', ancla: 'integraciones' },
   { id: 'obra', icono: 'cancha', nombre: 'Play', que: 'Turnos y cobros de canchas · En obra', ancla: 'viene', obra: true },
-  { id: 'sites', imagen: `${I}/porcorosso.png`, nombre: 'porcorosso.com.ar', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
+  { id: 'sites', imagen: `${I}/porcorosso.png`, nombre: 'porcorosso.com.ar', que: 'Sitio web hecho por Salix', ancla: 'sitios', pagina: 'sitios/porcorosso' },
   { id: 'obra', icono: 'agenda', nombre: 'Book', que: 'Turnos para consultorios · En obra', ancla: 'viene', obra: true },
 ];

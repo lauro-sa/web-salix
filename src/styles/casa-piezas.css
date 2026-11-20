@@ -1,0 +1,550 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   casa-piezas.css — las piezas que comparten la portada de la casa y las páginas
+   de cada producto y de cada sitio: la línea que baja por el costado, la mesa de
+   capturas, la lista de hechos, la ventana de navegador y el bloque de cierre.
+   Lo que es de una sola página vive en esa página.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── El isotipo de Salix y el de Nuvix, como máscara: toman el color del texto ── */
+.isotipo,
+.logo-nuvix {
+  display: inline-block;
+  inline-size: 1.25em;
+  block-size: 1.25em;
+  background: currentColor;
+  -webkit-mask: url('/logo-salix.svg') center / contain no-repeat;
+  mask: url('/logo-salix.svg') center / contain no-repeat;
+  flex: none;
+}
+.logo-nuvix {
+  -webkit-mask-image: url('/propuestas/nuvix-isotipo.svg');
+  mask-image: url('/propuestas/nuvix-isotipo.svg');
+}
+
+/* ── El riel: las líneas de la casa, que siguen bajando por el costado ──
+   Cada tramo que lo lleva (`.con-riel`, con `data-riel` para el movimiento) dibuja sus líneas. Una
+   línea termina en la parada del tramo (`.riel-linea--fin`) o lo cruza entero y sigue en el de abajo.
+   casa.ts escribe en `--y` hasta dónde llegó la punta; sin él, están enteras. `--estacion` es la
+   altura de la parada: el centro del primer renglón del tramo. */
+.con-riel {
+  position: relative;
+  --estacion: calc(var(--aire) + 1.125rem);
+}
+.riel {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: max(var(--margen), (100% - var(--ancho)) / 2);
+  inline-size: 2rem;
+  pointer-events: none;
+}
+.riel-linea {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--x, 0) * 0.5625rem);
+  inline-size: 0.1875rem;
+  background: var(--c);
+  clip-path: inset(0 0 max(0px, calc(100% - var(--y, 100000px))) 0);
+}
+.riel-linea--fin {
+  inset-block-end: auto;
+  block-size: var(--estacion);
+}
+/* La línea que nace en este tramo: arranca en su parada y sigue hacia abajo. */
+.riel-linea--nace {
+  inset-block-start: var(--estacion);
+}
+.riel-punto {
+  position: absolute;
+  inset-block-start: calc(var(--estacion) - 0.5rem);
+  inset-inline-start: calc(var(--x, 0) * 0.5625rem + 0.09375rem - 0.5rem);
+  inline-size: 1rem;
+  block-size: 1rem;
+  border-radius: 50%;
+  background: var(--fondo);
+  border: 0.1875rem solid var(--c);
+}
+/* El contenido de un tramo con riel deja libre el costado por donde baja la línea. */
+.riel-cuerpo {
+  padding-inline-start: 2.5rem;
+}
+@media (min-width: 56rem) {
+  .riel-cuerpo {
+    padding-inline-start: 3rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .con-js .riel-punto {
+    scale: 0;
+    transition: scale 0.45s var(--curva);
+  }
+  /* Al llegar la línea a su parada, la parada aparece y late una vez. */
+  .con-js .llego .riel-punto {
+    scale: 1;
+    animation: parada-late 0.9s var(--curva) 0.1s;
+  }
+}
+@keyframes parada-late {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0.875rem transparent;
+  }
+}
+
+/* ── El renglón del nombre: logo, nombre, qué es y en qué estado está ── */
+.producto-nombre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  min-block-size: 2.25rem;
+  font-size: 1rem;
+  font-weight: 650;
+}
+.producto-logo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 0.625rem;
+  background: var(--fondo-alt);
+  color: var(--c);
+  box-shadow: inset 0 0 0 1px var(--borde);
+  overflow: hidden;
+}
+/* Un sitio hecho por la casa lleva el ícono oficial de su marca, entero. */
+.producto-logo img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.producto-logo--logo img {
+  inline-size: 60%;
+  block-size: 60%;
+  object-fit: contain;
+}
+.producto-que {
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: var(--texto-secundario);
+}
+/* El estado de cada línea: si ya anda, lleva un punto que late despacio. */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-inline-start: auto;
+  padding: 0.1875rem 0.625rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--borde);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--texto-secundario);
+}
+.estado::before {
+  content: '';
+  inline-size: 0.375rem;
+  block-size: 0.375rem;
+  border-radius: 50%;
+  background: var(--texto-terciario);
+}
+.estado--vivo::before {
+  background: var(--c);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .estado--vivo::before {
+    animation: vivo 2.4s ease-in-out infinite;
+  }
+}
+@keyframes vivo {
+  50% {
+    opacity: 0.35;
+    scale: 0.8;
+  }
+}
+
+/* ── Los hechos: renglones cortos entre líneas finas ── */
+.hechos {
+  margin-top: 1.5rem;
+}
+@media (min-width: 56rem) {
+  .hechos {
+    max-inline-size: 30rem;
+  }
+}
+.hechos li {
+  padding-block: 0.75rem;
+  border-top: 1px solid var(--borde);
+  font-size: 0.9375rem;
+  color: var(--texto-secundario);
+  text-wrap: pretty;
+}
+.hechos li:last-child {
+  border-bottom: 1px solid var(--borde);
+}
+.hechos--obra li strong {
+  display: inline-block;
+  min-inline-size: 4rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+/* Un hecho con nombre: el nombre en tinta, arriba, y su explicación debajo. */
+.hechos--nombre li strong {
+  display: block;
+  font-weight: 600;
+  color: var(--texto);
+}
+.hechos + .enlace {
+  margin-top: 0.75rem;
+}
+
+/* ── La mesa: donde se apoyan las capturas. Un plano neutro de Salix, sin el color del producto.
+   Una vista va al frente y las otras esperan al costado; se elige con los rótulos. ── */
+.mesa {
+  display: grid;
+  /* Una sola columna que no se estira con lo que lleva adentro: los rótulos largos no la ensanchan. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.875rem;
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  border-radius: 0.875rem;
+  background: var(--fondo-alt);
+  box-shadow: inset 0 0 0 1px var(--borde);
+  overflow: hidden;
+}
+.vistas {
+  position: relative;
+  block-size: clamp(18rem, 31vw, 25rem);
+}
+.vista {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.75rem, 2.5vw, 1.75rem);
+  transition:
+    opacity 0.45s ease,
+    translate 0.7s var(--curva),
+    scale 0.7s var(--curva),
+    visibility 0s;
+}
+/* La vista que no está elegida se va hacia su lado y se apaga; la elegida entra desde el suyo. */
+.vista:not([data-pos='0']) {
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.96;
+  translate: 6% 0;
+  pointer-events: none;
+  transition-delay: 0s, 0s, 0s, 0.45s;
+}
+.vista[data-pos^='-'] {
+  translate: -6% 0;
+}
+.toma {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 0;
+  block-size: 100%;
+}
+.toma img {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  inline-size: auto;
+  block-size: auto;
+  border-radius: 0.375rem;
+  box-shadow:
+    0 0 0 1px var(--borde),
+    0 1.25rem 2.5rem -1.25rem rgba(0, 0, 0, 0.35);
+}
+.vista--tel .toma img {
+  border-radius: 1.125rem;
+}
+/* Un teléfono de modo fijo va primero cuando es el del tema que se está viendo. */
+[data-tema='oscuro'] .toma--oscuro,
+[data-tema='claro'] .toma--claro {
+  order: -1;
+}
+/* Varios teléfonos: se alternan un poco más arriba y un poco más abajo. */
+.vista--duo .toma {
+  block-size: 90%;
+  translate: 0 4.5%;
+}
+.vista--duo .toma:nth-child(odd):not(.toma--claro, .toma--oscuro),
+[data-tema='oscuro'] .vista--duo .toma--oscuro,
+[data-tema='claro'] .vista--duo .toma--claro {
+  translate: 0 -4.5%;
+}
+/* Si los rótulos no entran (tres nombres largos en un teléfono angosto), la fila se desliza. */
+.rotulos {
+  display: flex;
+  justify-content: safe center;
+  gap: 0.25rem;
+  justify-self: center;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0.1875rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--borde);
+}
+.rotulos::-webkit-scrollbar {
+  display: none;
+}
+.rotulo {
+  flex: none;
+  min-block-size: 2rem;
+  padding: 0 0.875rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--texto-secundario);
+  white-space: nowrap;
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+}
+.rotulo[aria-selected='true'] {
+  background: var(--texto);
+  color: var(--fondo);
+}
+@media (pointer: coarse) {
+  .rotulo {
+    min-block-size: 2.75rem;
+  }
+}
+@media (max-width: 26rem) {
+  .rotulo {
+    padding-inline: 0.625rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ── La ventana de navegador de una captura de sitio ── */
+.ventana {
+  display: block;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: var(--fondo-alt);
+  box-shadow: 0 0 0 1px var(--borde);
+  transition:
+    translate 0.5s var(--curva),
+    box-shadow 0.5s var(--curva);
+}
+.ventana-barra {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  block-size: 1.5rem;
+  padding-inline: 0.5rem;
+  border-bottom: 1px solid var(--borde);
+  font-size: 0.625rem;
+  color: var(--texto-terciario);
+}
+.ventana-barra i {
+  inline-size: 0.3125rem;
+  block-size: 0.3125rem;
+  border-radius: 50%;
+  background: var(--borde);
+}
+.ventana-barra span {
+  margin-inline: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-inline-end: 1.25rem;
+}
+.ventana-hoja {
+  display: block;
+  overflow: hidden;
+}
+.ventana-hoja img {
+  transition: scale 0.8s var(--curva);
+}
+
+/* ── El cierre (se acomoda solo: publico-salix.css) ──
+   Va alineado como el resto de la página y usa todo el ancho: el texto a la izquierda y, donde hay
+   lugar, las ramas a la derecha. Centrado y angosto quedaba un bloque chico en el medio de la
+   pantalla (Sal, 2026-11-20). */
+.cierre {
+  padding-block: clamp(2.5rem, 7vw, 4.5rem);
+  border-top: 1px solid var(--borde-sutil);
+}
+.cierre-caja {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+@media (min-width: 48rem) {
+  .cierre-caja {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+/* Las ramas: cuelgan del borde de arriba, como la copa del isotipo y las líneas del plano.
+   Solo donde van al costado del texto: debajo, sueltas, no dicen nada. */
+.cierre-ramas {
+  display: none;
+  justify-content: center;
+  gap: 0.875rem;
+  block-size: clamp(7rem, 20svh, 11rem);
+}
+@media (min-width: 48rem) {
+  .cierre-ramas {
+    display: flex;
+  }
+}
+.cierre-ramas span {
+  inline-size: 0.1875rem;
+  block-size: var(--largo);
+  border-radius: 0 0 999px 999px;
+  background: var(--texto);
+  transform-origin: top;
+}
+/* Las ramas no aparecen como el resto: crecen. Por eso el bloque en sí está siempre a la vista. */
+.cierre .cierre-ramas[data-asoma] {
+  opacity: 1;
+  translate: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .con-js .cierre-ramas span {
+    transform: scaleY(0);
+    transition: transform 1s var(--curva) calc(var(--i) * 55ms);
+  }
+  .con-js .cierre-ramas.visto span {
+    transform: scaleY(1);
+  }
+}
+.cierre .titulo {
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+}
+.cierre .bajada {
+  margin-top: 1.125rem;
+  max-inline-size: 40ch;
+}
+.cierre-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vista,
+  .ventana,
+  .ventana-hoja img,
+  .enlace > span {
+    transition: none;
+  }
+}
+
+/* ── La cabecera de una página interior (un producto, un sitio) ──
+   Las migas, el renglón del nombre, el título de la página y sus acciones. La línea de la página nace
+   en la parada de esta cabecera, a la altura del renglón del nombre. */
+.cabeza {
+  --cabeza-aire: calc(var(--psx-alto-barra, 4.5rem) + 2rem);
+  --estacion: calc(var(--cabeza-aire) + 4.125rem);
+  padding-block: var(--cabeza-aire) var(--aire);
+}
+.cabeza-caja {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  /* Arriba, no al centro: la parada de la línea se calcula desde el borde de arriba del texto. */
+  align-items: start;
+}
+@media (min-width: 56rem) {
+  .cabeza-caja {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+}
+.migas {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  block-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  color: var(--texto-terciario);
+}
+.migas a {
+  color: var(--texto-secundario);
+  transition: color 0.2s;
+}
+.migas [aria-current] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 550;
+  color: var(--texto);
+}
+@media (hover: hover) {
+  .migas a:hover {
+    color: var(--texto);
+  }
+}
+.antetitulo {
+  margin-top: 1.125rem;
+  font-size: 0.875rem;
+  color: var(--texto-secundario);
+}
+.titulo--pagina {
+  margin-top: 1.125rem;
+  font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+.antetitulo + .titulo--pagina {
+  margin-top: 0.5rem;
+}
+.cabeza .bajada {
+  margin-top: 1.25rem;
+}
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 1.75rem;
+}
+.nota {
+  margin-top: 1rem;
+  max-inline-size: 46ch;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--texto-terciario);
+  text-wrap: pretty;
+}
+
+/* ── El nombre de una parada: el renglón chico que encabeza cada tramo de una página interior.
+   La parada del riel queda a su altura (`.con-parada`). ── */
+.con-parada {
+  --estacion: calc(var(--aire) + 0.75rem);
+}
+.parada-nombre {
+  display: flex;
+  align-items: center;
+  block-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  color: var(--texto-secundario);
+}
+
+/* Dos columnas parejas: a la izquierda el título, a la derecha lo que lo acompaña. */
+.dos {
+  display: grid;
+  gap: 1.25rem;
+}
+@media (min-width: 56rem) {
+  .dos {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: end;
+  }
+}
+/* Cuando lo de la derecha es más alto que el título, los dos arrancan arriba. */
+.dos--arriba {
+  align-items: start;
+}

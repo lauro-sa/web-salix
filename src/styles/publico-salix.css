@@ -59,38 +59,89 @@ html:has(.psx-barra):not([data-msx-telon='activo'], [data-msx-telon='sube'])::af
   pointer-events: none;
 }
 
-/* La barra de scroll de la página arranca DEBAJO de la barra fija, no por encima de ella.
-   Solo existe en Chrome/Edge/Safari (el margen del riel es de ::-webkit-scrollbar); Firefox
-   conserva la suya de siempre. Y solo con mouse (hover): con el dedo el sistema la muestra flotante.
-   ⚠️ Chrome ignora ::-webkit-scrollbar si scrollbar-color o scrollbar-width no son `auto`,
-   por eso acá se vuelven a `auto` (el producto puede haberlos fijado para toda la página).
-   Va en <html> Y en <body>: Chrome dibuja la barra de la página con el estilo del <body> si él
-   tiene uno propio (un `::-webkit-scrollbar` suelto del producto lo alcanza), y si no con el de <html>.
-   Lee --psx-texto desde <html>: si el producto lo mapea más abajo (Flux, en .kit-root), cae al
-   color de texto del sistema. */
-@supports selector(::-webkit-scrollbar) {
-  @media (hover: hover) {
-    :is(html, body):has(.psx-barra) {
-      scrollbar-color: auto;
-      scrollbar-width: auto;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar {
-      width: 0.5rem;
-      background: transparent;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar-track {
-      margin-top: var(--psx-alto-barra);
-      background: transparent;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar-thumb {
-      background: color-mix(in srgb, var(--psx-texto, CanvasText) 22%, transparent);
-      border: 2px solid transparent;
-      border-radius: 999px;
-      background-clip: padding-box;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar-thumb:hover {
-      background-color: color-mix(in srgb, var(--psx-texto, CanvasText) 40%, transparent);
-    }
+/* La barra de scroll de la página la dibuja la pieza: flota sobre la página, arranca DEBAJO de la
+   barra fija y no ocupa lugar. La del navegador se esconde.
+   Por qué no la del navegador: una barra con estilo propio (`::-webkit-scrollbar`) siempre ocupa su
+   franja, aunque el aparato use barras flotantes, y esa franja muestra el fondo de <html>, no lo que
+   la página tiene al lado. En cuanto una portada o una sección es de otro color, queda un carril que
+   corta la página de arriba abajo, pegado a la barra fija (Sal, 2026-11-20, en la portada de Nuvix).
+   Solo con mouse o trackpad (con el dedo el sistema ya la muestra flotante) y solo con JavaScript,
+   que es quien dibuja la nuestra (`montarPublicoSalix`): sin él queda la del navegador, entera.
+   Va en <html> Y en <body>: el navegador dibuja la barra de la página con el estilo del <body> si él
+   tiene uno propio, y si no con el de <html>. */
+@media (hover: hover) and (pointer: fine) and (scripting: enabled) {
+  :is(html, body):has(.psx-barra) {
+    scrollbar-width: none;
+  }
+  :is(html, body):has(.psx-barra)::-webkit-scrollbar {
+    display: none;
+  }
+}
+/* El riel no se ve ni se toca: solo el pulgar. Es gris, con un borde claro apenas marcado, para
+   leerse igual sobre una sección clara que sobre una oscura (no depende del color del producto).
+   Aparece al mover la página o al acercar el puntero al borde, y se va solo. */
+.psx-scroll {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 298; /* debajo del menú móvil (299) y de la barra (300) */
+  width: 0.875rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease 0.15s;
+}
+.psx-scroll--visible {
+  opacity: 1;
+  transition-duration: 0.12s;
+  transition-delay: 0s;
+}
+.psx-scroll-pulgar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  /* El alto y el lugar los escribe publico-salix.ts, una vez por cuadro. */
+  height: var(--psx-scroll-alto, 0px);
+  transform: translateY(var(--psx-scroll-y, 0px));
+  pointer-events: none;
+  touch-action: none;
+}
+.psx-scroll--visible .psx-scroll-pulgar {
+  pointer-events: auto;
+}
+/* Lo que se ve del pulgar: angosto en reposo, un poco más ancho al acercarse o al arrastrarlo. */
+.psx-scroll-pulgar::before {
+  content: '';
+  position: absolute;
+  top: 0.125rem;
+  right: 0.1875rem;
+  bottom: 0.125rem;
+  width: 0.25rem;
+  border-radius: 999px;
+  background: rgba(128, 128, 128, 0.55);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
+  transition:
+    width 0.15s ease,
+    background-color 0.15s ease;
+}
+.psx-scroll-pulgar:hover::before,
+.psx-scroll--arrastra .psx-scroll-pulgar::before {
+  width: 0.4375rem;
+  background: rgba(128, 128, 128, 0.8);
+}
+html.psx-sin-scroll .psx-scroll {
+  display: none;
+}
+@media print {
+  .psx-scroll {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .psx-scroll,
+  .psx-scroll-pulgar::before {
+    transition: none;
   }
 }
 

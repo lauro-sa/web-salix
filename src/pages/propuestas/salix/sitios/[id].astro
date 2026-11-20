@@ -1,0 +1,220 @@
+---
+// La página de un sitio hecho por Salix para un cliente: quién es, qué tiene su sitio y el sitio
+// entero, de punta a punta, en capturas reales (por si el sitio en línea no responde). Por el costado
+// baja la línea de los sitios. Los textos y las capturas están en src/casa/sitios.ts.
+import Casa from '../../../../layouts/Casa.astro';
+import Captura from '../../../../components/Captura.astro';
+import Mesa from '../../../../components/Mesa.astro';
+import CierreCasa from '../../../../components/CierreCasa.astro';
+import OtrasDeLaCasa from '../../../../components/OtrasDeLaCasa.astro';
+import { SITIOS_HECHOS } from '../../../../casa/sitios';
+import type { Vista } from '../../../../casa/capturas';
+import { RAIZ_CASA } from '../../../../casa/navegacion';
+
+export function getStaticPaths() {
+  return SITIOS_HECHOS.map((s) => ({ params: { id: s.id } }));
+}
+
+const { id } = Astro.params;
+const s = SITIOS_HECHOS.find((x) => x.id === id)!;
+const contacto = `${RAIZ_CASA}#contacto`;
+
+// El teléfono: si el sitio cambia con el tema, sus dos modos lado a lado, con el del tema que se ve
+// primero; si no, uno solo.
+const telefono: Vista = {
+  rotulo: 'En el teléfono',
+  forma: 'tel',
+  tomas: s.telefono.oscura
+    ? [
+        { ...s.telefono, oscura: undefined, alt: `${s.telefono.alt} En modo claro.`, modo: 'claro' },
+        { ...s.telefono, src: s.telefono.oscura, oscura: undefined, alt: `${s.telefono.alt} En modo oscuro.`, modo: 'oscuro' },
+      ]
+    : [s.telefono],
+};
+const ficha = [
+  { que: 'Cliente', valor: s.cliente },
+  { que: 'Rubro', valor: s.rubro },
+  { que: 'Temas', valor: s.dosTemas ? 'Claro y oscuro' : 'Uno solo, el de la marca' },
+  { que: 'Hecho con', valor: s.hechoCon },
+];
+---
+
+<Casa titulo={`${s.dominio} · Sitio web hecho por Salix`} descripcion={s.bajada} base={RAIZ_CASA} inicio={RAIZ_CASA} sinIndexar>
+  <div style="--c:var(--linea-sites)">
+    <section class="cabeza con-riel" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--nace"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="cabeza-caja riel-cuerpo ancho">
+        <div>
+          <nav class="migas" aria-label="Dónde estás">
+            <a href={RAIZ_CASA}>Salix</a>
+            <span aria-hidden="true">/</span>
+            <a href={`${RAIZ_CASA}#sitios`}>Sitios</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{s.dominio}</span>
+          </nav>
+          <p class="producto-nombre">
+            <span class:list={['producto-logo', { 'producto-logo--logo': s.fondo }]} style={s.fondo ? `background:${s.fondo}` : undefined}>
+              <img src={s.icono} width="512" height="512" alt="" decoding="async" />
+            </span>
+            {s.dominio}
+            <span class="producto-que">{s.rubro}</span>
+          </p>
+          <h1 class="titulo titulo--pagina" data-asoma><span>Sitio web para</span> {s.cliente}.</h1>
+          <p class="bajada" data-asoma style="--i:1">{s.bajada}</p>
+          <div class="acciones" data-asoma style="--i:2">
+            <a class="boton" href={`https://${s.dominio}`} rel="noopener">Visitar {s.dominio} <span aria-hidden="true">↗</span></a>
+            <a class="boton boton-secundario" href={contacto}>Pedir un sitio</a>
+          </div>
+        </div>
+        <Mesa vistas={[telefono]} nombre={s.dominio} data-asoma style="--i:2" />
+      </div>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="sitio" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--fin"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">El sitio entero</p>
+        <div class="entero">
+          <div class="entero-texto">
+            <h2 class="titulo" data-asoma><span>De punta a punta,</span> tal como está en línea.</h2>
+            <ul class="hechos hechos--nombre" data-asoma style="--i:1">
+              {s.incluye.map((h) => <li><strong>{h.titulo}</strong> {h.texto}</li>)}
+            </ul>
+            <dl class="ficha" data-asoma style="--i:2">
+              {ficha.map((f) => <div><dt>{f.que}</dt><dd>{f.valor}</dd></div>)}
+            </dl>
+          </div>
+          <!-- La captura del sitio entero. Arranca recortada a una pantalla y se despliega con el
+               botón; sin JavaScript está entera. -->
+          <div class="entero-captura" data-desplegable>
+            <div class="ventana">
+              <span class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><span>{s.dominio}</span></span>
+              <div class="ventana-hoja">
+                <div class="recorte" style={`--razon:${(s.larga.alto / s.larga.ancho).toFixed(4)}`}>
+                  <Captura src={s.larga.src} oscura={s.larga.oscura} ancho={s.larga.ancho} alto={s.larga.alto} alt={s.larga.alt} />
+                </div>
+              </div>
+            </div>
+            <button type="button" class="boton boton-secundario desplegar" data-desplegar data-abrir="Ver el sitio entero" data-cerrar="Plegar" aria-expanded="false">
+              <span data-desplegar-rotulo>Ver el sitio entero</span>
+              <span class="desplegar-flecha" aria-hidden="true">↓</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <OtrasDeLaCasa actual={`sitios/${id}`} />
+
+  <CierreCasa
+    liviana="¿Necesitás un sitio?"
+    tinta="Hablemos."
+    bajada="Diseño propio para tu marca y tu rubro. Presupuesto a medida."
+    contacto={contacto}
+    boton="Pedir un sitio"
+  />
+</Casa>
+
+<style>
+  /* ── El sitio entero: a la izquierda lo que tiene, a la derecha la captura ── */
+  .entero {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 56rem) {
+    .entero {
+      grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+      gap: clamp(2rem, 5vw, 4.5rem);
+      align-items: start;
+    }
+    /* El texto acompaña mientras se recorre la captura desplegada. */
+    .entero-texto {
+      position: sticky;
+      inset-block-start: calc(var(--psx-alto-barra, 4.5rem) + 1.5rem);
+    }
+  }
+  .ficha {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.5rem;
+    margin: 1.5rem 0 0;
+  }
+  .ficha dt {
+    font-size: 0.75rem;
+    color: var(--texto-terciario);
+  }
+  .ficha dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 550;
+  }
+
+  .entero-captura {
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+  }
+  .entero-captura .ventana {
+    inline-size: 100%;
+  }
+  /* El recorte mide contra el ancho de la hoja: así sabe cuánto mide la captura entera. */
+  .ventana-hoja {
+    container-type: inline-size;
+  }
+  .recorte {
+    position: relative;
+    overflow: hidden;
+  }
+  .recorte :global(img) {
+    inline-size: 100%;
+  }
+  :global(.con-js) .recorte {
+    max-block-size: min(38rem, 62svh);
+    transition: max-block-size 1s var(--curva);
+  }
+  :global(.con-js) [data-abierta] .recorte {
+    max-block-size: calc(100cqi * var(--razon));
+  }
+  /* Recortada, la captura se pierde hacia abajo en vez de terminar en un corte seco. */
+  :global(.con-js) .recorte::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    block-size: 6rem;
+    background: linear-gradient(to bottom, transparent, var(--fondo-alt));
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  :global(.con-js) [data-abierta] .recorte::after {
+    opacity: 0;
+  }
+  .desplegar {
+    display: none;
+  }
+  :global(.con-js) .desplegar {
+    display: inline-flex;
+  }
+  .desplegar-flecha {
+    transition: rotate 0.4s var(--curva);
+  }
+  [data-abierta] .desplegar-flecha {
+    rotate: 180deg;
+  }
+  /* Desplegada, la caja deja lugar arriba para la barra cuando se vuelve a ella al plegar. */
+  .entero-captura {
+    scroll-margin-top: calc(var(--psx-alto-barra, 4.5rem) + 1rem);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.con-js) .recorte,
+    .desplegar-flecha {
+      transition: none;
+    }
+  }
+</style>

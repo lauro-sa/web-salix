@@ -7,11 +7,15 @@
 import Casa from '../../layouts/Casa.astro';
 import Captura from '../../components/Captura.astro';
 import FormularioCasa from '../../components/FormularioCasa.astro';
+import Mesa from '../../components/Mesa.astro';
+import CierreCasa from '../../components/CierreCasa.astro';
 import LogoFlux from '../../components/LogoFlux.astro';
 import LogoMenu from '../../components/LogoMenu.astro';
 import LogoSalixAnimado from '../../components/LogoSalixAnimado.astro';
 import Rueda from '../../components/Rueda.astro';
 import { ENTRADAS, SITIOS, CORREO } from '../../propuestas/datos';
+import { VISTAS_PORTADA } from '../../casa/capturas';
+import { rutaProducto, rutaSitio } from '../../casa/navegacion';
 
 const productos = ENTRADAS.filter((e) => ['flux', 'menu', 'nuvix'].includes(e.id));
 const vienen = ENTRADAS.filter((e) => e.viene);
@@ -39,62 +43,6 @@ const FASES = [
   { nombre: 'En obra', de: 0.78, tramo: 0.18 },
 ];
 const DESTINO: Record<string, string> = { sites: '#sitios', integraciones: '#integraciones' };
-
-// Las capturas de cada producto, agrupadas en vistas que se eligen con los rótulos de abajo. Una vista
-// lleva una captura o dos teléfonos lado a lado. Todas son capturas reales.
-interface Toma { src: string; oscura?: string; ancho: number; alto: number; alt: string; /** Una captura de un modo fijo: va primero si es el del tema que se ve. */ modo?: 'claro' | 'oscuro' }
-interface Vista { rotulo: string; forma: 'ancha' | 'tel'; tomas: Toma[] }
-const P = '/propuestas';
-const tel = (archivo: string, alt: string, conOscura = false, ancho = 660, alto = 1434): Toma => ({
-  src: `${P}/${archivo}.webp`,
-  oscura: conOscura ? `${P}/${archivo}-oscuro.webp` : undefined,
-  ancho,
-  alto,
-  alt,
-});
-const VISTAS: Record<string, Vista[]> = {
-  flux: [
-    { rotulo: 'En la computadora', forma: 'ancha', tomas: [{ src: `${P}/flux-mac.webp`, oscura: `${P}/flux-mac-oscuro.webp`, ancho: 1512, alto: 993, alt: 'La bandeja de mensajes de Flux, con las conversaciones de WhatsApp de una empresa de muestra.' }] },
-    {
-      // Los dos modos lado a lado; va primero el del tema que se está viendo (Sal, 2026-11-20).
-      rotulo: 'En el teléfono',
-      forma: 'tel',
-      tomas: [
-        { ...tel('flux-tel', 'El inicio de Flux en el teléfono, en modo claro.'), modo: 'claro' },
-        { ...tel('flux-tel-oscuro', 'El inicio de Flux en el teléfono, en modo oscuro.'), modo: 'oscuro' },
-      ],
-    },
-  ],
-  menu: [
-    {
-      rotulo: 'La carta',
-      forma: 'tel',
-      tomas: [
-        tel('menu-clasica', 'Una carta de Menu en su versión clásica, en un teléfono.', false, 600, 1304),
-        tel('menu-visual', 'La misma carta en su versión visual.', false, 600, 1304),
-      ],
-    },
-    { rotulo: 'El panel', forma: 'ancha', tomas: [{ src: `${P}/menu-panel.webp`, ancho: 1600, alto: 1000, alt: 'El panel de Menu, donde se arma la carta.' }] },
-  ],
-  nuvix: [
-    {
-      rotulo: 'El día',
-      forma: 'tel',
-      tomas: [
-        tel('nuvix-dia', 'La pantalla del día en Nuvix.', true),
-        tel('nuvix-aplicacion', 'La pantalla de Nuvix que muestra dónde sigue la próxima aplicación.', true),
-      ],
-    },
-    {
-      rotulo: 'La historia',
-      forma: 'tel',
-      tomas: [
-        tel('nuvix-historia', 'La historia en Nuvix: lo anotado día por día.', true),
-        tel('nuvix-diario', 'El diario de Nuvix: proteínas, agua y cómo se siente la persona.', true),
-      ],
-    },
-  ],
-};
 
 // Una frase de dos oraciones se parte como en las webs de los productos: la primera liviana, la
 // segunda en tinta.
@@ -179,16 +127,16 @@ const VOCES = [
   <div id="productos">
     {productos.map((e, k) => {
       const [liviana, tinta] = partes(e.frase);
-      const vistas = VISTAS[e.id];
+      const vistas = VISTAS_PORTADA[e.id];
       return (
-        <section class="tramo producto-tramo" id={e.id} style={`--c:var(--linea-${e.id});--x:${k}`} data-riel>
+        <section class="tramo con-riel" id={e.id} style={`--c:var(--linea-${e.id});--x:${k}`} data-riel>
           <div class="riel" aria-hidden="true">
             {productos.slice(k).map((otro, j) => (
               <span class:list={['riel-linea', { 'riel-linea--fin': j === 0 }]} style={`--c:var(--linea-${otro.id});--x:${k + j}`}></span>
             ))}
             <span class="riel-punto" data-parada></span>
           </div>
-          <div class="producto ancho">
+          <div class="producto riel-cuerpo ancho">
             <div class="producto-texto">
               <p class="producto-nombre">
                 <span class="producto-logo">
@@ -202,24 +150,13 @@ const VOCES = [
               </p>
               <h2 class="titulo" data-asoma>{liviana && <span>{liviana}</span>} {tinta}</h2>
               <ul class="hechos" data-asoma style="--i:1">{e.hechos.map((h) => <li>{h}</li>)}</ul>
-              <a class="enlace" href={e.url}>{e.dominio} <span aria-hidden="true">→</span></a>
+              <!-- Dos salidas: la página del producto en esta web y, más callada, su web propia. -->
+              <p class="producto-enlaces">
+                <a class="enlace" href={rutaProducto(e.id)}>Todo sobre {e.nombre} <span aria-hidden="true">→</span></a>
+                <a class="enlace enlace--afuera" href={e.url} rel="noopener">{e.dominio} <span aria-hidden="true">↗</span></a>
+              </p>
             </div>
-            <figure class="mesa" data-vistas data-asoma style="--i:2">
-              <div class="vistas">
-                {vistas.map((v, i) => (
-                  <div class:list={['vista', `vista--${v.forma}`, { 'vista--duo': v.tomas.length > 1 }]} data-vista data-pos={i} aria-hidden={i === 0 ? 'false' : 'true'}>
-                    {v.tomas.map((toma) => (
-                      <span class:list={['toma', toma.modo && `toma--${toma.modo}`]}><Captura src={toma.src} oscura={toma.oscura} ancho={toma.ancho} alto={toma.alto} alt={toma.alt} /></span>
-                    ))}
-                  </div>
-                ))}
-              </div>
-              <figcaption class="rotulos" role="tablist" aria-label={`Capturas de ${e.nombre}`}>
-                {vistas.map((v, i) => (
-                  <button type="button" role="tab" class="rotulo" data-rotulo aria-selected={i === 0 ? 'true' : 'false'}>{v.rotulo}</button>
-                ))}
-              </figcaption>
-            </figure>
+            <Mesa vistas={vistas} nombre={e.nombre} data-asoma style="--i:2" />
           </div>
         </section>
       );
@@ -238,7 +175,7 @@ const VOCES = [
       <ul class="sitios-fila">
         {SITIOS.map((s, i) => (
           <li data-asoma style={`--i:${i % 3}`}>
-            <a href={`https://${s.dominio}`} rel="noopener">
+            <a href={s.sitio ? rutaSitio(s.sitio) : rutaProducto(s.producto!)}>
               <span class="ventana">
                 <span class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><span>{s.dominio}</span></span>
                 <span class="ventana-hoja">
@@ -297,41 +234,15 @@ const VOCES = [
     </div>
   </section>
 
-  <!-- El cierre: el último bloque, el que se acomoda entre la barra y el pie cuando la cortina lo
-       destapa. Las ramas cuelgan de arriba, y una invitación corta. -->
-  <section class="cierre psx-cierre">
-    <div class="cierre-caja psx-cierre-caja ancho">
-      <div class="cierre-texto">
-        <h2 class="titulo"><span>¿Tenés algo en mente?</span> Hablemos.</h2>
-        <p class="bajada psx-cierre-extra">Un sistema, una app, un sitio, o una idea que todavía no tiene forma.</p>
-        <div class="cierre-acciones">
-          <a class="boton" href="#contacto">Escribinos</a>
-          <a class="enlace" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
-        </div>
-      </div>
-      <div class="cierre-ramas psx-cierre-extra" aria-hidden="true" data-asoma>
-        {[30, 54, 72, 86, 92, 86, 72, 54, 30].map((largo, i) => <span style={`--largo:${largo}%;--i:${i}`}></span>)}
-      </div>
-    </div>
-  </section>
+  <CierreCasa
+    liviana="¿Tenés algo en mente?"
+    tinta="Hablemos."
+    bajada="Un sistema, una app, un sitio, o una idea que todavía no tiene forma."
+    contacto="#contacto"
+  />
 </Casa>
 
 <style>
-  .isotipo,
-  .logo-nuvix {
-    display: inline-block;
-    inline-size: 1.25em;
-    block-size: 1.25em;
-    background: currentColor;
-    -webkit-mask: url('/logo-salix.svg') center / contain no-repeat;
-    mask: url('/logo-salix.svg') center / contain no-repeat;
-    flex: none;
-  }
-  .logo-nuvix {
-    -webkit-mask-image: url('/propuestas/nuvix-isotipo.svg');
-    mask-image: url('/propuestas/nuvix-isotipo.svg');
-  }
-
   /* ── Primera pantalla: centrada ── */
   .abre {
     display: grid;
@@ -730,278 +641,36 @@ const VOCES = [
   }
 
   /* ── Productos, con la estética de Salix ── */
-  .producto-tramo {
-    position: relative;
-    --estacion: calc(var(--aire) + 1.125rem);
-  }
-  /* El riel: las líneas de los productos, que siguen bajando por el costado. Cada una termina en la
-     parada de su producto (`.riel-linea--fin`); las que siguen de largo cruzan el tramo entero.
-     casa.ts escribe en `--y` hasta dónde llegó la punta; sin él, están enteras. */
-  .riel {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: max(var(--margen), (100% - var(--ancho)) / 2);
-    inline-size: 2rem;
-    pointer-events: none;
-  }
-  .riel-linea {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: calc(var(--x) * 0.5625rem);
-    inline-size: 0.1875rem;
-    background: var(--c);
-    clip-path: inset(0 0 max(0px, calc(100% - var(--y, 100000px))) 0);
-  }
-  .riel-linea--fin {
-    inset-block-end: auto;
-    block-size: var(--estacion);
-  }
-  .riel-punto {
-    position: absolute;
-    inset-block-start: calc(var(--estacion) - 0.5rem);
-    inset-inline-start: calc(var(--x) * 0.5625rem + 0.09375rem - 0.5rem);
-    inline-size: 1rem;
-    block-size: 1rem;
-    border-radius: 50%;
-    background: var(--fondo);
-    border: 0.1875rem solid var(--c);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    :global(.con-js) .riel-punto {
-      scale: 0;
-      transition: scale 0.45s var(--curva);
-    }
-    /* Al llegar la línea a su parada, la parada aparece y late una vez. */
-    :global(.con-js) .llego .riel-punto {
-      scale: 1;
-      animation: parada-late 0.9s var(--curva) 0.1s;
-    }
-  }
-  @keyframes parada-late {
-    0% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 55%, transparent);
-    }
-    100% {
-      box-shadow: 0 0 0 0.875rem transparent;
-    }
-  }
   .producto {
     display: grid;
     gap: clamp(2rem, 5vw, 4.5rem);
     align-items: center;
-    padding-inline-start: 2.5rem;
   }
   @media (min-width: 56rem) {
     .producto {
       grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-      padding-inline-start: 3rem;
-    }
-  }
-  .producto-nombre {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.625rem;
-    min-block-size: 2.25rem;
-    font-size: 1rem;
-    font-weight: 650;
-  }
-  .producto-logo {
-    display: grid;
-    place-items: center;
-    inline-size: 2.25rem;
-    block-size: 2.25rem;
-    border-radius: 0.625rem;
-    background: var(--fondo-alt);
-    color: var(--c);
-    box-shadow: inset 0 0 0 1px var(--borde);
-  }
-  .producto-que {
-    font-weight: 400;
-    font-size: 0.875rem;
-    color: var(--texto-secundario);
-  }
-  /* El estado de cada línea: si ya anda, lleva un punto que late despacio. */
-  .estado {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    margin-inline-start: auto;
-    padding: 0.1875rem 0.625rem;
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 1px var(--borde);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--texto-secundario);
-  }
-  .estado::before {
-    content: '';
-    inline-size: 0.375rem;
-    block-size: 0.375rem;
-    border-radius: 50%;
-    background: var(--texto-terciario);
-  }
-  .estado--vivo::before {
-    background: var(--c);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .estado--vivo::before {
-      animation: vivo 2.4s ease-in-out infinite;
-    }
-  }
-  @keyframes vivo {
-    50% {
-      opacity: 0.35;
-      scale: 0.8;
     }
   }
   .producto .titulo {
     margin-top: 1.125rem;
     max-inline-size: 16ch;
   }
-  .hechos {
-    margin-top: 1.5rem;
-  }
-  @media (min-width: 56rem) {
-    .hechos {
-      max-inline-size: 30rem;
-    }
-  }
-  .hechos li {
-    padding-block: 0.75rem;
-    border-top: 1px solid var(--borde);
-    font-size: 0.9375rem;
-    color: var(--texto-secundario);
-    text-wrap: pretty;
-  }
-  .hechos li:last-child {
-    border-bottom: 1px solid var(--borde);
-  }
-  .hechos--obra li strong {
-    display: inline-block;
-    min-inline-size: 4rem;
-    font-weight: 600;
-    color: var(--texto);
-  }
-  .hechos + .enlace,
   .sitios-texto .enlace,
   .contacto-texto .enlace {
     margin-top: 0.75rem;
   }
-  /* La mesa: donde se apoyan las capturas. Un plano neutro de Salix, sin el color del producto.
-     Una captura va al frente y las otras asoman atrás; se elige con los rótulos o tocándolas. */
-  .mesa {
-    display: grid;
-    gap: 0.875rem;
-    padding: clamp(1rem, 2.5vw, 1.75rem);
-    border-radius: 0.875rem;
-    background: var(--fondo-alt);
-    box-shadow: inset 0 0 0 1px var(--borde);
-    overflow: hidden;
-  }
-  .vistas {
-    position: relative;
-    block-size: clamp(18rem, 31vw, 25rem);
-  }
-  .vista {
-    position: absolute;
-    inset: 0;
+  .producto-enlaces {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(0.75rem, 2.5vw, 1.75rem);
-    transition:
-      opacity 0.45s ease,
-      translate 0.7s var(--curva),
-      scale 0.7s var(--curva),
-      visibility 0s;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin-top: 0.75rem;
   }
-  /* La vista que no está elegida se va hacia su lado y se apaga; la elegida entra desde el suyo. */
-  .vista:not([data-pos='0']) {
-    opacity: 0;
-    visibility: hidden;
-    scale: 0.96;
-    translate: 6% 0;
-    pointer-events: none;
-    transition-delay: 0s, 0s, 0s, 0.45s;
-  }
-  .vista[data-pos^='-'] {
-    translate: -6% 0;
-  }
-  .toma {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-inline-size: 0;
-    block-size: 100%;
-  }
-  .toma :global(img) {
-    max-inline-size: 100%;
-    max-block-size: 100%;
-    inline-size: auto;
-    block-size: auto;
-    border-radius: 0.375rem;
-    box-shadow:
-      0 0 0 1px var(--borde),
-      0 1.25rem 2.5rem -1.25rem rgba(0, 0, 0, 0.35);
-  }
-  .vista--tel .toma :global(img) {
-    border-radius: 1.125rem;
-  }
-  /* Un teléfono de modo fijo va primero cuando es el del tema que se está viendo. */
-  :global([data-tema='oscuro']) .toma--oscuro,
-  :global([data-tema='claro']) .toma--claro {
-    order: -1;
-  }
-  /* Dos teléfonos: el primero un poco más arriba y el otro un poco más abajo. */
-  .vista--duo .toma {
-    block-size: 90%;
-  }
-  .vista--duo .toma {
-    translate: 0 4.5%;
-  }
-  .vista--duo .toma:first-child:not(.toma--claro, .toma--oscuro),
-  :global([data-tema='oscuro']) .vista--duo .toma--oscuro,
-  :global([data-tema='claro']) .vista--duo .toma--claro {
-    translate: 0 -4.5%;
-  }
-  .rotulos {
-    display: flex;
-    justify-content: center;
-    gap: 0.25rem;
-    justify-self: center;
-    padding: 0.1875rem;
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 1px var(--borde);
-  }
-  .rotulo {
-    min-block-size: 2rem;
-    padding: 0 0.875rem;
-    border-radius: 999px;
-    font-size: 0.8125rem;
+  /* La salida a la web propia del producto: el mismo enlace, sin el subrayado de la casa. */
+  .enlace--afuera {
     font-weight: 500;
     color: var(--texto-secundario);
-    white-space: nowrap;
-    transition:
-      background-color 0.25s,
-      color 0.25s;
+    background-image: linear-gradient(var(--borde), var(--borde));
   }
-  .rotulo[aria-selected='true'] {
-    background: var(--texto);
-    color: var(--fondo);
-  }
-  @media (pointer: coarse) {
-    .rotulo {
-      min-block-size: 2.75rem;
-    }
-  }
-  @media (max-width: 26rem) {
-    .rotulo {
-      padding-inline: 0.625rem;
-      font-size: 0.75rem;
-    }
-  }
-
   /* ── Sitios: cada captura en su ventana de navegador ── */
   .sitios-fila {
     display: grid;
@@ -1017,46 +686,8 @@ const VOCES = [
   .sitios-fila a {
     display: grid;
   }
-  .ventana {
-    display: block;
-    overflow: hidden;
+  .sitios-fila .ventana {
     margin-bottom: 0.75rem;
-    border-radius: 0.5rem;
-    background: var(--fondo-alt);
-    box-shadow: 0 0 0 1px var(--borde);
-    transition:
-      translate 0.5s var(--curva),
-      box-shadow 0.5s var(--curva);
-  }
-  .ventana-barra {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    block-size: 1.5rem;
-    padding-inline: 0.5rem;
-    border-bottom: 1px solid var(--borde);
-    font-size: 0.625rem;
-    color: var(--texto-terciario);
-  }
-  .ventana-barra i {
-    inline-size: 0.3125rem;
-    block-size: 0.3125rem;
-    border-radius: 50%;
-    background: var(--borde);
-  }
-  .ventana-barra span {
-    margin-inline: auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding-inline-end: 1.25rem;
-  }
-  .ventana-hoja {
-    display: block;
-    overflow: hidden;
-  }
-  .ventana-hoja :global(img) {
-    transition: scale 0.8s var(--curva);
   }
   .sitios-fila strong {
     font-size: 0.875rem;
@@ -1136,78 +767,8 @@ const VOCES = [
     margin-top: 1.25rem;
   }
 
-  /* ── El cierre (se acomoda solo: publico-salix.css) ──
-     Va alineado como el resto de la página y usa todo el ancho: el texto a la izquierda y, donde hay
-     lugar, las ramas a la derecha. Centrado y angosto quedaba un bloque chico en el medio de la
-     pantalla (Sal, 2026-11-20). */
-  .cierre {
-    padding-block: clamp(2.5rem, 7vw, 4.5rem);
-    border-top: 1px solid var(--borde-sutil);
-  }
-  .cierre-caja {
-    display: grid;
-    gap: 2rem;
-    align-items: center;
-  }
-  @media (min-width: 48rem) {
-    .cierre-caja {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-  }
-  /* Las ramas: cuelgan del borde de arriba, como la copa del isotipo y las líneas del plano. */
-  /* Solo donde van al costado del texto: debajo, sueltas, no dicen nada. */
-  .cierre-ramas {
-    display: none;
-    justify-content: center;
-    gap: 0.875rem;
-    block-size: clamp(7rem, 20svh, 11rem);
-  }
-  @media (min-width: 48rem) {
-    .cierre-ramas {
-      display: flex;
-    }
-  }
-  .cierre-ramas span {
-    inline-size: 0.1875rem;
-    block-size: var(--largo);
-    border-radius: 0 0 999px 999px;
-    background: var(--texto);
-    transform-origin: top;
-  }
-  .cierre-ramas[data-asoma] {
-    opacity: 1;
-    translate: none;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    :global(.con-js) .cierre-ramas span {
-      transform: scaleY(0);
-      transition: transform 1s var(--curva) calc(var(--i) * 55ms);
-    }
-    :global(.con-js) .cierre-ramas.visto span {
-      transform: scaleY(1);
-    }
-  }
-  .cierre .titulo {
-    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
-  }
-  .cierre .bajada {
-    margin-top: 1.125rem;
-    max-inline-size: 40ch;
-  }
-  .cierre-acciones {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1.5rem;
-    margin-top: 1.5rem;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .linea-punto,
-    .vista,
-    .ventana,
-    .ventana-hoja :global(img),
-    .enlace > span {
+    .linea-punto {
       transition: none;
     }
   }

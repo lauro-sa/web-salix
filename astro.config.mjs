@@ -11,7 +11,8 @@ export default defineConfig({
   compressHTML: true,
 
   // Integraciones
-  integrations: [sitemap()],
+  // Las propuestas de rediseño no se indexan (llevan `noindex`): tampoco van al mapa del sitio.
+  integrations: [sitemap({ filter: (pagina) => !pagina.includes('/propuestas/') })],
 
   // Configuración de Vite (bundler interno)
   vite: {
