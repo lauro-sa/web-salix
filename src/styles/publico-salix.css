@@ -34,6 +34,27 @@ html:has(.psx-barra) {
   scroll-padding-top: calc(5rem + env(safe-area-inset-top, 0px));
 }
 
+/* El tapón del borde de abajo. Safari del iPhone prueba el punto medio del borde de abajo de la pantalla
+   y, si ahí encuentra una pieza fija o pegada (un pie pegado al fondo, un bloque que queda fijo mientras
+   se baja), pinta una franja lisa detrás de su barra de direcciones y ya no la suelta en toda la visita
+   (Sal, 2026-11-20, en la portada de Nuvix: «sigo viendo la barra abajo, atrás del link»). Esta pieza
+   chiquita, fija en ese punto y por encima de todo, es lo primero que la prueba encuentra: como es
+   angosta y baja, Safari la descarta y no sigue buscando, así que la página pasa por detrás de su barra.
+   Es de <html> (un pseudoelemento cuenta como su dueño, que no es fijo). No se ve: su fondo es un
+   degradé transparente, que hace falta para que Safari no la tome por escondida y pruebe de nuevo sin
+   ella; ni se toca: los toques la atraviesan. Detalle y fuente en trampas/ios.md. */
+html:has(.psx-barra)::after {
+  content: '';
+  position: fixed;
+  left: calc(50% - 0.5rem);
+  bottom: 0;
+  z-index: 2147483647;
+  width: 1rem;
+  height: 0.75rem;
+  background-image: linear-gradient(transparent, transparent);
+  pointer-events: none;
+}
+
 /* La barra de scroll de la página arranca DEBAJO de la barra fija, no por encima de ella.
    Solo existe en Chrome/Edge/Safari (el margen del riel es de ::-webkit-scrollbar); Firefox
    conserva la suya de siempre. Y solo con mouse (hover): con el dedo el sistema la muestra flotante.
