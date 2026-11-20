@@ -1,0 +1,594 @@
+---
+// Propuesta C · «La casa»: la web ES de Salix. La primera pantalla es solo la marca (el isotipo con
+// sus ramas, el nombre y qué somos); los productos aparecen al bajar, con la estética de Salix, y el
+// plano de líneas resume todo lo que cuelga de la casa. Claro y oscuro, según el aparato.
+import Propuesta from '../../layouts/Propuesta.astro';
+import LogoFlux from '../../components/LogoFlux.astro';
+import LogoMenu from '../../components/LogoMenu.astro';
+import ramas from '../../ramas-salix.json';
+import { ENTRADAS, SITIOS, CORREO } from '../../propuestas/datos';
+
+const productos = ENTRADAS.filter((e) => ['flux', 'menu', 'nuvix'].includes(e.id));
+const vienen = ENTRADAS.filter((e) => e.viene);
+const de = (id: string) => ENTRADAS.find((e) => e.id === id)!;
+const sites = de('sites');
+const integraciones = de('integraciones');
+const LARGO: Record<string, number> = { flux: 80, menu: 94, nuvix: 72, sites: 86, integraciones: 62, go: 50, play: 41, book: 31 };
+// Testimonios de clientes (los de la web actual; el dueño confirmó que son reales).
+const VOCES = [
+  { texto: 'Desde que migramos a Flux la gestión del consorcio es otra cosa. Todo más ordenado, los presupuestos se hacen en minutos.', quien: 'Marcela Rodríguez', de: 'Administradora de consorcios' },
+  { texto: 'Le pedimos la web a Salix y nos sorprendió la calidad. Rápida, moderna y en tiempo récord. Se nota que entienden el negocio.', quien: 'Juan Pablo Ferreira', de: 'Ferreira Inmobiliaria' },
+  { texto: 'El soporte es excelente. No es un ticket y esperar días: te responden rápido y resuelven. Eso para nosotros vale mucho.', quien: 'Valentina López', de: 'LogiCenter SA' },
+];
+const { cx, cy, r } = ramas.copa;
+---
+
+<Propuesta titulo="Salix · Propuesta C · La casa" tema="ambos">
+  <header class="tope">
+    <a class="marca" href="#arriba" aria-label="Salix, arriba">
+      <span class="isotipo" aria-hidden="true"></span>
+      <span>Salix</span>
+    </a>
+    <nav class="tope-nav" aria-label="Secciones">
+      <a href="#casa">La casa</a>
+      <a href="#productos">Productos</a>
+      <a href="#sitios">Sitios</a>
+      <a href="#voces">Clientes</a>
+    </nav>
+    <a class="boton boton--tinta" href="#contacto">Hablemos</a>
+  </header>
+
+  <main id="arriba">
+    <!-- Primera pantalla: solo Salix. -->
+    <section class="abre">
+      <svg class="copa" viewBox="0 0 24 24" role="img" aria-label="El isotipo de Salix: la copa de un sauce hecha de ramas verticales" style={`--curva:${ramas.curva}`}>
+        <defs><clipPath id="copa-recorte"><circle cx={cx} cy={cy} r={r} /></clipPath></defs>
+        <g clip-path="url(#copa-recorte)" fill="currentColor">
+          {ramas.ramas.map((rama) => (
+            <path class="rama" d={rama.d} style={`--desde:${rama.desde}px;--retraso:${rama.retraso}s;--duracion:${rama.duracion}s`} />
+          ))}
+        </g>
+      </svg>
+      <div class="abre-texto">
+        <h1>Salix. <span>Software que simplifica tu negocio.</span></h1>
+        <p class="abre-bajada">
+          Somos una casa de software de Buenos Aires. Hacemos sistemas de gestión, apps y sitios web
+          para negocios de verdad, y los dejamos andando.
+        </p>
+        <p class="lema" aria-label="Salix: Software And Logic for eXcellence">
+          <span aria-hidden="true"><b>S</b>oftware <b>A</b>nd <b>L</b>og<b>i</b>c for e<b>X</b>cellence</span>
+        </p>
+      </div>
+      <a class="abre-baja" href="#casa">Conocé la casa <span aria-hidden="true">↓</span></a>
+    </section>
+
+    <!-- El plano: todo lo que cuelga de la casa, de un vistazo. -->
+    <section class="casa" id="casa">
+      <div class="casa-texto">
+        <h2><span>Una casa.</span> Varias líneas.</h2>
+        <p>
+          Cada cosa que hacemos es una línea con su nombre y su propia web. Algunas ya andan, otras
+          están en obra, y todas salen de la misma casa. Donde dos se cruzan, comparten algo.
+        </p>
+      </div>
+      <div class="plano" role="group" aria-label="Las líneas de Salix">
+        <div class="plano-casa" aria-hidden="true"><span class="isotipo"></span> Salix</div>
+        <div class="cruce cruce--ia"><span>Salix IA</span></div>
+        <div class="cruce cruce--mp"><span>Mercado Pago</span></div>
+        {ENTRADAS.map((e, i) => (
+          <a
+            class:list={['linea', { 'linea--obra': e.viene }]}
+            href={e.viene ? '#viene' : ['sites'].includes(e.id) ? '#sitios' : e.id === 'integraciones' ? '#integraciones' : `#${e.id}`}
+            style={`--c:var(--${e.viene ? 'obra' : e.id});--largo:${LARGO[e.id]}%;--i:${i}`}
+          >
+            <span class="linea-via" aria-hidden="true"></span>
+            <span class="linea-fin">
+              <span class="linea-punto" aria-hidden="true"></span>
+              <strong>{e.nombre}</strong>
+              <span>{e.viene ? 'En obra' : e.que}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Los productos, con la estética de Salix: cada uno pone su logo, su captura y su línea. -->
+    <div id="productos">
+      {productos.map((e) => (
+        <section class="producto" id={e.id} style={`--c:var(--${e.id})`}>
+          <div class="producto-texto">
+            <p class="producto-nombre">
+              <span class="producto-logo">
+                {e.id === 'flux' && <LogoFlux tamaño={26} />}
+                {e.id === 'menu' && <LogoMenu tamaño={26} />}
+                {e.id === 'nuvix' && <span class="logo-nuvix"></span>}
+              </span>
+              {e.nombre}
+              <span class="producto-que">{e.que}</span>
+            </p>
+            <h2>{e.frase}</h2>
+            <ul class="hechos">{e.hechos.map((h) => <li>{h}</li>)}</ul>
+            <a class="enlace" href={e.url}>{e.dominio} <span aria-hidden="true">→</span></a>
+          </div>
+          <figure class:list={['mesa', { 'mesa--duo': e.id !== 'flux' }]}>
+            {e.id === 'flux' && (
+              <picture>
+                <source srcset="/propuestas/flux-mac-oscuro.webp" media="(prefers-color-scheme: dark)" />
+                <img src="/propuestas/flux-mac.webp" width="1512" height="993" loading="lazy" decoding="async" alt="La bandeja de mensajes de Flux, con las conversaciones de WhatsApp de una empresa de muestra." />
+              </picture>
+            )}
+            {e.id === 'menu' && (
+              <>
+                <img src="/propuestas/menu-clasica.webp" width="600" height="1304" loading="lazy" decoding="async" alt="Una carta de Menu en su versión clásica, en un teléfono." />
+                <img src="/propuestas/menu-visual.webp" width="600" height="1304" loading="lazy" decoding="async" alt="La misma carta en su versión visual." />
+              </>
+            )}
+            {e.id === 'nuvix' && (
+              <>
+                <img src="/propuestas/nuvix-dia.webp" width="660" height="1434" loading="lazy" decoding="async" alt="La pantalla del día en Nuvix." />
+                <img src="/propuestas/nuvix-aplicacion.webp" width="660" height="1434" loading="lazy" decoding="async" alt="La pantalla de Nuvix que muestra dónde sigue la próxima aplicación." />
+              </>
+            )}
+          </figure>
+        </section>
+      ))}
+    </div>
+
+    <section class="sitios" id="sitios">
+      <div class="sitios-texto">
+        <h2><span>Sitios web,</span> hechos por nosotros.</h2>
+        <p>{sites.hechos[0]} {sites.hechos[1]} Estos son algunos de los que hicimos, incluidos los de nuestros productos.</p>
+        <a class="enlace" href={`mailto:${CORREO}?subject=Sitio%20web`}>Pedir un sitio <span aria-hidden="true">→</span></a>
+      </div>
+      <ul class="sitios-fila">
+        {SITIOS.map((s) => (
+          <li>
+            <a href={`https://${s.dominio}`} rel="noopener">
+              <img src={`/propuestas/${s.archivo}`} width="1440" height="900" loading="lazy" decoding="async" alt={`Portada de ${s.dominio}`} />
+              <strong>{s.dominio}</strong>
+              <span>{s.que}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="mas">
+      <div class="mas-bloque" id="integraciones">
+        <h2><span>{integraciones.nombre}.</span> {integraciones.frase}</h2>
+        <ul class="hechos">{integraciones.hechos.map((h) => <li>{h}</li>)}</ul>
+        <a class="enlace" href={integraciones.url}>Ver las sesiones <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="mas-bloque" id="viene">
+        <h2><span>Lo que viene.</span> En obra.</h2>
+        <ul class="hechos hechos--obra">
+          {vienen.map((e) => <li><strong>{e.nombre}</strong> {e.que}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="voces" id="voces">
+      <h2><span>Lo dicen</span> quienes ya trabajan con nosotros.</h2>
+      <ul class="voces-fila">
+        {VOCES.map((v) => (
+          <li>
+            <blockquote>{v.texto}</blockquote>
+            <p><strong>{v.quien}</strong> {v.de}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="cierre" id="contacto">
+      <svg class="copa copa--chica" viewBox="0 0 24 24" aria-hidden="true">
+        <g clip-path="url(#copa-recorte)" fill="currentColor">
+          {ramas.ramas.map((rama) => <path d={rama.d} />)}
+        </g>
+      </svg>
+      <h2><span>¿No sabés por dónde empezar?</span> Contanos qué tenés.</h2>
+      <a class="boton boton--cobre boton--grande" href={`mailto:${CORREO}`}>{CORREO}</a>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <span class="marca"><span class="isotipo" aria-hidden="true"></span> Salix</span>
+    <span>Software And Logic for eXcellence · Buenos Aires, Argentina</span>
+    <a href="/propuestas/">Volver a las propuestas</a>
+  </footer>
+</Propuesta>
+
+<style>
+  :global(body) {
+    --fondo: light-dark(#f6f4ef, #0e0f12);
+    --fondo-2: light-dark(#ffffff, #17181d);
+    --tinta: light-dark(#141310, #f4f1ea);
+    --tinta-2: light-dark(#5d584e, #a8a59d);
+    --tinta-3: light-dark(#a8a296, #5f6068);
+    --linea-fina: light-dark(#ddd7ca, #2a2c33);
+    --cobre: light-dark(#b0600a, #e8922a);
+    --cobre-lleno: #e8922a;
+    --flux: light-dark(#4e4eb8, #8585f2);
+    --menu: light-dark(#394a42, #9bb88f);
+    --nuvix: light-dark(#136c64, #2fb5a6);
+    --sites: light-dark(#c2710c, #e8922a);
+    --integraciones: var(--tinta);
+    --obra: light-dark(#a8a296, #6b6e78);
+    --via: 0.625rem;
+    --margen: clamp(1.25rem, 4.5vw, 5rem);
+    --ancho: 100rem;
+    background: var(--fondo);
+    color: var(--tinta);
+  }
+  :global(::selection) { background: var(--cobre-lleno); color: #1c1206; }
+  :global(:focus-visible) { outline: 3px solid var(--cobre); outline-offset: 4px; border-radius: 4px; }
+
+  .isotipo, .logo-nuvix {
+    display: inline-block;
+    inline-size: 1.5em;
+    block-size: 1.5em;
+    background: currentColor;
+    -webkit-mask: url('/logo-salix.svg') center / contain no-repeat;
+    mask: url('/logo-salix.svg') center / contain no-repeat;
+    flex: none;
+  }
+  .logo-nuvix { -webkit-mask-image: url('/propuestas/nuvix-isotipo.svg'); mask-image: url('/propuestas/nuvix-isotipo.svg'); }
+
+  /* Los títulos de Salix: una parte liviana y apagada, y la que importa en tinta. */
+  h1, h2 {
+    font-weight: 650;
+    font-stretch: 104%;
+    letter-spacing: -0.028em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+  h1 span, h2 span { display: block; font-weight: 400; color: var(--tinta-3); }
+  h2 { font-size: clamp(2rem, 1.1rem + 3.2vw, 4rem); max-inline-size: 18ch; }
+
+  .tope {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.875rem max(var(--margen), env(safe-area-inset-right)) 0.875rem max(var(--margen), env(safe-area-inset-left));
+    background: color-mix(in srgb, var(--fondo) 84%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--linea-fina);
+  }
+  .marca { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; font-stretch: 110%; font-size: 1.0625rem; text-decoration: none; }
+  .tope-nav { display: none; gap: 1.75rem; margin-inline: auto; font-size: 0.9375rem; font-weight: 500; color: var(--tinta-2); }
+  .tope-nav a { padding-block: 0.5rem; text-decoration: none; }
+  .tope .boton { margin-inline-start: auto; }
+  @media (min-width: 54rem) {
+    .tope-nav { display: flex; }
+    .tope .boton { margin-inline-start: 0; }
+  }
+  @media (hover: hover) { .tope-nav a:hover { color: var(--tinta); } }
+
+  .boton {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding: 0 1.25rem;
+    border-radius: 999px;
+    font-weight: 650;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .boton--tinta { background: var(--tinta); color: var(--fondo); }
+  .boton--cobre { background: var(--cobre-lleno); color: #1c1206; }
+  .boton--grande { min-block-size: 3.5rem; padding-inline: 1.75rem; font-size: 1.125rem; }
+  .enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    font-weight: 650;
+    text-decoration: underline;
+    text-decoration-color: var(--cobre);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+
+  /* ── Primera pantalla: solo Salix ── */
+  .abre {
+    position: relative;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: clamp(1.5rem, 4svh, 3rem);
+    min-block-size: calc(100svh - 4.6rem);
+    padding: clamp(1.5rem, 4svh, 3rem) var(--margen) clamp(4rem, 9svh, 6rem);
+    text-align: center;
+    overflow: clip;
+  }
+  .copa {
+    inline-size: min(36svh, 62vw, 22rem);
+    block-size: auto;
+    color: var(--tinta);
+    overflow: visible;
+  }
+  h1 { font-size: clamp(2.5rem, 1.2rem + 5.2vw, 5.75rem); }
+  h1 span { max-inline-size: 13ch; }
+  .abre-bajada {
+    margin: clamp(1rem, 2.5svh, 1.75rem) auto 0;
+    max-inline-size: 52ch;
+    font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.3125rem);
+    color: var(--tinta-2);
+    text-wrap: pretty;
+  }
+  .lema { margin-top: 1.25rem; font-size: 0.9375rem; letter-spacing: 0.01em; color: var(--tinta-2); }
+  .lema b { font-weight: 750; color: var(--cobre); }
+  .abre-baja {
+    position: absolute;
+    inset-block-end: clamp(1rem, 3svh, 2rem);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--tinta-2);
+    text-decoration: none;
+  }
+  /* Computadora y televisor: la copa a un lado, enorme, y el texto al otro. */
+  @media (min-width: 62rem) and (min-height: 34rem) {
+    .abre {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      justify-items: start;
+      text-align: start;
+      max-inline-size: var(--ancho);
+      margin-inline: auto;
+      column-gap: clamp(2rem, 6vw, 7rem);
+    }
+    .copa { order: 2; justify-self: center; inline-size: min(62svh, 40vw, 38rem); }
+    .abre-bajada { margin-inline: 0; }
+    .abre-baja { inset-inline-start: var(--margen); }
+  }
+  /* Teléfono acostado: poco alto. La copa se achica y va al costado. */
+  @media (max-height: 30rem) and (min-width: 34rem) {
+    .abre { grid-template-columns: auto minmax(0, 1fr); justify-items: start; text-align: start; align-items: center; min-block-size: auto; }
+    .copa { inline-size: min(48svh, 11rem); }
+    .abre-bajada { margin-inline: 0; }
+    .abre-baja { display: none; }
+  }
+
+  /* El momento de la página: las ramas del sauce bajan, cada una a su tiempo. */
+  @media (prefers-reduced-motion: no-preference) {
+    .copa:not(.copa--chica) .rama { animation: rama-baja var(--duracion) var(--curva) var(--retraso) both; }
+    .abre-texto, .abre-baja { animation: asoma 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.9s both; }
+  }
+  @keyframes rama-baja { from { transform: translateY(var(--desde)); } }
+  @keyframes asoma { from { opacity: 0; translate: 0 0.75rem; } }
+
+  /* ── La casa: el plano ── */
+  .casa {
+    display: grid;
+    gap: clamp(2rem, 5svh, 3.5rem);
+    padding: clamp(4rem, 12svh, 9rem) var(--margen);
+    max-inline-size: var(--ancho);
+    margin-inline: auto;
+    border-top: 1px solid var(--linea-fina);
+    scroll-margin-top: 4rem;
+  }
+  .casa-texto p { margin-top: 1.25rem; max-inline-size: 44ch; font-size: 1.125rem; color: var(--tinta-2); text-wrap: pretty; }
+  @media (min-width: 70rem) {
+    .casa { grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); align-items: start; }
+    .casa-texto { position: sticky; top: 7rem; }
+  }
+  .plano {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    block-size: clamp(27rem, 70svh, 42rem);
+    padding-top: 2.25rem;
+  }
+  .plano-casa {
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    block-size: 2.25rem;
+    padding-inline: 0.875rem;
+    border-radius: 999px;
+    background: var(--tinta);
+    color: var(--fondo);
+    font-weight: 700;
+    font-stretch: 110%;
+    font-size: 0.9375rem;
+  }
+  .linea { position: relative; display: block; min-inline-size: 0; text-decoration: none; }
+  .linea-via {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: calc(50% - var(--via) / 2);
+    inline-size: var(--via);
+    block-size: var(--largo);
+    border-radius: 0 0 999px 999px;
+    background: var(--c);
+    transform-origin: top;
+  }
+  .linea--obra .linea-via {
+    background: repeating-linear-gradient(to bottom, var(--c) 0 0.625rem, transparent 0.625rem 1.125rem);
+    border-radius: 0;
+  }
+  .linea-fin {
+    position: absolute;
+    inset-block-start: var(--largo);
+    inset-inline: 0;
+    display: grid;
+    justify-items: center;
+    gap: 0.125rem;
+    text-align: center;
+  }
+  .linea-punto {
+    inline-size: 1.625rem;
+    block-size: 1.625rem;
+    margin-top: -0.875rem;
+    border-radius: 50%;
+    background: var(--fondo);
+    border: 0.3125rem solid var(--c);
+    transition: scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .linea-fin strong { margin-top: 0.5rem; font-size: clamp(0.875rem, 0.7rem + 0.45vw, 1.125rem); font-weight: 700; font-stretch: 104%; }
+  .linea-fin span:last-child { font-size: 0.75rem; color: var(--tinta-2); text-wrap: balance; max-inline-size: 9rem; }
+  @media (hover: hover) { .linea:hover .linea-punto { scale: 1.3; } }
+  .cruce {
+    position: absolute;
+    z-index: 1;
+    inset-inline-start: calc(100% / 16 - 1.125rem);
+    block-size: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--fondo-2);
+    color: var(--tinta);
+    border: 2px solid var(--tinta);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .cruce--ia { inset-block-start: 26%; inline-size: calc(100% / 8 * 2 + 2.25rem); }
+  .cruce--mp { inset-block-start: 47%; inline-size: calc(100% / 8 * 1 + 2.25rem); }
+  @media (max-width: 47.99rem) {
+    .plano { --via: 0.5rem; block-size: clamp(25rem, 66svh, 34rem); }
+    .linea-fin strong { writing-mode: vertical-rl; font-size: 0.8125rem; }
+    .linea-fin span:last-child { display: none; }
+    .linea-punto { inline-size: 1.375rem; block-size: 1.375rem; margin-top: -0.75rem; border-width: 0.25rem; }
+    .cruce { block-size: 1.75rem; font-size: 0.625rem; inset-inline-start: calc(100% / 16 - 0.875rem); }
+    .cruce--ia { inline-size: calc(100% / 8 * 2 + 1.75rem); }
+    .cruce--mp { inline-size: calc(100% / 8 * 1 + 1.75rem); }
+    .cruce--mp span { font-size: 0.5625rem; }
+  }
+  /* Las líneas bajan de la casa cuando el plano entra en pantalla, atadas al scroll. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Un solo reloj para todo el plano: su propia entrada en pantalla. Así las líneas bajan juntas y
+         los nombres aparecen cuando ya llegaron, sin importar dónde quede cada uno. */
+      .plano { view-timeline-name: --plano; }
+      .linea-via { animation: linea-baja linear both; animation-timeline: --plano; animation-range: entry 10% entry 80%; }
+      .linea-fin, .cruce { animation: asoma-quieto linear both; animation-timeline: --plano; animation-range: entry 70% entry 100%; }
+    }
+  }
+  @keyframes linea-baja { from { transform: scaleY(0); } }
+  @keyframes asoma-quieto { from { opacity: 0; } }
+
+  /* ── Productos, con la estética de Salix ── */
+  .producto {
+    display: grid;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+    padding: clamp(3.5rem, 10svh, 8rem) var(--margen);
+    max-inline-size: var(--ancho);
+    margin-inline: auto;
+    border-top: 1px solid var(--linea-fina);
+    scroll-margin-top: 4rem;
+  }
+  @media (min-width: 62rem) {
+    .producto { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+    .producto:nth-child(even) .producto-texto { order: 2; }
+  }
+  .producto-nombre { display: flex; flex-wrap: wrap; align-items: center; gap: 0.625rem; font-size: 1.25rem; font-weight: 700; font-stretch: 108%; }
+  .producto-logo { display: grid; place-items: center; inline-size: 2.75rem; block-size: 2.75rem; border-radius: 0.75rem; background: var(--fondo-2); color: var(--c); box-shadow: inset 0 0 0 1px var(--linea-fina); }
+  .producto-logo .logo-nuvix { inline-size: 1.5rem; block-size: 1.5rem; }
+  .producto-que { font-weight: 450; font-stretch: 100%; font-size: 0.9375rem; color: var(--tinta-2); }
+  .producto h2 { margin-top: 1.25rem; max-inline-size: 15ch; }
+  .hechos { margin-top: 1.75rem; display: grid; max-inline-size: 34rem; }
+  .hechos li { padding-block: 0.875rem; border-top: 1px solid var(--linea-fina); font-size: 1.0625rem; color: var(--tinta-2); text-wrap: pretty; }
+  .hechos--obra li strong { display: inline-block; min-inline-size: 4.5rem; color: var(--tinta); font-stretch: 106%; }
+  .producto .enlace, .sitios .enlace, .mas .enlace { margin-top: 1.25rem; }
+  /* La mesa: donde se apoya la captura. Un plano neutro de Salix, sin el color del producto. */
+  .mesa {
+    display: grid;
+    place-items: center;
+    padding: clamp(1.25rem, 3.5vw, 3.5rem);
+    border-radius: 1rem;
+    background: var(--fondo-2);
+    box-shadow: inset 0 0 0 1px var(--linea-fina);
+  }
+  .mesa img { border-radius: 0.5rem; }
+  .mesa--duo { grid-template-columns: 1fr 1fr; gap: clamp(0.75rem, 2vw, 1.5rem); padding-inline: clamp(1.5rem, 8vw, 7rem); }
+  .mesa--duo img { border-radius: 1.5rem; }
+  .mesa--duo img:last-child { margin-top: 2.5rem; }
+
+  /* ── Sitios ── */
+  .sitios {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    padding: clamp(3.5rem, 10svh, 8rem) var(--margen);
+    max-inline-size: var(--ancho);
+    margin-inline: auto;
+    border-top: 1px solid var(--linea-fina);
+    scroll-margin-top: 4rem;
+  }
+  .sitios-texto p { margin-top: 1.25rem; max-inline-size: 46ch; font-size: 1.0625rem; color: var(--tinta-2); text-wrap: pretty; }
+  .sitios-fila { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 2vw, 1.75rem); }
+  @media (min-width: 62rem) { .sitios-fila { grid-template-columns: 1fr 1fr 1fr; } }
+  .sitios-fila a { display: grid; gap: 0.125rem; text-decoration: none; }
+  .sitios-fila img { border-radius: 0.5rem; margin-bottom: 0.625rem; box-shadow: 0 0 0 1px var(--linea-fina); transition: translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .sitios-fila strong { font-size: 0.9375rem; font-weight: 650; }
+  .sitios-fila span { font-size: 0.8125rem; color: var(--tinta-2); }
+  @media (hover: hover) { .sitios-fila a:hover img { translate: 0 -0.375rem; } }
+
+  .mas {
+    display: grid;
+    gap: clamp(3rem, 6vw, 6rem);
+    padding: clamp(3.5rem, 10svh, 8rem) var(--margen);
+    max-inline-size: var(--ancho);
+    margin-inline: auto;
+    border-top: 1px solid var(--linea-fina);
+  }
+  @media (min-width: 62rem) { .mas { grid-template-columns: 1fr 1fr; } }
+  .mas-bloque { scroll-margin-top: 6rem; }
+
+  /* ── Voces ── */
+  .voces {
+    padding: clamp(3.5rem, 10svh, 8rem) var(--margen);
+    max-inline-size: var(--ancho);
+    margin-inline: auto;
+    border-top: 1px solid var(--linea-fina);
+    scroll-margin-top: 4rem;
+  }
+  .voces-fila { margin-top: clamp(2rem, 5svh, 3.5rem); display: grid; gap: clamp(2rem, 4vw, 4rem); }
+  @media (min-width: 62rem) { .voces-fila { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .voces blockquote { margin: 0; font-size: clamp(1.1875rem, 1.05rem + 0.6vw, 1.5rem); line-height: 1.35; font-weight: 450; text-wrap: pretty; }
+  .voces li p { margin-top: 1.25rem; padding-top: 1rem; border-top: 2px solid var(--cobre); font-size: 0.9375rem; color: var(--tinta-2); }
+  .voces li p strong { display: block; color: var(--tinta); font-weight: 650; }
+
+  .cierre {
+    display: grid;
+    justify-items: center;
+    gap: 1.75rem;
+    padding: clamp(4rem, 14svh, 10rem) var(--margen);
+    border-top: 1px solid var(--linea-fina);
+    text-align: center;
+    scroll-margin-top: 4rem;
+  }
+  .copa--chica { inline-size: 4rem; color: var(--cobre); }
+  .cierre h2 { max-inline-size: 20ch; }
+  .pie {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    align-items: center;
+    padding: 1.5rem var(--margen) max(1.5rem, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--linea-fina);
+    font-size: 0.875rem;
+    color: var(--tinta-2);
+  }
+  .pie .marca { color: var(--tinta); }
+  .pie a { margin-inline-start: auto; }
+
+  /* Televisor y monitores muy grandes: todo dentro de un margen seguro y con letra que se lea de lejos. */
+  @media (min-width: 120rem) {
+    :global(body) { --margen: 5vw; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .linea-punto, .sitios-fila img { transition: none; }
+  }
+</style>
