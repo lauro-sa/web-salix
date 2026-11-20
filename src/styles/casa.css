@@ -248,7 +248,15 @@ img {
   }
 }
 
-/* Los dos botones del formulario de contacto (los nombres de la web anterior). */
+/* La frase del nombre, bajo el logo del pie: lisa, sin letras de otro color ni resaltadas
+   (Sal, 2026-11-20: «que tenga una letra resaltada, siento que está raro»). */
+/* El selector largo es para ganarle al estilo propio de la pieza del lema, que pinta esas letras. */
+.psx-pie .psx-pie-caja .psx-pie-marca .psx-pie-lema b {
+  font-weight: inherit;
+  color: inherit;
+}
+
+/* Los dos botones: el lleno y el de contorno (con los nombres de la web anterior). */
 .boton-primario {
   padding-inline: 1.5rem;
 }

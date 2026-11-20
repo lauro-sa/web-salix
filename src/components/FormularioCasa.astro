@@ -12,7 +12,8 @@
 // whatsapp, preferencia, mensaje, pagina, demora y la trampa `sitio_web`. Si el envío falla, lo dice
 // y muestra el correo: nunca da por enviado algo que no salió.
 //
-// Nuvix no se ofrece acá: su web no junta correos de interesados (regla de Nuvix, productos.ts).
+// Están todas las líneas de la casa, Nuvix incluido (Sal, 2026-11-20: «que estén todos, lo que
+// hacemos»). La consulta por Nuvix es una consulta a Salix, no una lista de espera de la app.
 // ============================================================
 import ramas from '../ramas-salix.json';
 import { ENTRADAS, CORREO } from '../propuestas/datos';
@@ -29,12 +30,16 @@ const pista = (id: string) => PRODUCTOS.find((p) => p.id.toLowerCase() === id)?.
 const valor = (id: string) => PRODUCTOS.find((p) => p.id.toLowerCase() === id)?.id ?? id;
 const de = (id: string) => ENTRADAS.find((e) => e.id === id)!;
 
-const OPCIONES = ['flux', 'menu', 'sites', 'integraciones'].map((id) => ({
+// La ayuda del mensaje que la lista de siempre no trae.
+const PISTA_PROPIA: Record<string, string> = {
+  nuvix: 'Nuvix todavía no está en el App Store. Contanos tu consulta sobre la app.',
+};
+const OPCIONES = ['flux', 'menu', 'nuvix', 'sites', 'integraciones'].map((id) => ({
   id,
   valor: valor(id),
   nombre: id === 'sites' ? 'Un sitio web' : de(id).nombre,
   que: id === 'sites' ? 'A medida, hecho por nosotros' : de(id).que,
-  pista: pista(id),
+  pista: PISTA_PROPIA[id] ?? pista(id),
 }));
 const VIENEN = ENTRADAS.filter((e) => e.viene).map((e) => ({ id: e.id, valor: valor(e.id), nombre: e.nombre, que: e.que, pista: pista(e.id) }));
 const OTRA = { valor: 'Otra consulta', nombre: 'Otra cosa', que: 'Una idea, un software a medida, una duda', pista: 'Contanos qué tenés en mente, con tus palabras.' };
@@ -85,7 +90,7 @@ const { cx, cy, r } = ramas.copa;
             {VIENEN.map((o) => (
               <label class="fc-chip">
                 <input type="radio" name="producto" value={o.valor} data-nombre={o.nombre} data-pista={o.pista} />
-                <span><strong>{o.nombre}</strong> {o.que}</span>
+                <span><strong>{o.nombre}</strong> <span class="fc-chip-que">{o.que}</span></span>
               </label>
             ))}
           </div>
@@ -276,6 +281,10 @@ const { cx, cy, r } = ramas.copa;
   .fc-cuerpo {
     min-block-size: 23.5rem;
     padding: clamp(1.25rem, 3vw, 1.75rem) var(--fc-margen) 0.5rem;
+    /* Nada se corre hacia el costado: el paso que entra viene desplazado y, sin esto, por un
+       momento el formulario se podía mover de lado (Sal, 2026-11-20). */
+    overflow-x: hidden;
+    overflow-x: clip;
   }
   .fc-paso {
     margin: 0;
@@ -444,6 +453,12 @@ const { cx, cy, r } = ramas.copa;
   .fc-chip strong {
     font-weight: 600;
     color: var(--texto);
+  }
+  /* En un teléfono angosto los tres entran en un renglón: queda el nombre solo. */
+  @media (max-width: 30rem) {
+    .fc-chip-que {
+      display: none;
+    }
   }
   .fc-chip input:checked + span {
     background: var(--texto);
@@ -700,8 +715,11 @@ const { cx, cy, r } = ramas.copa;
     z-index: 600;
     inset: 0 0 auto;
     block-size: var(--fc-alto, 100dvh);
-    transform: translateY(calc(var(--fc-arriba, 0px) + var(--fc-tira, 0px)));
-    border-radius: 0;
+    transform: translateY(calc(var(--fc-arriba, 0px) + var(--fc-tira, 0px))) scale(var(--fc-escala, 1));
+    border-radius: var(--fc-radio, 0px);
+    /* El dedo no mueve nada de lado ni estira la página: los arrastres los maneja formulario-casa.ts. */
+    touch-action: pan-y;
+    overscroll-behavior: none;
     box-shadow: none;
     background: var(--fondo);
     padding-top: env(safe-area-inset-top, 0px);
@@ -741,6 +759,7 @@ const { cx, cy, r } = ramas.copa;
   }
   .fc--pantalla .fc-cuerpo {
     min-block-size: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
@@ -752,7 +771,19 @@ const { cx, cy, r } = ramas.copa;
     background: var(--fondo);
   }
   .fc--suelta {
-    transition: transform 0.35s var(--curva);
+    transition:
+      transform 0.35s var(--curva),
+      border-radius 0.35s var(--curva);
+  }
+  /* Los renglones del paso 1 no se salen de la hoja ni con letra grande. */
+  .fc-chip span {
+    max-inline-size: 100%;
+  }
+  .fc-chips,
+  .fc-opciones,
+  .fc-campo {
+    min-inline-size: 0;
+    max-inline-size: 100%;
   }
   /* Sin la transición entre vistas del navegador, entra subiendo desde abajo. */
   @media (prefers-reduced-motion: no-preference) {

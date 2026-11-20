@@ -4,8 +4,8 @@
 //
 //   · Los pasos: validar, avanzar, volver, y el envío a /contacto.php (el contrato de siempre).
 //   · En el teléfono, la pantalla completa: al tocar el formulario ocupa toda la pantalla y la página
-//     de atrás deja de moverse; vuelve a su lugar con el botón, tirando hacia abajo, con Escape o
-//     yendo atrás. Sigue a lo que queda a la vista cuando el teclado del iPhone achica la pantalla.
+//     de atrás deja de moverse; vuelve a su lugar con el botón, arrastrando con fuerza hacia abajo o
+//     hacia arriba desde cualquier parte, con Escape o yendo atrás. Sigue a lo que queda a la vista cuando el teclado del iPhone achica la pantalla.
 // ============================================================
 
 const TEXTO_PREFERENCIA: Record<string, string> = {
@@ -254,6 +254,9 @@ export function montarFormularioCasa(): void {
         caja!.style.removeProperty('--fc-alto');
         caja!.style.removeProperty('--fc-arriba');
         caja!.style.removeProperty('--fc-tira');
+        caja!.style.removeProperty('--fc-escala');
+        caja!.style.removeProperty('--fc-radio');
+        caja!.classList.remove('fc--suelta');
         lugar.style.minBlockSize = '';
       }
     };
@@ -335,21 +338,40 @@ export function montarFormularioCasa(): void {
     if (!TELEFONO.matches) cerrar();
   });
 
-  // Tirar hacia abajo lo devuelve a su lugar. Arranca solo desde arriba (las paradas) o desde el
-  // cuerpo cuando no hay nada escrito encima que desplazar, y nunca sobre un campo.
+  // Arrastrar con fuerza hacia abajo o hacia arriba lo despega y lo devuelve a su lugar en la página.
+  // Vale desde cualquier parte del formulario (también sobre una opción o un botón: un toque sin
+  // moverse sigue siendo un toque). Mientras se arrastra, la hoja sigue al dedo y se achica un poco,
+  // así se ve la página de atrás. Si el contenido tiene para desplazarse (con el teclado abierto),
+  // primero se desplaza y recién en el borde empieza a despegarse.
+  const UMBRAL_INICIO = 10;
+  const UMBRAL_SOLTAR = 90;
+  let desdeX = 0;
   let desdeY = 0;
+  let desdeT = 0;
   let tirando = false;
-  let puedeTirar = false;
+  let descartado = false;
+  const mover = (dy: number) => {
+    const avance = Math.min(1, Math.abs(dy) / 320);
+    caja.style.setProperty('--fc-tira', `${Math.round(dy * 0.85)}px`);
+    caja.style.setProperty('--fc-escala', String(1 - avance * 0.08));
+    caja.style.setProperty('--fc-radio', `${Math.round(avance * 28)}px`);
+  };
+  const soltar = () => {
+    caja.classList.add('fc--suelta');
+    caja.style.setProperty('--fc-tira', '0px');
+    caja.style.setProperty('--fc-escala', '1');
+    caja.style.setProperty('--fc-radio', '0px');
+  };
   caja.addEventListener(
     'touchstart',
     (e) => {
       if (!enPantalla || e.touches.length !== 1) return;
-      const blanco = e.target as HTMLElement;
-      const enCampo = Boolean(blanco.closest('input, textarea, button, label, a'));
-      const enTope = Boolean(blanco.closest('.fc-tope'));
-      puedeTirar = enTope || (!enCampo && cuerpo.scrollTop <= 0);
+      desdeX = e.touches[0].clientX;
       desdeY = e.touches[0].clientY;
+      desdeT = performance.now();
       tirando = false;
+      // Un texto largo se desplaza con el dedo: ahí no se despega.
+      descartado = Boolean((e.target as HTMLElement).closest('textarea'));
       caja.classList.remove('fc--suelta');
     },
     { passive: true },
@@ -357,24 +379,51 @@ export function montarFormularioCasa(): void {
   caja.addEventListener(
     'touchmove',
     (e) => {
-      if (!enPantalla || !puedeTirar) return;
+      if (!enPantalla || descartado || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - desdeX;
       const dy = e.touches[0].clientY - desdeY;
-      if (!tirando && dy < 12) return;
-      tirando = true;
+      if (!tirando) {
+        if (Math.abs(dy) < UMBRAL_INICIO) return;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          descartado = true;
+          return;
+        }
+        // Si el contenido todavía tiene para desplazarse en ese sentido, que se desplace.
+        const sobra = cuerpo.scrollHeight - cuerpo.clientHeight;
+        const dentroDelCuerpo = cuerpo.contains(e.target as Node);
+        if (dentroDelCuerpo && sobra > 1) {
+          const puedeSubir = cuerpo.scrollTop > 0;
+          const puedeBajar = cuerpo.scrollTop < sobra - 1;
+          if ((dy > 0 && puedeSubir) || (dy < 0 && puedeBajar)) {
+            descartado = true;
+            return;
+          }
+        }
+        tirando = true;
+        (document.activeElement as HTMLElement | null)?.blur?.();
+      }
       e.preventDefault();
-      caja.style.setProperty('--fc-tira', `${Math.max(0, dy)}px`);
+      mover(dy);
     },
     { passive: false },
   );
-  caja.addEventListener('touchend', (e) => {
+  const terminar = (e: TouchEvent) => {
     if (!enPantalla || !tirando) return;
     tirando = false;
     const dy = (e.changedTouches[0]?.clientY ?? desdeY) - desdeY;
-    if (dy > 110) {
+    const rapidez = Math.abs(dy) / Math.max(1, performance.now() - desdeT);
+    if (Math.abs(dy) > UMBRAL_SOLTAR || (Math.abs(dy) > 36 && rapidez > 0.55)) {
+      // El toque que termina un arrastre no cuenta como toque sobre lo que había debajo.
+      e.preventDefault();
       cerrar();
       return;
     }
-    caja.classList.add('fc--suelta');
-    caja.style.setProperty('--fc-tira', '0px');
+    soltar();
+  };
+  caja.addEventListener('touchend', terminar);
+  caja.addEventListener('touchcancel', () => {
+    if (!tirando) return;
+    tirando = false;
+    soltar();
   });
 }
