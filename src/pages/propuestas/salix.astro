@@ -379,6 +379,37 @@ const VOCES = [
     gap: 0.625rem;
     margin-top: clamp(1.25rem, 3svh, 2rem);
   }
+  /* Un teléfono chico (poco alto, o muy angosto): todo se junta un poco para que los botones
+     entren en la primera pantalla sin bajar. */
+  @media (max-height: 40rem), (max-width: 22.5rem) {
+    .abre {
+      padding-block: calc(var(--psx-alto-barra, 4.5rem) + 0.5rem) 1.25rem;
+    }
+    .abre-logo :global(svg) {
+      inline-size: 2.5rem;
+      block-size: 2.5rem;
+    }
+    .abre-nombre {
+      margin-top: 0.625rem;
+      font-size: 2.5rem;
+    }
+    .abre-frase {
+      margin-top: 0.75rem;
+      font-size: 1.25rem;
+    }
+    .abre-rueda {
+      margin-top: 1rem;
+    }
+    .abre-acciones {
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+      margin-top: 0.875rem;
+    }
+    .abre-acciones .boton {
+      padding-inline: 1rem;
+      font-size: 0.8125rem;
+    }
+  }
   /* Teléfono acostado: poco alto. La pantalla no pide alto y el isotipo se guarda. */
   @media (max-height: 30rem) and (min-width: 34rem) {
     .abre {
@@ -389,15 +420,24 @@ const VOCES = [
       display: none;
     }
   }
+  /* La aparición al cargar, en un solo gesto de arriba hacia abajo: el isotipo (sus ramas bajan
+     solas), el nombre, la frase renglón por renglón, las fichas que se abren desde el centro
+     (rueda.ts) y, al final, los botones. Todo termina antes de los dos segundos. */
   @media (prefers-reduced-motion: no-preference) {
-    .abre-texto {
-      animation: asoma 0.8s var(--curva) 0.15s both;
+    .abre-logo {
+      animation: asoma-logo 0.9s var(--curva) both;
     }
-    .abre-rueda {
-      animation: asoma 1s var(--curva) 0.45s both;
+    .abre-nombre {
+      animation: asoma 0.9s var(--curva) 0.12s both;
+    }
+    .abre-frase {
+      animation: asoma 0.9s var(--curva) 0.26s both;
+    }
+    .abre-frase span {
+      animation: asoma 0.9s var(--curva) 0.38s both;
     }
     .abre-acciones {
-      animation: asoma 0.8s var(--curva) 0.75s both;
+      animation: asoma 0.8s var(--curva) 1.15s both;
     }
     /* Al seguir bajando, la primera pantalla se retira: se apaga y queda un poco atrás. */
     @supports (animation-timeline: view()) {
@@ -408,10 +448,17 @@ const VOCES = [
       }
     }
   }
+  @keyframes asoma-logo {
+    from {
+      opacity: 0;
+      scale: 0.8;
+    }
+  }
   @keyframes asoma {
     from {
       opacity: 0;
-      translate: 0 0.75rem;
+      translate: 0 1rem;
+      filter: blur(6px);
     }
   }
   @keyframes se-retira {

@@ -25,7 +25,13 @@ function montar(rueda: HTMLElement): void {
   if (fichas.length < 5) return;
   const paso = (Math.PI * 2) / fichas.length;
 
-  let angulo = 0.85; // arranca corrida y se acomoda: es la entrada
+  // La entrada: las fichas salen todas del centro y se abren en abanico mientras la rueda termina de
+  // acomodarse. `apertura` va de 0 a 1 en algo más de un segundo, después de que entró el título.
+  const ENTRADA_DEMORA = 0.55;
+  const ENTRADA_DURA = 1.25;
+  let reloj = 0;
+  let apertura = 0;
+  let angulo = 0.7;
   let destino: number | null = 0;
   let velocidad = 0; // el envión del arrastre, en radianes por segundo
   let espera = 0;
@@ -62,9 +68,9 @@ function montar(rueda: HTMLElement): void {
         if (ficha.style.visibility !== 'hidden') ficha.style.visibility = 'hidden';
         return;
       }
-      const x = Math.sin(a) * radio;
-      const escala = 0.52 + 0.48 * z * z;
-      const opacidad = Math.min(1, Math.pow((z - 0.06) / 0.62, 1.25));
+      const x = Math.sin(a) * radio * apertura;
+      const escala = (0.52 + 0.48 * z * z) * (0.72 + 0.28 * apertura);
+      const opacidad = Math.min(1, Math.pow((z - 0.06) / 0.62, 1.25)) * Math.min(1, apertura * 1.6);
       const desenfoque = z < 0.72 ? (0.72 - z) * 4.5 : 0;
       ficha.style.visibility = '';
       ficha.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0) scale(${escala.toFixed(3)})`;
@@ -92,7 +98,13 @@ function montar(rueda: HTMLElement): void {
     cuadro = 0;
     const dt = Math.min(0.05, (ahora - antes) / 1000);
     antes = ahora;
-    if (!arrastrando) {
+    if (apertura < 1) {
+      reloj += dt;
+      const t = Math.min(1, Math.max(0, (reloj - ENTRADA_DEMORA) / ENTRADA_DURA));
+      apertura = 1 - Math.pow(1 - t, 4); // desacelera al llegar
+      if (t > 0) rueda.classList.add('rueda--abierta');
+    }
+    if (!arrastrando && reloj >= ENTRADA_DEMORA) {
       if (Math.abs(velocidad) > 0.35) {
         // El envión del arrastre: sigue girando y se va gastando.
         angulo += velocidad * dt;
@@ -108,7 +120,7 @@ function montar(rueda: HTMLElement): void {
         if (Math.abs(falta) < 0.004) {
           angulo = destino;
           // …descansa ahí, y pasa a la siguiente.
-          if (!encima && !conFoco) {
+          if (!encima && !conFoco && apertura >= 1) {
             espera += dt;
             if (espera > REPOSO) {
               destino -= paso;
@@ -134,6 +146,7 @@ function montar(rueda: HTMLElement): void {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     arrastrando = true;
     seMovio = false;
+    reloj = ENTRADA_DEMORA + ENTRADA_DURA;
     destino = null;
     velocidad = 0;
     ultimoX = e.clientX;

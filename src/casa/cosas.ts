@@ -29,14 +29,15 @@ export const COSAS: Cosa[] = [
 export interface Pieza {
   /** La línea de la casa: decide el color de la luz y del borde cuando pasa al frente (`--linea-<id>`). */
   id: string;
-  /** El ícono de la casa (IconoProducto.astro), o… */
-  icono?: string;
-  /** …el ícono oficial del sitio, tal como lo publica su dueño (nunca redibujado). */
+  /**
+   * El ícono de app oficial, tal como lo publica su dueño: el de cada producto es el de su app y el de
+   * cada sitio, el de su marca. Va entero, sin retoques (nunca redibujado ni recoloreado).
+   */
   imagen?: string;
-  /** El color de fondo de la ficha, como el de un ícono de app. Sin él, la ficha es neutra. */
+  /** Un logo con fondo transparente: va centrado sobre este color, que es el de su marca. */
   fondo?: string;
-  /** El ícono trae su propio fondo y ocupa la ficha entera. */
-  llena?: boolean;
+  /** Lo que todavía no tiene ícono propio lleva uno de trazo de la casa (IconoProducto.astro). */
+  icono?: string;
   nombre: string;
   que: string;
   /** La parte de la portada a la que lleva. */
@@ -46,15 +47,19 @@ export interface Pieza {
 
 // Todo lo que hace la casa, en el orden de la rueda. Los productos, los sitios hechos y lo que viene
 // se intercalan, así al frente y a sus lados siempre hay cosas distintas.
+// Los íconos están en public/propuestas/iconos/ y salen de: Flux y Menu, `public/iconos/icon-512.png`
+// de cada producto en el monorepo; Nuvix, `web/public/icono-512.png`; herreelec y porcorosso, su
+// `apple-touch-icon.png`; tph, su logo oficial en blanco (`public/logos/Logo-B-01.png`).
+const I = '/propuestas/iconos';
 export const RUEDA: Pieza[] = [
-  { id: 'flux', icono: 'flux', fondo: '#4e4eb8', nombre: 'Flux', que: 'Sistema de gestión', ancla: 'flux' },
-  { id: 'sites', imagen: '/propuestas/iconos/herreelec.png', fondo: '#0f1320', nombre: 'herreelec.com', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
-  { id: 'menu', icono: 'menu', fondo: '#394a42', nombre: 'Menu', que: 'Carta digital con QR', ancla: 'menu' },
+  { id: 'flux', imagen: `${I}/flux.png`, nombre: 'Flux', que: 'Sistema de gestión', ancla: 'flux' },
+  { id: 'sites', imagen: `${I}/herreelec.png`, nombre: 'herreelec.com', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
+  { id: 'menu', imagen: `${I}/menu.png`, nombre: 'Menu', que: 'Carta digital con QR', ancla: 'menu' },
   { id: 'obra', icono: 'delivery', nombre: 'Go', que: 'Delivery para tu local · En obra', ancla: 'viene', obra: true },
-  { id: 'nuvix', icono: 'nuvix', fondo: '#136c64', nombre: 'Nuvix', que: 'App para iPhone', ancla: 'nuvix' },
-  { id: 'sites', imagen: '/propuestas/iconos/tph.png', fondo: '#000000', llena: true, nombre: 'tphservice.com', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
-  { id: 'integraciones', icono: 'link', fondo: '#2a2c33', nombre: 'Integraciones', que: 'Sesiones de 45 minutos', ancla: 'integraciones' },
+  { id: 'nuvix', imagen: `${I}/nuvix.png`, nombre: 'Nuvix', que: 'App para iPhone', ancla: 'nuvix' },
+  { id: 'sites', imagen: `${I}/tph.png`, fondo: '#0a0a0b', nombre: 'tphservice.com', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
+  { id: 'integraciones', icono: 'link', nombre: 'Integraciones', que: 'Sesiones de 45 minutos', ancla: 'integraciones' },
   { id: 'obra', icono: 'cancha', nombre: 'Play', que: 'Turnos y cobros de canchas · En obra', ancla: 'viene', obra: true },
-  { id: 'sites', imagen: '/propuestas/iconos/porcorosso.png', fondo: '#ffffff', llena: true, nombre: 'porcorosso.com.ar', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
+  { id: 'sites', imagen: `${I}/porcorosso.png`, nombre: 'porcorosso.com.ar', que: 'Sitio web hecho por Salix', ancla: 'sitios' },
   { id: 'obra', icono: 'agenda', nombre: 'Book', que: 'Turnos para consultorios · En obra', ancla: 'viene', obra: true },
 ];

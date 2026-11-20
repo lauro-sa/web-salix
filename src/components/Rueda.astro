@@ -31,9 +31,9 @@ const { base = '' } = Astro.props;
           data-que={p.que}
           draggable="false"
         >
-          <span class:list={['rueda-icono', { 'rueda-icono--llena': p.llena, 'rueda-icono--color': p.fondo }]}>
-            {p.icono && <IconoProducto nombre={p.icono} tamaño={28} />}
-            {p.imagen && <img src={p.imagen} width="192" height="192" alt="" loading="eager" decoding="async" draggable="false" />}
+          <span class:list={['rueda-icono', { 'rueda-icono--oficial': p.imagen, 'rueda-icono--logo': p.imagen && p.fondo, 'rueda-icono--obra': p.obra }]}>
+            {p.imagen && <img src={p.imagen} width="512" height="512" alt="" loading="eager" decoding="async" draggable="false" />}
+            {!p.imagen && p.icono && <IconoProducto nombre={p.icono} tamaño={28} />}
           </span>
           <span class="rueda-rotulo"><strong>{p.nombre}</strong> <span>{p.que}</span></span>
         </a>
@@ -53,14 +53,16 @@ const { base = '' } = Astro.props;
 
 <style>
   .rueda {
-    --lado: 4.5rem;
+    /* El lado de la ficha del frente: crece con la pantalla, de un teléfono chico a un monitor. */
+    --lado: clamp(4.25rem, 3.2rem + 4.4vw, 6.75rem);
     position: relative;
-    inline-size: min(100%, 46rem);
+    inline-size: min(100%, 48rem);
     margin-inline: auto;
   }
-  @media (min-width: 48rem) {
+  /* Poco alto (un teléfono acostado, una ventana baja): la ficha cede. */
+  @media (max-height: 34rem) {
     .rueda {
-      --lado: 6rem;
+      --lado: 4.25rem;
     }
   }
   .rueda-luz,
@@ -82,42 +84,48 @@ const { base = '' } = Astro.props;
     inline-size: 8.5rem;
     -webkit-tap-highlight-color: transparent;
   }
-  /* La ficha: un ícono de app. Su color de fondo, un brillo arriba, el borde fino y la sombra que la
-     despega del fondo. */
+  /* La ficha: un ícono de app. Los oficiales van enteros, tal como son; lo que todavía no tiene ícono
+     propio va en una ficha de la casa, oscura, con su dibujo de trazo. A todas las despega del fondo
+     la misma sombra y el mismo borde fino. */
   .rueda-icono {
-    --fondo: var(--fondo-ficha, var(--superficie));
     display: grid;
     place-items: center;
     inline-size: var(--lado);
     block-size: var(--lado);
     overflow: hidden;
-    border-radius: calc(var(--lado) * 0.26);
+    border-radius: calc(var(--lado) * 0.235);
     background:
-      linear-gradient(160deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 46%),
-      var(--fondo);
+      linear-gradient(160deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0) 48%),
+      #1b1c21;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 1.5rem 2rem -1.25rem rgba(0, 0, 0, 0.6);
+    color: #f2efe8;
+    transition: box-shadow 0.6s ease;
+  }
+  .rueda-icono :global(svg) {
+    inline-size: 42%;
+    block-size: 42%;
+  }
+  .rueda-icono--obra {
+    color: rgba(242, 239, 232, 0.5);
+  }
+  .rueda-icono--oficial {
+    background: var(--fondo-ficha, none);
     box-shadow:
       inset 0 0 0 1px color-mix(in srgb, var(--texto) 12%, transparent),
       0 1.5rem 2rem -1.25rem rgba(0, 0, 0, 0.6);
-    color: var(--texto-secundario);
-    transition: box-shadow 0.6s ease;
-  }
-  .rueda-icono--color {
-    color: #fff;
-  }
-  .rueda-icono :global(svg) {
-    inline-size: 46%;
-    block-size: 46%;
   }
   .rueda-icono img {
-    inline-size: 64%;
-    block-size: 64%;
-    object-fit: contain;
-    -webkit-user-drag: none;
-  }
-  .rueda-icono--llena img {
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
+    -webkit-user-drag: none;
+  }
+  .rueda-icono--logo img {
+    inline-size: 60%;
+    block-size: 60%;
+    object-fit: contain;
   }
   .rueda-rotulo {
     display: grid;
@@ -194,11 +202,17 @@ const { base = '' } = Astro.props;
     border-radius: 50%;
     background-color: var(--frente, transparent);
     filter: blur(2.75rem);
-    opacity: 0.34;
-    transition: background-color 0.9s ease;
+    opacity: 0;
+    transition:
+      background-color 0.9s ease,
+      opacity 1.4s ease 0.3s;
     pointer-events: none;
   }
-  :global([data-tema='claro']) :global(.rueda--viva) .rueda-luz {
+  /* La luz y el cartel entran cuando las fichas ya se están abriendo. */
+  :global(.rueda--abierta) .rueda-luz {
+    opacity: 0.34;
+  }
+  :global([data-tema='claro']) :global(.rueda--abierta) .rueda-luz {
     opacity: 0.22;
   }
   /* El cartel: el nombre de la ficha que está al frente. */
@@ -211,6 +225,11 @@ const { base = '' } = Astro.props;
     min-block-size: 3rem;
     text-align: center;
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.7s ease 0.75s;
+  }
+  :global(.rueda--abierta) .rueda-cartel {
+    opacity: 1;
   }
   .rueda-cartel strong {
     font-size: 1.0625rem;
