@@ -20,9 +20,13 @@ import { PRODUCTOS, SIN_DECIDIR, CORREO_CONTACTO } from '../productos';
 
 interface Props {
   productoPreseleccionado?: string;
+  /** Sin el título de arriba: la página que lo usa pone el suyo (la web nueva). */
+  sinEncabezado?: boolean;
+  /** El id del bloque. Por defecto es el destino de «Hablemos». */
+  id?: string;
 }
 
-const { productoPreseleccionado } = Astro.props;
+const { productoPreseleccionado, sinEncabezado = false, id = 'contacto' } = Astro.props;
 
 // Un producto con `formulario: false` se muestra en la grilla pero no se ofrece acá.
 const enFormulario = PRODUCTOS.filter((p) => p.formulario !== false);
@@ -32,8 +36,8 @@ const PASOS = ['Producto', 'Contacto', 'Mensaje', 'Listo'];
 const flecha = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
 ---
 
-<section class="seccion" id="contacto">
-  <div class="form-encabezado aparecer">
+<section class="seccion" id={id}>
+  {!sinEncabezado && <div class="form-encabezado aparecer">
     <span class="etiqueta">Contacto</span>
     <h2 class="titulo-seccion">Hablemos.</h2>
     {productoPreseleccionado ? (
@@ -41,7 +45,7 @@ const flecha = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
     ) : (
       <p class="form-sub">Contanos qué necesitás y te decimos cómo te puede ayudar Salix.</p>
     )}
-  </div>
+  </div>}
 
   <form
     class="form-contenedor aparecer delay-2"

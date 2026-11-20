@@ -37,6 +37,10 @@
   --linea-nuvix: #136c64;
   --linea-sites: #b0600a;
   --linea-obra: #a8a296;
+  --salix-suave: rgba(176, 96, 10, 0.08);
+  --salix-borde: rgba(176, 96, 10, 0.22);
+  --peligro: #c5221f;
+  --peligro-suave: rgba(197, 34, 31, 0.12);
 }
 [data-tema='oscuro'] {
   --fondo: #0d0e11;
@@ -56,6 +60,10 @@
   --linea-nuvix: #2fb5a6;
   --linea-sites: #e8922a;
   --linea-obra: #5d6068;
+  --salix-suave: rgba(232, 146, 42, 0.1);
+  --salix-borde: rgba(232, 146, 42, 0.2);
+  --peligro: #f28b82;
+  --peligro-suave: rgba(242, 139, 130, 0.14);
 }
 
 :root {
@@ -65,6 +73,16 @@
   --margen: clamp(1.25rem, 5vw, 3rem);
   --aire: clamp(4rem, 9vw, 7rem);
   --curva: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Lo que todavía leen las piezas que se conservan de la web anterior (el formulario de contacto). */
+  --card: var(--fondo-alt);
+  --card-hover: var(--superficie);
+  --ico-color: var(--texto);
+  --radio-pill: 999px;
+  --radio-card: 0.875rem;
+  --radio-icono: 0.625rem;
+  --transicion: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicion-lenta: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Lo que leen la barra, el menú y el pie de la familia (publico-salix.css). */
   --psx-fondo: var(--fondo);
@@ -227,6 +245,39 @@ img {
   }
   .enlace:hover > span {
     translate: 0.1875rem 0;
+  }
+}
+
+/* Los dos botones del formulario de contacto (los nombres de la web anterior). */
+.boton-primario {
+  padding-inline: 1.5rem;
+}
+.boton-secundario {
+  padding-inline: 1.5rem;
+  background: transparent;
+  color: var(--texto);
+  box-shadow: inset 0 0 0 1px var(--borde);
+}
+@media (hover: hover) {
+  .boton-secundario:hover {
+    background: var(--superficie);
+  }
+}
+
+/* ── Lo que aparece una vez, al entrar en pantalla (casa.ts le pone `.visto`). Sin JavaScript o con
+   «reducir movimiento» está siempre a la vista. Los hermanos entran en cascada corta (`--i`). ── */
+@media (prefers-reduced-motion: no-preference) {
+  .con-js [data-asoma] {
+    opacity: 0;
+    translate: 0 1.25rem;
+    transition:
+      opacity 0.7s var(--curva),
+      translate 0.9s var(--curva);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+  .con-js [data-asoma].visto {
+    opacity: 1;
+    translate: 0 0;
   }
 }
 

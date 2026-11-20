@@ -33,6 +33,8 @@ const conVersion = (ruta: string) => `${ruta}?v=${VERSION_LOGO}`;
   <script is:inline>
     (function () {
       var d = document.documentElement;
+      // Con JavaScript: lo que aparece al entrar en pantalla puede arrancar escondido (casa.css).
+      d.classList.add('con-js');
       function aplicar() {
         var p = 'sistema';
         try { p = localStorage.getItem('salix-tema') || 'sistema'; } catch (e) {}
@@ -76,11 +78,14 @@ const conVersion = (ruta: string) => `${ruta}?v=${VERSION_LOGO}`;
 <script>
   import { iniciarToggleTema } from '../scripts/utilidades.js';
   import { montarPublicoSalix } from '../scripts/publico-salix';
+  import { montarCasa } from '../scripts/casa';
   import '../firma-stian/firma-stian.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     iniciarToggleTema('boton-tema');
     // La barra, el menú del teléfono, el pie en cortina y el cierre que se acomoda (familia).
     montarPublicoSalix(document);
+    // El plano que se dibuja con el scroll, las líneas de los productos y lo que aparece al entrar.
+    montarCasa();
   });
 </script>
