@@ -523,7 +523,14 @@ const LINEAS: Record<number, string> = {
   }
 
   @media (max-width: 720px) {
-    .impl { grid-template-columns: 1fr; max-width: 420px; }
+    /* Una columna que no se estira con lo que lleva adentro (el contador no la ensancha). */
+    .impl { grid-template-columns: minmax(0, 1fr); max-width: 420px; }
+  }
+  /* Un teléfono angosto: menos aire en la caja, y el contador ocupa el ancho que haya. */
+  @media (max-width: 24rem) {
+    .impl-checkout { padding: 20px 16px; }
+    .impl-stepper { display: flex; }
+    .impl-horas { min-width: 0; flex: 1; }
   }
 
   @media (prefers-reduced-motion: reduce) {
