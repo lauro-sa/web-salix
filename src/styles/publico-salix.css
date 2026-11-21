@@ -125,10 +125,15 @@ html:has(.psx-barra):not([data-msx-telon='activo'], [data-msx-telon='sube'])::af
     width 0.15s ease,
     background-color 0.15s ease;
 }
-.psx-scroll-pulgar:hover::before,
 .psx-scroll--arrastra .psx-scroll-pulgar::before {
   width: 0.4375rem;
   background: rgba(128, 128, 128, 0.8);
+}
+@media (hover: hover) {
+  .psx-scroll-pulgar:hover::before {
+    width: 0.4375rem;
+    background: rgba(128, 128, 128, 0.8);
+  }
 }
 html.psx-sin-scroll .psx-scroll {
   display: none;
