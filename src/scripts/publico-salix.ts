@@ -35,12 +35,13 @@
  *     el foco a la opción activa y lo devuelve al botón. ELEGIR el idioma es de cada producto: el
  *     de React escucha el clic de su opción; uno sin framework, el evento `psx:idioma` que se emite
  *     con `{ idioma }` al tocar una opción habilitada;
- *   - el control de tema (`.psx-tema`, en el pie): tres tramos, automático, claro y oscuro. Guarda la
- *     elección en `localStorage` bajo la clave de `data-clave` (automático no guarda nada: sigue al
- *     aparato), escribe `data-tema` («claro» u «oscuro») y `data-pref` («auto», «claro» u «oscuro») en
- *     `<html>` y emite `psx:tema` con `{ pref, tema }`. Un producto que aplica el tema por su cuenta
- *     (React) pone `data-solo-avisa` y escucha el evento. El tema ANTES del primer pintado sigue siendo
- *     de cada producto: un script en el `<head>` que lee la misma clave.
+ *   - el botón de tema (`.psx-tema`, en el pie): cada toque pasa al modo siguiente (automático, claro,
+ *     oscuro) y asoma un instante el nombre del modo. Le pone sus tres íconos, guarda la elección en
+ *     `localStorage` bajo la clave de `data-clave` (automático no guarda nada: sigue al aparato),
+ *     escribe `data-tema` («claro» u «oscuro») y `data-pref` («auto», «claro» u «oscuro») en `<html>`
+ *     y emite `psx:tema` con `{ pref, tema }`. Un producto que aplica el tema por su cuenta (React)
+ *     pone `data-solo-avisa` y escucha el evento. El tema ANTES del primer pintado sigue siendo de
+ *     cada producto: un script en el `<head>` que lee la misma clave.
  */
 
 const CLASE_FIJA = 'psx-barra--fija'
@@ -54,8 +55,13 @@ const CLASE_LATE = 'msx--late'
 const CLASE_SCROLL_VISIBLE = 'psx-scroll--visible'
 const CLASE_SCROLL_ARRASTRA = 'psx-scroll--arrastra'
 const CLASE_TEMA_CAMBIA = 'psx-tema-cambia'
+const CLASE_TEMA_DICE = 'psx-tema--dice'
 /** Lo que se elige en el control de tema: «auto» sigue al aparato. */
 type PrefTema = 'auto' | 'claro' | 'oscuro'
+/** El orden en que el botón de tema pasa de un modo a otro. */
+const MODOS_TEMA: PrefTema[] = ['auto', 'claro', 'oscuro']
+/** Cuánto queda a la vista el nombre del modo después de tocar el botón (en ms). */
+const NOMBRE_TEMA_SE_VA = 1600
 /** Cuándo la pieza dibuja la barra de scroll: la misma condición con la que el CSS esconde la del navegador. */
 const CON_SCROLL_PROPIO = '(hover: hover) and (pointer: fine) and (scripting: enabled)'
 /** El pulgar de la barra de scroll no baja de este alto (en px), para que siempre se pueda agarrar. */
@@ -426,13 +432,21 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   })
 
   // ── Tema ──
-  raiz.querySelectorAll<HTMLElement>('.psx-tema').forEach((caja) => {
-    const tramos = Array.from(caja.querySelectorAll<HTMLButtonElement>('button[data-tema-pref]'))
-    if (tramos.length === 0) return
-    const clave = caja.dataset.clave
-    const soloAvisa = caja.hasAttribute('data-solo-avisa')
+  raiz.querySelectorAll<HTMLElement>('.psx-tema').forEach((boton) => {
+    const clave = boton.dataset.clave
+    const soloAvisa = boton.hasAttribute('data-solo-avisa')
     const html = document.documentElement
     const sistemaOscuro = window.matchMedia('(prefers-color-scheme: dark)')
+    // Los tres íconos los pone la pieza (el producto escribe el botón vacío, con los nombres).
+    if (!boton.querySelector('.psx-tema-icono')) {
+      for (const modo of MODOS_TEMA) {
+        const icono = document.createElement('span')
+        icono.className = 'psx-tema-icono'
+        icono.dataset.de = modo
+        icono.setAttribute('aria-hidden', 'true')
+        boton.appendChild(icono)
+      }
+    }
     const leer = (): PrefTema => {
       try {
         const guardado = clave ? localStorage.getItem(clave) : null
@@ -442,21 +456,23 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       }
     }
     let pref = leer()
+    let relojNombre = 0
     const aplicar = (avisar: boolean) => {
       const tema = pref === 'auto' ? (sistemaOscuro.matches ? 'oscuro' : 'claro') : pref
-      tramos.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.temaPref === pref)))
+      const nombre = boton.dataset[pref] ?? pref
+      boton.dataset.pref = pref
+      boton.dataset.ahora = nombre
+      boton.setAttribute('aria-label', boton.dataset.rotulo ? `${boton.dataset.rotulo}: ${nombre}` : nombre)
       if (!soloAvisa) {
         html.setAttribute('data-tema', tema)
         html.setAttribute('data-pref', pref)
       }
-      if (avisar) caja.dispatchEvent(new CustomEvent('psx:tema', { bubbles: true, detail: { pref, tema } }))
+      if (avisar) boton.dispatchEvent(new CustomEvent('psx:tema', { bubbles: true, detail: { pref, tema } }))
     }
     aplicar(false)
-    const alTramo = (e: Event) => {
-      const tramo = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-tema-pref]')
-      const elegida = tramo?.dataset.temaPref as PrefTema | undefined
-      if (!elegida || elegida === pref) return
-      pref = elegida
+    const alToque = () => {
+      // Cada toque pasa al modo siguiente: automático, claro, oscuro, y de vuelta.
+      pref = MODOS_TEMA[(MODOS_TEMA.indexOf(pref) + 1) % MODOS_TEMA.length]
       try {
         if (!clave) throw new Error('sin clave')
         if (pref === 'auto') localStorage.removeItem(clave)
@@ -464,6 +480,10 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       } catch {
         // Sin almacenamiento (modo privado estricto) la elección vale hasta salir de la página.
       }
+      // El nombre del modo asoma un instante: con un solo ícono no se ven las opciones.
+      boton.classList.add(CLASE_TEMA_DICE)
+      window.clearTimeout(relojNombre)
+      relojNombre = window.setTimeout(() => boton.classList.remove(CLASE_TEMA_DICE), NOMBRE_TEMA_SE_VA)
       // Toda la página cambia de una vez, fundida, si el navegador sabe hacerlo.
       const doc = document as Document & { startViewTransition?: (cambio: () => void) => { finished: Promise<void> } }
       if (soloAvisa || !doc.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -478,11 +498,12 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     }
     // En automático, si el aparato cambia de claro a oscuro, la página lo sigue.
     const alSistema = () => pref === 'auto' && aplicar(true)
-    caja.addEventListener('click', alTramo)
+    boton.addEventListener('click', alToque)
     sistemaOscuro.addEventListener('change', alSistema)
     soltar.push(() => {
-      caja.removeEventListener('click', alTramo)
+      boton.removeEventListener('click', alToque)
       sistemaOscuro.removeEventListener('change', alSistema)
+      window.clearTimeout(relojNombre)
     })
   })
 
