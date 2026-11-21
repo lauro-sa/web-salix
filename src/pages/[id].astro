@@ -12,7 +12,7 @@ import LogoMenu from '../components/LogoMenu.astro';
 import { ENTRADAS } from '../casa/datos';
 import { DETALLES } from '../casa/productos';
 import { VISTAS_PORTADA } from '../casa/capturas';
-import { RAIZ_CASA } from '../casa/navegacion';
+import { RAIZ_CASA, rutaSitio } from '../casa/navegacion';
 
 export function getStaticPaths() {
   return Object.keys(DETALLES).map((id) => ({ params: { id } }));
@@ -177,6 +177,8 @@ const paradas = [
               )}
               <a class="boton boton-secundario" href={e.url} rel="noopener">{e.dominio} <span aria-hidden="true">↗</span></a>
             </div>
+            <!-- La web del producto también la hicimos nosotros: tiene su página entre los sitios. -->
+            <a class="enlace planes-sitio" href={rutaSitio(id)}>Cómo es la web de {e.nombre} <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>
@@ -321,6 +323,9 @@ const paradas = [
     color: var(--texto-secundario);
   }
 
+  .planes-sitio {
+    margin-top: 0.75rem;
+  }
   .planes-texto + .planes-texto {
     margin-top: 0.75rem;
   }

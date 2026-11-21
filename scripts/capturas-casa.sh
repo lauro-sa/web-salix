@@ -32,16 +32,19 @@ for n in recorrido aplicacion-muslos aplicacion-brazos avisos peso medidas agua 
   cp "$NUVIX/oscuro/$n-660.webp" "$DEST/nuvix-$n-oscuro.webp"
 done
 
-# Los sitios de clientes: la página entera y la primera pantalla en el teléfono.
+# Los sitios hechos (los de clientes y las webs de los productos): la página entera y la primera
+# pantalla en el teléfono.
 if [ -n "${1:-}" ]; then
-  for n in herreelec tph; do
+  for n in herreelec tph flux nuvix; do
     cp "$1/sitio-$n-largo.webp" "$DEST/sitio-$n-largo.webp"
     cp "$1/sitio-$n-largo-oscuro.webp" "$DEST/sitio-$n-largo-oscuro.webp"
     cp "$1/sitio-$n-tel.webp" "$DEST/sitio-$n-tel.webp"
     cp "$1/sitio-$n-tel-oscuro.webp" "$DEST/sitio-$n-tel-oscuro.webp"
   done
-  # Porco Rosso no cambia con el tema: una sola.
-  cp "$1/sitio-porcorosso-largo.webp" "$DEST/sitio-porcorosso-largo.webp"
-  cp "$1/sitio-porcorosso-tel.webp" "$DEST/sitio-porcorosso-tel.webp"
+  # Porco Rosso y la web de Menu no cambian con el tema: una sola.
+  for n in porcorosso menu; do
+    cp "$1/sitio-$n-largo.webp" "$DEST/sitio-$n-largo.webp"
+    cp "$1/sitio-$n-tel.webp" "$DEST/sitio-$n-tel.webp"
+  done
 fi
 echo "Capturas al día en $DEST"

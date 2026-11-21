@@ -15,7 +15,7 @@ const e = ENTRADAS.find((x) => x.id === 'sites')!;
 const contacto = `${RAIZ_CASA}#contacto`;
 
 // En la cabecera, la primera pantalla de cada sitio de cliente, en el teléfono.
-const vistas: Vista[] = SITIOS_HECHOS.map((s) => ({
+const vistas: Vista[] = SITIOS_HECHOS.filter((s) => !s.producto).map((s) => ({
   rotulo: s.cliente,
   forma: 'tel',
   tomas: s.telefono.oscura

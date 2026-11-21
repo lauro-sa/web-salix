@@ -1,24 +1,24 @@
 ---
 // Los sitios hechos por Salix, cada uno con la captura real de su portada en una ventana de navegador.
-// Cada tarjeta lleva a la página que lo cuenta entero: la del sitio, o la del producto si es la web de
-// un producto. La lista está en src/casa/datos.ts (`SITIOS`).
+// Cada tarjeta lleva a la página del sitio, que lo muestra entero. La lista y su orden están en
+// src/casa/sitios.ts.
 import Captura from './Captura.astro';
-import { SITIOS } from '../casa/datos';
-import { rutaProducto, rutaSitio } from '../casa/navegacion';
+import { SITIOS_HECHOS } from '../casa/sitios';
+import { rutaSitio } from '../casa/navegacion';
 ---
 
 <ul class="sitios-fila">
-  {SITIOS.map((s, i) => (
+  {SITIOS_HECHOS.map((s, i) => (
     <li data-asoma style={`--i:${i % 3}`}>
-      <a href={s.sitio ? rutaSitio(s.sitio) : rutaProducto(s.producto!)}>
+      <a href={rutaSitio(s.id)}>
         <span class="ventana">
           <span class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><span>{s.dominio}</span></span>
           <span class="ventana-hoja">
-            <Captura src={`/capturas/${s.archivo}`} oscura={s.oscura && `/capturas/${s.oscura}`} ancho={1440} alto={900} alt={`Portada de ${s.dominio}`} />
+            <Captura src={s.portada.src} oscura={s.portada.oscura} ancho={s.portada.ancho} alto={s.portada.alto} alt={s.portada.alt} />
           </span>
         </span>
         <strong>{s.dominio}</strong>
-        <span>{s.que}</span>
+        <span>{s.rubro}</span>
       </a>
     </li>
   ))}

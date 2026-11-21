@@ -9,7 +9,7 @@ import CierreCasa from '../../components/CierreCasa.astro';
 import OtrasDeLaCasa from '../../components/OtrasDeLaCasa.astro';
 import { SITIOS_HECHOS } from '../../casa/sitios';
 import type { Vista } from '../../casa/capturas';
-import { RAIZ_CASA } from '../../casa/navegacion';
+import { RAIZ_CASA, rutaProducto } from '../../casa/navegacion';
 
 export function getStaticPaths() {
   return SITIOS_HECHOS.map((s) => ({ params: { id: s.id } }));
@@ -31,9 +31,10 @@ const telefono: Vista = {
       ]
     : [s.telefono],
 };
+// La web de un producto de Salix no es de un cliente: es de la casa, y enlaza a su producto.
 const ficha = [
-  { que: 'Cliente', valor: s.cliente },
-  { que: 'Rubro', valor: s.rubro },
+  s.producto ? { que: 'Producto', valor: `${s.cliente}, de Salix` } : { que: 'Cliente', valor: s.cliente },
+  s.producto ? { que: 'Idea', valor: 'Mostrar el producto' } : { que: 'Rubro', valor: s.rubro },
   { que: 'Temas', valor: s.dosTemas ? 'Claro y oscuro' : 'Uno solo, el de la marca' },
   { que: 'Hecho con', valor: s.hechoCon },
 ];
@@ -62,11 +63,15 @@ const ficha = [
             {s.dominio}
             <span class="producto-que">{s.rubro}</span>
           </p>
-          <h1 class="titulo titulo--pagina" data-asoma><span>Sitio web para</span> {s.cliente}.</h1>
+          <h1 class="titulo titulo--pagina" data-asoma><span>{s.producto ? 'La web de' : 'Sitio web para'}</span> {s.cliente}.</h1>
           <p class="bajada" data-asoma style="--i:1">{s.bajada}</p>
           <div class="acciones" data-asoma style="--i:2">
             <a class="boton" href={`https://${s.dominio}`} rel="noopener">Visitar {s.dominio} <span aria-hidden="true">↗</span></a>
-            <a class="boton boton-secundario" href={contacto}>Pedir un sitio</a>
+            {s.producto ? (
+              <a class="boton boton-secundario" href={rutaProducto(s.producto)}>Conocer {s.cliente}</a>
+            ) : (
+              <a class="boton boton-secundario" href={contacto}>Pedir un sitio</a>
+            )}
           </div>
         </div>
         <Mesa vistas={[telefono]} nombre={s.dominio} data-asoma style="--i:2" />

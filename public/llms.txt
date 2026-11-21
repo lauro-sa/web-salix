@@ -20,6 +20,7 @@ Salix es de Buenos Aires, Argentina. Contacto: hola@salixweb.com.
 - [herreelec.com](https://salixweb.com/sitios/herreelec/): reparación y automatización de portones.
 - [tphservice.com](https://salixweb.com/sitios/tph/): técnicos en portones y herrería de obra.
 - [b2b.porcorosso.com.ar](https://salixweb.com/sitios/porcorosso/): mayorista de carne porcina.
+- Las webs de los productos, hechas por Salix: [la de Flux](https://salixweb.com/sitios/flux/), [la de Menu](https://salixweb.com/sitios/menu/) y [la de Nuvix](https://salixweb.com/sitios/nuvix/).
 
 ## Legal
 
