@@ -55,12 +55,12 @@ const organizacion = JSON.stringify({
       // Con JavaScript: lo que aparece al entrar en pantalla puede arrancar escondido (casa.css).
       d.classList.add('con-js');
       function aplicar() {
-        var p = 'sistema';
-        try { p = localStorage.getItem('salix-tema') || 'sistema'; } catch (e) {}
-        var t = p === 'sistema' ? (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'oscuro' : 'claro') : p;
+        // Automático (sigue al aparato) salvo que se haya elegido claro u oscuro en el pie.
+        var p = 'auto';
+        try { var g = localStorage.getItem('salix-tema'); if (g === 'claro' || g === 'oscuro') p = g; } catch (e) {}
+        var t = p === 'auto' ? (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'oscuro' : 'claro') : p;
         d.setAttribute('data-tema', t);
         d.setAttribute('data-pref', p);
-        d.style.colorScheme = t === 'oscuro' ? 'dark' : 'light';
       }
       aplicar();
       window.addEventListener('pageshow', aplicar);
@@ -123,14 +123,12 @@ const organizacion = JSON.stringify({
 </html>
 
 <script>
-  import { iniciarToggleTema } from '../scripts/utilidades.js';
   import { montarPublicoSalix } from '../scripts/publico-salix';
   import { montarCasa } from '../scripts/casa';
   import '../firma-stian/firma-stian.js';
 
   document.addEventListener('DOMContentLoaded', () => {
-    iniciarToggleTema('boton-tema');
-    // La barra, el menú del teléfono, el pie en cortina y el cierre que se acomoda (familia).
+    // La barra, el menú del teléfono, el pie en cortina, el cierre que se acomoda y el tema (familia).
     montarPublicoSalix(document);
     // El plano que se dibuja con el scroll, las líneas de los productos y lo que aparece al entrar.
     montarCasa();

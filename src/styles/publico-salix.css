@@ -975,6 +975,104 @@ html.psx-sin-scroll {
   text-transform: uppercase;
   color: var(--psx-texto-3);
 }
+/* ── Tema ── En la base del pie, al lado del idioma (publico-salix.md §6). Tres tramos en una píldora
+   del mismo alto y con el mismo borde que el idioma: automático, claro y oscuro, con una pastilla que
+   se desliza al elegido. Los íconos los dibuja la hoja (máscaras): cada producto pone solo el nombre
+   de cada opción. Guardar la elección y aplicarla es de `montarPublicoSalix`. Solo lo lleva un
+   producto con dos temas. */
+.psx-tema {
+  --psx-tema-tramo: 1.875rem;
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--psx-tema-tramo);
+  box-sizing: border-box;
+  min-height: 2rem;
+  padding: 0.125rem;
+  border: 1px solid var(--psx-borde);
+  border-radius: 999px;
+}
+/* La pastilla: una sola, que se corre al tramo elegido (no una por tramo que aparece y desaparece). */
+.psx-tema::before {
+  content: '';
+  position: absolute;
+  top: 0.125rem;
+  bottom: 0.125rem;
+  left: 0.125rem;
+  width: var(--psx-tema-tramo);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--psx-texto) 11%, transparent);
+  transform: translateX(calc(var(--psx-tema-i, 0) * 100%));
+  transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1);
+}
+.psx-tema:has(button:nth-child(2)[aria-pressed='true']) {
+  --psx-tema-i: 1;
+}
+.psx-tema:has(button:nth-child(3)[aria-pressed='true']) {
+  --psx-tema-i: 2;
+}
+.psx-tema button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--psx-texto-3);
+  cursor: pointer;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.psx-tema button::before {
+  content: '';
+  width: 0.9375rem;
+  height: 0.9375rem;
+  background: currentColor;
+  -webkit-mask: var(--psx-icono) center / contain no-repeat;
+  mask: var(--psx-icono) center / contain no-repeat;
+  transition: transform 0.16s ease-out;
+}
+.psx-tema button:active::before {
+  transform: scale(0.88);
+}
+.psx-tema button[aria-pressed='true'] {
+  color: var(--psx-texto);
+}
+@media (hover: hover) {
+  .psx-tema button:hover {
+    color: var(--psx-texto);
+  }
+}
+/* Automático: medio círculo lleno, lo que decide el aparato. */
+.psx-tema button[data-tema-pref='auto'] {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 1 0 17z' fill='black'/%3E%3C/svg%3E");
+}
+.psx-tema button[data-tema-pref='claro'] {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3.75'/%3E%3Cpath d='M12 2.5v2.25M12 19.25v2.25M2.5 12h2.25M19.25 12h2.25M5.28 5.28l1.6 1.6M17.12 17.12l1.6 1.6M5.28 18.72l1.6-1.6M17.12 6.88l1.6-1.6'/%3E%3C/svg%3E");
+}
+.psx-tema button[data-tema-pref='oscuro'] {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z'/%3E%3C/svg%3E");
+}
+@media (pointer: coarse) {
+  .psx-tema {
+    --psx-tema-tramo: 2.125rem;
+    min-height: 2.75rem;
+  }
+}
+/* El cambio de tema funde toda la página de una vez, en vez de que cada pieza cambie a su ritmo. */
+html.psx-tema-cambia::view-transition-old(root),
+html.psx-tema-cambia::view-transition-new(root) {
+  animation-duration: 0.28s;
+  animation-timing-function: ease;
+}
+/* Los controles de la base (idioma y tema) van juntos, contra el borde. */
+.psx-pie-controles {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* En la fila del menú, lo propio del producto va junto a la derecha (el idioma y la firma). */
 .psx-menu-pie-extra {
   display: flex;
@@ -1021,8 +1119,14 @@ html.psx-sin-scroll {
     gap: 0 1rem;
     padding-top: 0.75rem;
   }
+  /* Lo propio ocupa su renglón: los controles a la izquierda y el crédito o la firma a la derecha. */
   .psx-pie-base-extra {
-    gap: 0 1rem;
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: 0 0.75rem;
+  }
+  .psx-pie-controles {
+    order: -1;
   }
   .psx-cierre-extra {
     display: none;
@@ -1032,6 +1136,18 @@ html.psx-sin-scroll {
     right: auto;
     left: 0;
     transform-origin: 0 100%;
+  }
+}
+
+/* En un teléfono angosto el idioma de la base muestra su código («ES»), como en la fila del menú: así
+   los controles y el crédito o la firma siguen entrando en un renglón. */
+@media (max-width: 400px) {
+  .psx-pie-base .psx-idioma-nombre {
+    display: none;
+  }
+  .psx-pie-base .psx-idioma-codigo {
+    display: inline;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -1068,7 +1184,9 @@ html.psx-sin-scroll {
   .psx-menu,
   .psx-menu-enlace,
   .psx-menu-pie,
-  .psx-h-linea {
+  .psx-h-linea,
+  .psx-tema::before,
+  .psx-tema button::before {
     transition: none;
   }
   .psx-menu-enlace {

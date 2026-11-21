@@ -19,6 +19,8 @@
 
 :root,
 [data-tema='claro'] {
+  /* Los controles del navegador (campos, barras) acompañan al tema elegido. */
+  color-scheme: light;
   --fondo: #f7f5f0;
   --fondo-alt: #ffffff;
   --superficie: #efece4;
@@ -43,6 +45,8 @@
   --peligro-suave: rgba(197, 34, 31, 0.12);
 }
 [data-tema='oscuro'] {
+  /* Los controles del navegador (campos, barras) acompañan al tema elegido. */
+  color-scheme: dark;
   --fondo: #0d0e11;
   --fondo-alt: #15161a;
   --superficie: #191a1f;
@@ -107,7 +111,6 @@
   box-sizing: border-box;
 }
 html {
-  color-scheme: light dark;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   /* El fondo de atrás, el que se ve al tirar de más: el mismo de la página y del pie. */

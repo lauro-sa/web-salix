@@ -34,7 +34,13 @@
  *   - el selector de idioma (`.psx-idioma`, en el pie y en el menú): abre y cierra la lista, lleva
  *     el foco a la opción activa y lo devuelve al botón. ELEGIR el idioma es de cada producto: el
  *     de React escucha el clic de su opción; uno sin framework, el evento `psx:idioma` que se emite
- *     con `{ idioma }` al tocar una opción habilitada.
+ *     con `{ idioma }` al tocar una opción habilitada;
+ *   - el control de tema (`.psx-tema`, en el pie): tres tramos, automático, claro y oscuro. Guarda la
+ *     elección en `localStorage` bajo la clave de `data-clave` (automático no guarda nada: sigue al
+ *     aparato), escribe `data-tema` («claro» u «oscuro») y `data-pref` («auto», «claro» u «oscuro») en
+ *     `<html>` y emite `psx:tema` con `{ pref, tema }`. Un producto que aplica el tema por su cuenta
+ *     (React) pone `data-solo-avisa` y escucha el evento. El tema ANTES del primer pintado sigue siendo
+ *     de cada producto: un script en el `<head>` que lee la misma clave.
  */
 
 const CLASE_FIJA = 'psx-barra--fija'
@@ -47,6 +53,9 @@ const CLASE_ASOMA = 'psx-pie-logo--asoma'
 const CLASE_LATE = 'msx--late'
 const CLASE_SCROLL_VISIBLE = 'psx-scroll--visible'
 const CLASE_SCROLL_ARRASTRA = 'psx-scroll--arrastra'
+const CLASE_TEMA_CAMBIA = 'psx-tema-cambia'
+/** Lo que se elige en el control de tema: «auto» sigue al aparato. */
+type PrefTema = 'auto' | 'claro' | 'oscuro'
 /** Cuándo la pieza dibuja la barra de scroll: la misma condición con la que el CSS esconde la del navegador. */
 const CON_SCROLL_PROPIO = '(hover: hover) and (pointer: fine) and (scripting: enabled)'
 /** El pulgar de la barra de scroll no baja de este alto (en px), para que siempre se pueda agarrar. */
@@ -413,6 +422,67 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       lista.removeEventListener('click', alOpcion)
       caja.removeEventListener('focusout', alSalirFoco)
       document.removeEventListener('pointerdown', alAfuera)
+    })
+  })
+
+  // ── Tema ──
+  raiz.querySelectorAll<HTMLElement>('.psx-tema').forEach((caja) => {
+    const tramos = Array.from(caja.querySelectorAll<HTMLButtonElement>('button[data-tema-pref]'))
+    if (tramos.length === 0) return
+    const clave = caja.dataset.clave
+    const soloAvisa = caja.hasAttribute('data-solo-avisa')
+    const html = document.documentElement
+    const sistemaOscuro = window.matchMedia('(prefers-color-scheme: dark)')
+    const leer = (): PrefTema => {
+      try {
+        const guardado = clave ? localStorage.getItem(clave) : null
+        return guardado === 'claro' || guardado === 'oscuro' ? guardado : 'auto'
+      } catch {
+        return 'auto'
+      }
+    }
+    let pref = leer()
+    const aplicar = (avisar: boolean) => {
+      const tema = pref === 'auto' ? (sistemaOscuro.matches ? 'oscuro' : 'claro') : pref
+      tramos.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.temaPref === pref)))
+      if (!soloAvisa) {
+        html.setAttribute('data-tema', tema)
+        html.setAttribute('data-pref', pref)
+      }
+      if (avisar) caja.dispatchEvent(new CustomEvent('psx:tema', { bubbles: true, detail: { pref, tema } }))
+    }
+    aplicar(false)
+    const alTramo = (e: Event) => {
+      const tramo = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-tema-pref]')
+      const elegida = tramo?.dataset.temaPref as PrefTema | undefined
+      if (!elegida || elegida === pref) return
+      pref = elegida
+      try {
+        if (!clave) throw new Error('sin clave')
+        if (pref === 'auto') localStorage.removeItem(clave)
+        else localStorage.setItem(clave, pref)
+      } catch {
+        // Sin almacenamiento (modo privado estricto) la elección vale hasta salir de la página.
+      }
+      // Toda la página cambia de una vez, fundida, si el navegador sabe hacerlo.
+      const doc = document as Document & { startViewTransition?: (cambio: () => void) => { finished: Promise<void> } }
+      if (soloAvisa || !doc.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        aplicar(true)
+        return
+      }
+      html.classList.add(CLASE_TEMA_CAMBIA)
+      doc
+        .startViewTransition(() => aplicar(true))
+        .finished.catch(() => undefined)
+        .then(() => html.classList.remove(CLASE_TEMA_CAMBIA))
+    }
+    // En automático, si el aparato cambia de claro a oscuro, la página lo sigue.
+    const alSistema = () => pref === 'auto' && aplicar(true)
+    caja.addEventListener('click', alTramo)
+    sistemaOscuro.addEventListener('change', alSistema)
+    soltar.push(() => {
+      caja.removeEventListener('click', alTramo)
+      sistemaOscuro.removeEventListener('change', alSistema)
     })
   })
 

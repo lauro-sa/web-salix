@@ -34,7 +34,8 @@ export function montarFormularioCasa(): void {
   const sigue = $<HTMLButtonElement>('.fc-sigue');
   const sigueTexto = $<HTMLElement>('[data-fc-sigue]');
   const atras = $<HTMLButtonElement>('[data-fc-atras]');
-  const cuenta = $<HTMLElement>('[data-fc-n]');
+  const sobre = $<HTMLElement>('[data-fc-sobre]');
+  const sobreNombre = $<HTMLElement>('[data-fc-sobre-nombre]');
   const error = $<HTMLElement>('.fc-error');
   const campo = (nombre: string) => form.elements.namedItem(nombre) as HTMLInputElement;
   const elegido = () => form.querySelector<HTMLInputElement>('input[name="producto"]:checked');
@@ -42,6 +43,8 @@ export function montarFormularioCasa(): void {
 
   let paso = 1;
   let enviando = false;
+  let cambiando = false;
+  let enPantalla = false;
 
   // ── Avisos de cada campo ──
   const avisar = (clave: string, texto: string) => {
@@ -103,15 +106,30 @@ export function montarFormularioCasa(): void {
     r.addEventListener('change', () => {
       limpiar('producto');
       $<HTMLElement>('#fc-pista').textContent = r.dataset.pista || '';
+      teñir();
     }),
   );
 
+  /** La línea de lo elegido tiñe el recorrido del formulario; lo que todavía no tiene línea, el color de Salix. */
+  function teñir() {
+    const linea = elegido()?.dataset.linea;
+    if (linea) caja!.style.setProperty('--fc-c', linea);
+    else caja!.style.removeProperty('--fc-c');
+    sobreNombre.textContent = elegido()?.dataset.nombre || '';
+  }
+
   // ── Ir de un paso a otro ──
-  function irA(n: number, conFoco = true) {
-    caja!.dataset.dir = n < paso ? 'atras' : 'adelante';
+  const PARTES = '.fc-pregunta, .fc-opcion, .fc-grupo, .fc-chips, .fc-campo';
+  const pasoDe = (n: number) => caja.querySelector<HTMLElement>(`.fc-paso[data-paso="${n}"]`);
+
+  /** Deja a la vista el paso `n` y pone al día las paradas, los botones y lo elegido. */
+  function mostrar(n: number) {
     paso = n;
     caja!.dataset.paso = String(n);
     caja!.querySelectorAll<HTMLElement>('.fc-paso').forEach((p) => (p.hidden = p.dataset.paso !== String(n)));
+    // Las partes del paso entran en cascada: se numeran en el orden en que se leen.
+    const partes = n === 4 ? Array.from(pasoDe(4)?.children ?? []) : Array.from(pasoDe(n)?.querySelectorAll(PARTES) ?? []);
+    partes.forEach((el, i) => (el as HTMLElement).style.setProperty('--n', String(i)));
     paradas.forEach((p, i) => {
       p.classList.toggle('fc-parada--hecha', i + 1 < n);
       p.classList.toggle('fc-parada--actual', i + 1 === n);
@@ -120,10 +138,33 @@ export function montarFormularioCasa(): void {
     });
     riel.style.setProperty('--avance', String(Math.min(1, (n - 1) / (paradas.length - 1))));
     atras.disabled = n === 1 || n === 4;
-    cuenta.textContent = String(Math.min(n, 3));
+    sobre.hidden = n === 1 || n === 4;
     sigueTexto.textContent = n === 3 ? 'Enviar' : 'Seguir';
     error.hidden = true;
     cuerpo.scrollTop = 0;
+  }
+
+  async function irA(n: number, conFoco = true) {
+    if (cambiando) return;
+    const animado = !QUIETO.matches && n !== paso;
+    caja!.dataset.dir = n < paso ? 'atras' : 'adelante';
+    if (animado) {
+      // El paso que se va se apaga rápido hacia el lado contrario; después la caja pasa de un alto al
+      // otro mientras entra el siguiente. En el teléfono a pantalla completa el alto no cambia.
+      cambiando = true;
+      const sale = pasoDe(paso);
+      const altoAntes = cuerpo.offsetHeight;
+      const corre = n < paso ? '0.5rem' : '-0.5rem';
+      await sale?.animate([{ opacity: 1 }, { opacity: 0, translate: `${corre} 0` }], { duration: 130, easing: 'ease-out' }).finished.catch(() => undefined);
+      mostrar(n);
+      const altoDespues = cuerpo.offsetHeight;
+      if (!enPantalla && altoAntes !== altoDespues) {
+        cuerpo.animate([{ blockSize: `${altoAntes}px` }, { blockSize: `${altoDespues}px` }], { duration: 380, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+      }
+      cambiando = false;
+    } else {
+      mostrar(n);
+    }
     if (!conFoco) return;
     const destino =
       n === 4
@@ -141,7 +182,7 @@ export function montarFormularioCasa(): void {
 
   form.addEventListener('submit', async (evento) => {
     evento.preventDefault();
-    if (enviando) return;
+    if (enviando || cambiando) return;
     const falla = validar(paso);
     if (falla) {
       falla.focus({ preventScroll: true });
@@ -214,6 +255,7 @@ export function montarFormularioCasa(): void {
     form.reset();
     $<HTMLElement>('#fc-pista').textContent = '';
     opcionalWhatsapp.hidden = false;
+    teñir();
     irA(1);
   });
 
@@ -228,7 +270,6 @@ export function montarFormularioCasa(): void {
   }
 
   // ── La pantalla completa, en el teléfono ──
-  let enPantalla = false;
   let conHistorial = false;
 
   const seguirVista = () => {
