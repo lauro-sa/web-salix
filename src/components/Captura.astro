@@ -1,0 +1,15 @@
+---
+// Una captura real. Si tiene versión oscura (`oscura`), se muestra la del tema que se está viendo
+// (casa.css, `.cap--clara` / `.cap--oscura`); si no, la misma en los dos.
+interface Props {
+  src: string;
+  oscura?: string;
+  ancho: number;
+  alto: number;
+  alt: string;
+  clase?: string;
+}
+const { src, oscura, ancho, alto, alt, clase } = Astro.props;
+---
+<img class:list={[clase, { 'cap--clara': oscura }]} src={src} width={ancho} height={alto} loading="lazy" decoding="async" alt={alt} />
+{oscura && <img class:list={[clase, 'cap--oscura']} src={oscura} width={ancho} height={alto} loading="lazy" decoding="async" alt={alt} />}

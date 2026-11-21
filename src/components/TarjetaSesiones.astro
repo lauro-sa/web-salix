@@ -103,9 +103,9 @@ const LINEAS: Record<number, string> = {
         <strong>US$ {PRIMERA}</strong> · primera sesión US$ {PRIMERA}
       </p>
       {ctaModo === 'enlace' && ctaHref ? (
-        <a class="boton boton-verde" href={ctaHref} data-impl-cta target="_blank" rel="noopener noreferrer">{ctaTexto}</a>
+        <a class="boton" href={ctaHref} data-impl-cta target="_blank" rel="noopener noreferrer">{ctaTexto}</a>
       ) : (
-        <a class="boton boton-verde" href="#contacto" data-impl-cta>{ctaTexto}</a>
+        <a class="boton" href="#contacto" data-impl-cta>{ctaTexto}</a>
       )}
       {nota && <p class="impl-nota">{nota}</p>}
     </div>
@@ -193,7 +193,8 @@ const LINEAS: Record<number, string> = {
 
     if (modo === 'contacto') {
       cta.addEventListener('click', () => {
-        const campo = document.getElementById('form-mensaje') as HTMLTextAreaElement | null
+        // El mensaje del formulario por pasos de la casa (FormularioCasa.astro).
+        const campo = document.getElementById('fc-mensaje') as HTMLTextAreaElement | null
         const prod = document.querySelector('input[name="producto"][value="Integraciones"]') as HTMLInputElement | null
         const pedido = sessionStorage.getItem('salix-pedido-sesiones')
         if (campo && pedido) {
@@ -202,7 +203,10 @@ const LINEAS: Record<number, string> = {
             if (data.mensaje && !campo.value.trim()) campo.value = data.mensaje
           } catch { /* ignore */ }
         }
-        if (prod && !prod.checked) prod.checked = true
+        if (prod && !prod.checked) {
+          prod.checked = true
+          prod.dispatchEvent(new Event('change', { bubbles: true }))
+        }
       })
     }
 
@@ -519,7 +523,14 @@ const LINEAS: Record<number, string> = {
   }
 
   @media (max-width: 720px) {
-    .impl { grid-template-columns: 1fr; max-width: 420px; }
+    /* Una columna que no se estira con lo que lleva adentro (el contador no la ensancha). */
+    .impl { grid-template-columns: minmax(0, 1fr); max-width: 420px; }
+  }
+  /* Un teléfono angosto: menos aire en la caja, y el contador ocupa el ancho que haya. */
+  @media (max-width: 24rem) {
+    .impl-checkout { padding: 20px 16px; }
+    .impl-stepper { display: flex; }
+    .impl-horas { min-width: 0; flex: 1; }
   }
 
   @media (prefers-reduced-motion: reduce) {

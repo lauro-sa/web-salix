@@ -1,0 +1,136 @@
+---
+// ============================================================
+// Casa.astro — la plantilla de la web nueva de Salix (rediseño 2026-11).
+// Lleva la barra, el menú del teléfono y el pie de la familia (Nav.astro y Footer.astro sobre
+// publico-salix.css), el cuerpo que hace de cortina sobre el pie y el tema claro u oscuro.
+// La página pone su contenido y, al final, su bloque de cierre (`.psx-cierre`).
+// ============================================================
+import '../styles/casa.css';
+import '../styles/casa-piezas.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { VERSION_LOGO } from '../marca-version';
+import { LEMA_SALIX } from '../lema';
+import { CORREO } from '../casa/datos';
+import { enlacesBarra, ctaBarra, columnasPie } from '../casa/navegacion';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** '' en la portada (los saltos son de la misma página); '/' en las demás. */
+  base?: string;
+  /** A dónde lleva el logo. */
+  inicio?: string;
+  /** Una página que no se indexa. */
+  sinIndexar?: boolean;
+}
+const { titulo, descripcion, base = '/', inicio = '/', sinIndexar = false } = Astro.props;
+// La imagen de compartir y los íconos llevan la versión del logo en la dirección: el servidor guarda
+// public/ por siete días, y sin el `?v=` un logo nuevo tarda una semana en verse.
+const conVersion = (ruta: string) => `${ruta}?v=${VERSION_LOGO}`;
+const canonica = new URL(Astro.url.pathname, Astro.site).href;
+// PNG, no SVG: ninguna plataforma muestra un SVG en la vista previa de un enlace. La genera `npm run marca`.
+const imagen = new URL(conVersion('/og-image.png'), Astro.site).href;
+const organizacion = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Salix',
+  url: Astro.site?.href,
+  logo: imagen,
+  slogan: `SALIX — ${LEMA_SALIX}`,
+  description: 'Salix hace software: sistemas de gestión, apps y sitios web.',
+  address: { '@type': 'PostalAddress', addressLocality: 'Buenos Aires', addressCountry: 'AR' },
+  contactPoint: { '@type': 'ContactPoint', email: CORREO, contactType: 'customer service', availableLanguage: 'Spanish' },
+});
+---
+
+<!doctype html>
+<html lang="es" data-tema="claro">
+<head>
+  <meta charset="utf-8" />
+  <!-- El tema, antes de pintar: el elegido en el pie o, si no eligió, el del aparato. -->
+  <script is:inline>
+    (function () {
+      var d = document.documentElement;
+      // Con JavaScript: lo que aparece al entrar en pantalla puede arrancar escondido (casa.css).
+      d.classList.add('con-js');
+      function aplicar() {
+        // Automático (sigue al aparato) salvo que se haya elegido claro u oscuro en el pie.
+        var p = 'auto';
+        try { var g = localStorage.getItem('salix-tema'); if (g === 'claro' || g === 'oscuro') p = g; } catch (e) {}
+        var t = p === 'auto' ? (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'oscuro' : 'claro') : p;
+        d.setAttribute('data-tema', t);
+        d.setAttribute('data-pref', p);
+      }
+      aplicar();
+      window.addEventListener('pageshow', aplicar);
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <!-- El color de la barra del navegador en el teléfono: el fondo de la página, en claro y en oscuro. -->
+  <meta name="theme-color" content="#f7f5f0" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0d0e11" media="(prefers-color-scheme: dark)" />
+
+  <title>{titulo}</title>
+  <meta name="description" content={descripcion} />
+  <meta name="author" content="Salix" />
+  <meta name="robots" content={sinIndexar ? 'noindex, nofollow' : 'index, follow'} />
+  <link rel="canonical" href={canonica} />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- La vista previa al compartir el enlace (WhatsApp, redes, mensajería). -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonica} />
+  <meta property="og:title" content={titulo} />
+  <meta property="og:description" content={descripcion} />
+  <meta property="og:image" content={imagen} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:alt" content="Salix. Software que simplifica. Sistemas, apps y sitios web." />
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:site_name" content="Salix" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@salixweb" />
+  <meta name="twitter:creator" content="@salixweb" />
+  <meta name="twitter:title" content={titulo} />
+  <meta name="twitter:description" content={descripcion} />
+  <meta name="twitter:image" content={imagen} />
+
+  <script type="application/ld+json" set:html={organizacion} />
+  <link rel="preload" href="/fuentes/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" type="image/svg+xml" id="favicon" href={conVersion('/favicon.svg')} />
+  <script is:inline define:vars={{ claro: conVersion('/favicon-claro.svg'), oscuro: conVersion('/favicon-oscuro.svg') }}>
+    (function () {
+      var m = window.matchMedia('(prefers-color-scheme: dark)');
+      var l = document.getElementById('favicon');
+      var aplicar = function () { if (l) l.setAttribute('href', m.matches ? oscuro : claro); };
+      aplicar();
+      m.addEventListener('change', aplicar);
+    })();
+  </script>
+  <link rel="apple-touch-icon" href={conVersion('/apple-touch-icon.png')} />
+</head>
+
+<body>
+  <Nav enlaces={enlacesBarra(base)} cta={ctaBarra(base)} inicio={inicio} />
+  <main class="psx-cuerpo">
+    <slot />
+  </main>
+  <Footer columnas={columnasPie(base)} inicio={inicio} />
+</body>
+</html>
+
+<script>
+  import { montarPublicoSalix } from '../scripts/publico-salix';
+  import { montarCasa } from '../scripts/casa';
+  import '../firma-stian/firma-stian.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // La barra, el menú del teléfono, el pie en cortina, el cierre que se acomoda y el tema (familia).
+    montarPublicoSalix(document);
+    // El plano que se dibuja con el scroll, las líneas de los productos y lo que aparece al entrar.
+    montarCasa();
+  });
+</script>

@@ -1,0 +1,65 @@
+---
+// Los sitios hechos por Salix, cada uno con la captura real de su portada en una ventana de navegador.
+// Cada tarjeta lleva a la página del sitio, que lo muestra entero. La lista y su orden están en
+// src/casa/sitios.ts.
+import Captura from './Captura.astro';
+import { SITIOS_HECHOS } from '../casa/sitios';
+import { rutaSitio } from '../casa/navegacion';
+---
+
+<ul class="sitios-fila">
+  {SITIOS_HECHOS.map((s, i) => (
+    <li data-asoma style={`--i:${i % 3}`}>
+      <a href={rutaSitio(s.id)}>
+        <span class="ventana">
+          <span class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><span>{s.dominio}</span></span>
+          <span class="ventana-hoja">
+            <Captura src={s.portada.src} oscura={s.portada.oscura} ancho={s.portada.ancho} alto={s.portada.alto} alt={s.portada.alt} />
+          </span>
+        </span>
+        <strong>{s.dominio}</strong>
+        <span>{s.rubro}</span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  /* ── Sitios: cada captura en su ventana de navegador ── */
+  .sitios-fila {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 3vw, 2.25rem) clamp(0.875rem, 2vw, 1.5rem);
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+  }
+  @media (min-width: 56rem) {
+    .sitios-fila {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .sitios-fila a {
+    display: grid;
+  }
+  .sitios-fila .ventana {
+    margin-bottom: 0.75rem;
+  }
+  .sitios-fila strong {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .sitios-fila a > span:last-child {
+    font-size: 0.8125rem;
+    color: var(--texto-secundario);
+  }
+  @media (hover: hover) {
+    .sitios-fila a:hover .ventana {
+      translate: 0 -0.25rem;
+      box-shadow:
+        0 0 0 1px var(--texto-terciario),
+        0 1.25rem 2rem -1.25rem rgba(0, 0, 0, 0.35);
+    }
+    .sitios-fila a:hover .ventana-hoja :global(img) {
+      scale: 1.03;
+    }
+  }
+</style>

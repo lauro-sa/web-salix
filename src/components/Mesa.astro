@@ -1,0 +1,45 @@
+---
+// La mesa de capturas: un plano neutro donde se apoyan las capturas reales. Una vista va al frente y
+// se cambia con los rótulos de abajo (casa.ts, `data-vistas`). Con `rotulos={false}` no lleva rótulos
+// ni se maneja sola: la elige quien la envuelve (una lista cuyos renglones son los rótulos).
+// Los estilos están en casa-piezas.css.
+import Captura from './Captura.astro';
+import type { Vista } from '../casa/capturas';
+
+interface Props {
+  vistas: Vista[];
+  /** De qué son las capturas, para el nombre accesible de los rótulos. */
+  nombre: string;
+  rotulos?: boolean;
+  class?: string;
+  [atributo: string]: unknown;
+}
+const { vistas, nombre, rotulos = true, class: clase, ...resto } = Astro.props;
+const conRotulos = rotulos && vistas.length > 1;
+---
+
+<figure class:list={['mesa', clase]} data-vistas={conRotulos ? '' : undefined} {...resto}>
+  <div class="vistas">
+    {vistas.map((v, i) => (
+      <div
+        class:list={['vista', `vista--${v.forma}`, { 'vista--duo': v.tomas.length > 1 }]}
+        data-vista
+        data-pos={i}
+        aria-hidden={i === 0 ? 'false' : 'true'}
+      >
+        {v.tomas.map((toma) => (
+          <span class:list={['toma', toma.modo && `toma--${toma.modo}`]}>
+            <Captura src={toma.src} oscura={toma.oscura} ancho={toma.ancho} alto={toma.alto} alt={toma.alt} />
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+  {conRotulos && (
+    <figcaption class="rotulos" role="tablist" aria-label={`Capturas de ${nombre}`}>
+      {vistas.map((v, i) => (
+        <button type="button" role="tab" class="rotulo" data-rotulo aria-selected={i === 0 ? 'true' : 'false'}>{v.rotulo}</button>
+      ))}
+    </figcaption>
+  )}
+</figure>

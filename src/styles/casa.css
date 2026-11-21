@@ -1,0 +1,318 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   casa.css — la base de la web nueva de Salix («la casa», rediseño 2026-11).
+   Los colores llevan los mismos nombres que tenía la web anterior, así
+   las piezas que se conservan (el logo animado, el lema, el idioma, el botón de
+   tema) y las de la familia (barra, menú, pie) siguen andando sin tocarlas.
+   Se escriben por tema con `data-tema`, no con `light-dark()`: los navegadores de
+   los televisores suelen ser viejos y `data-tema` anda en todos.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@import './marca-salix.css';
+@import './publico-salix.css';
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fuentes/archivo-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+
+:root,
+[data-tema='claro'] {
+  /* Los controles del navegador (campos, barras) acompañan al tema elegido. */
+  color-scheme: light;
+  --fondo: #f7f5f0;
+  --fondo-alt: #ffffff;
+  --superficie: #efece4;
+  --texto: #16150f;
+  --texto-secundario: #5f5a50;
+  --texto-terciario: #8f897d;
+  --borde: #e2ddd1;
+  --borde-sutil: #ebe7dd;
+  --btn-fondo: #16150f;
+  --btn-texto: #f7f5f0;
+  --btn-hover: #33312a;
+  --salix: #b0600a;
+  /* El color de cada línea de la casa: solo en su logo y en su línea del plano. */
+  --linea-flux: #4e4eb8;
+  --linea-menu: #394a42;
+  --linea-nuvix: #136c64;
+  --linea-sites: #b0600a;
+  --linea-obra: #a8a296;
+  --salix-suave: rgba(176, 96, 10, 0.08);
+  --salix-borde: rgba(176, 96, 10, 0.22);
+  --peligro: #c5221f;
+  --peligro-suave: rgba(197, 34, 31, 0.12);
+}
+[data-tema='oscuro'] {
+  /* Los controles del navegador (campos, barras) acompañan al tema elegido. */
+  color-scheme: dark;
+  --fondo: #0d0e11;
+  --fondo-alt: #15161a;
+  --superficie: #191a1f;
+  --texto: #f2efe8;
+  --texto-secundario: #a5a299;
+  --texto-terciario: #6f7078;
+  --borde: #26282e;
+  --borde-sutil: #1b1d22;
+  --btn-fondo: #f2efe8;
+  --btn-texto: #0d0e11;
+  --btn-hover: #d6d3cb;
+  --salix: #e8922a;
+  --linea-flux: #8585f2;
+  --linea-menu: #9bb88f;
+  --linea-nuvix: #2fb5a6;
+  --linea-sites: #e8922a;
+  --linea-obra: #5d6068;
+  --salix-suave: rgba(232, 146, 42, 0.1);
+  --salix-borde: rgba(232, 146, 42, 0.2);
+  --peligro: #f28b82;
+  --peligro-suave: rgba(242, 139, 130, 0.14);
+}
+
+:root {
+  --linea-integraciones: var(--texto);
+  --fuente-principal: 'Archivo', system-ui, -apple-system, sans-serif;
+  --ancho: 72rem;
+  --margen: clamp(1.25rem, 5vw, 3rem);
+  --aire: clamp(4rem, 9vw, 7rem);
+  --curva: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Lo que todavía leen las piezas que se conservan de la web anterior (el formulario de contacto). */
+  --card: var(--fondo-alt);
+  --card-hover: var(--superficie);
+  --ico-color: var(--texto);
+  --radio-pill: 999px;
+  --radio-card: 0.875rem;
+  --radio-icono: 0.625rem;
+  --transicion: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicion-lenta: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Lo que leen la barra, el menú y el pie de la familia (publico-salix.css). */
+  --psx-fondo: var(--fondo);
+  --psx-texto: var(--texto);
+  --psx-texto-2: var(--texto-secundario);
+  --psx-texto-3: var(--texto-terciario);
+  --psx-borde: var(--borde);
+  --psx-marca: var(--salix);
+  --psx-cta-fondo: var(--btn-fondo);
+  --psx-cta-texto: var(--btn-texto);
+  --psx-cta-hover: var(--btn-hover);
+  --psx-fuente: var(--fuente-principal);
+  /* Lo que lee el movimiento del logo de la familia (marca-salix.css). */
+  --texto-primario: var(--texto);
+  --texto-marca: var(--salix);
+  --fuente-sans: var(--fuente-principal);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* El fondo de atrás, el que se ve al tirar de más: el mismo de la página y del pie. */
+  background: var(--fondo);
+}
+/* La letra base es la de siempre (16 px) y las piezas de la familia miden lo mismo que en los otros
+   productos. Solo en pantallas que se miran de lejos (un monitor muy grande, un televisor) todo crece
+   junto, porque todo se mide con `rem`. */
+@media (min-width: 120rem) {
+  html {
+    font-size: 112.5%;
+  }
+}
+@media (min-width: 160rem) {
+  html {
+    font-size: 137.5%;
+  }
+}
+body {
+  margin: 0;
+  font-family: var(--fuente-principal);
+  font-size: 1rem;
+  line-height: 1.55;
+  background: var(--fondo);
+  color: var(--texto);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+figure,
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+ul,
+ol {
+  list-style: none;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+img {
+  height: auto;
+}
+::selection {
+  background: #e8922a;
+  color: #1c1206;
+}
+:focus-visible {
+  outline: 2px solid var(--salix);
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+}
+
+/* ── La voz de los títulos: un renglón liviano y apagado, y el que manda en tinta ── */
+.titulo {
+  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.026em;
+  text-wrap: balance;
+}
+.titulo > span {
+  display: block;
+  font-weight: 350;
+  color: var(--texto-terciario);
+}
+.bajada {
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--texto-secundario);
+  max-inline-size: 44ch;
+  text-wrap: pretty;
+}
+
+/* ── Cajas ── */
+.ancho {
+  inline-size: min(var(--ancho), 100% - 2 * var(--margen));
+  margin-inline: auto;
+}
+.tramo {
+  padding-block: var(--aire);
+  border-top: 1px solid var(--borde-sutil);
+}
+
+/* Los íconos de trazo (IconoSVG.astro): de línea, con el color del texto. */
+.icono-svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── Lo que se aprieta ── */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  background: var(--btn-fondo);
+  color: var(--btn-texto);
+  font-size: 0.875rem;
+  font-weight: 550;
+  white-space: nowrap;
+  transition: background-color 0.25s;
+}
+.enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 2.75rem;
+  font-size: 0.9375rem;
+  font-weight: 550;
+  background: linear-gradient(var(--salix), var(--salix)) 0 calc(100% - 0.625rem) / 100% 1.5px no-repeat;
+}
+.enlace > span {
+  transition: translate 0.3s var(--curva);
+}
+@media (hover: hover) {
+  .boton:hover {
+    background: var(--btn-hover);
+  }
+  .enlace:hover > span {
+    translate: 0.1875rem 0;
+  }
+}
+
+/* La frase del nombre, bajo el logo del pie: lisa, sin letras de otro color ni resaltadas
+   (Sal, 2026-11-20: «que tenga una letra resaltada, siento que está raro»). */
+/* El selector largo es para ganarle al estilo propio de la pieza del lema, que pinta esas letras. */
+.psx-pie .psx-pie-caja .psx-pie-marca .psx-pie-lema b {
+  font-weight: inherit;
+  color: inherit;
+}
+
+/* Los dos botones: el lleno y el de contorno (con los nombres de la web anterior). */
+.boton-primario {
+  padding-inline: 1.5rem;
+}
+.boton-secundario {
+  padding-inline: 1.5rem;
+  background: transparent;
+  color: var(--texto);
+  box-shadow: inset 0 0 0 1px var(--borde);
+}
+@media (hover: hover) {
+  .boton-secundario:hover {
+    background: var(--superficie);
+  }
+}
+
+/* ── Lo que aparece una vez, al entrar en pantalla (casa.ts le pone `.visto`). Sin JavaScript o con
+   «reducir movimiento» está siempre a la vista. Los hermanos entran en cascada corta (`--i`). ── */
+@media (prefers-reduced-motion: no-preference) {
+  .con-js [data-asoma] {
+    opacity: 0;
+    translate: 0 1.25rem;
+    transition:
+      opacity 0.7s var(--curva),
+      translate 0.9s var(--curva);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+  .con-js [data-asoma].visto {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ── Una captura que tiene versión clara y oscura muestra la del tema que se está viendo ── */
+.cap--oscura,
+[data-tema='oscuro'] .cap--clara {
+  display: none;
+}
+[data-tema='oscuro'] .cap--oscura {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

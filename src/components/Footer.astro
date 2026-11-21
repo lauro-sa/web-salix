@@ -1,8 +1,8 @@
 ---
 // ============================================================
 // Footer.astro — el pie de la familia Salix (publico-salix.md, en la carpeta de la familia del
-// repo de Flux): marca con su lema, columnas de enlaces, la base con el copyright y lo propio, y
-// la firma (en la base, con el tema). La forma y la cortina son de toda la familia (src/styles/publico-salix.css,
+// repo de Flux): marca con su lema, columnas de enlaces, la base con el copyright, la firma
+// y los controles (idioma y tema). La forma y la cortina son de toda la familia (src/styles/publico-salix.css,
 // GENERADO); acá solo va lo de Salix.
 // ============================================================
 import Idioma from './Idioma.astro';
@@ -10,7 +10,16 @@ import LogoSalixAnimado from './LogoSalixAnimado.astro';
 import LemaSalix from './LemaSalix.astro';
 
 const AÑO = new Date().getFullYear();
-const COLUMNAS = [
+interface Columna { titulo: string; enlaces: { href: string; texto: string }[] }
+interface Props {
+  /** Las columnas de enlaces. Sin ellas, las de la web anterior. */
+  columnas?: Columna[];
+  /** A dónde lleva el logo. */
+  inicio?: string;
+  /** Sin la frase del nombre bajo el logo: la web nueva la explica en el cierre, justo arriba. */
+  sinLema?: boolean;
+}
+const COLUMNAS_DE_ANTES: Columna[] = [
   {
     // Solo los que existen hoy (Sal, 2026-09-28): los que vienen no se listan hasta que estén.
     titulo: 'Productos',
@@ -36,6 +45,7 @@ const COLUMNAS = [
     ],
   },
 ];
+const { columnas: COLUMNAS = COLUMNAS_DE_ANTES, inicio = '/', sinLema = false } = Astro.props;
 ---
 
 <footer class="psx-pie">
@@ -47,7 +57,7 @@ const COLUMNAS = [
         <!-- La envoltura del logo del pie de la familia (publico-salix.md §«El logo del pie»): repite su
              entrada cada vez que la cortina destapa el pie. Salix no lleva «by Salix»: es la madre. -->
         <div class="psx-pie-logo">
-          <a href="/" aria-label="Salix, inicio">
+          <a href={inicio} aria-label="Salix, inicio">
             <span class="msx">
               <span class="msx-icono">
                 <LogoSalixAnimado clase="msx-svg" id="copa-salix-footer" tamaño={26} />
@@ -58,7 +68,7 @@ const COLUMNAS = [
             </span>
           </a>
         </div>
-        <LemaSalix clase="psx-pie-lema" sinSigla />
+        {!sinLema && <LemaSalix clase="psx-pie-lema" sinSigla />}
       </div>
       <nav class="psx-pie-columnas" aria-label="Enlaces del pie">
         {COLUMNAS.map((c) => (
@@ -73,78 +83,16 @@ const COLUMNAS = [
     <div class="psx-pie-base psx-pie-animar">
       <span>&copy; {AÑO} Salix &middot; Buenos Aires, Argentina</span>
       <div class="psx-pie-base-extra">
-        <Idioma id="idioma-pie" />
+        <!-- Primero lo que se lee (la firma de quien hizo el sitio) y, contra el borde, los controles
+             juntos: idioma y tema (publico-salix.md §4 y §6). -->
         <firma-stian logo="/firma-stian/logo-claro.png"></firma-stian>
-        <button id="boton-tema" class="tema-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
-          <svg class="tema-icono icono-sol-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-            <circle cx="9" cy="9" r="3.5"/>
-            <line x1="9" y1="1.5" x2="9" y2="3.5"/>
-            <line x1="9" y1="14.5" x2="9" y2="16.5"/>
-            <line x1="3.1" y1="3.1" x2="4.5" y2="4.5"/>
-            <line x1="13.5" y1="13.5" x2="14.9" y2="14.9"/>
-            <line x1="1.5" y1="9" x2="3.5" y2="9"/>
-            <line x1="14.5" y1="9" x2="16.5" y2="9"/>
-            <line x1="3.1" y1="14.9" x2="4.5" y2="13.5"/>
-            <line x1="13.5" y1="4.5" x2="14.9" y2="3.1"/>
-          </svg>
-          <svg class="tema-icono icono-luna-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M15.5 9.5A7 7 0 0 1 8.5 2.5 5.5 5.5 0 1 0 15.5 9.5z"/>
-          </svg>
-          <svg class="tema-icono icono-sistema-f" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="2" y="2" width="14" height="10" rx="1.5"/>
-            <line x1="6" y1="15" x2="12" y2="15"/>
-            <line x1="9" y1="12" x2="9" y2="15"/>
-          </svg>
-        </button>
+        <div class="psx-pie-controles">
+          <Idioma id="idioma-pie" />
+          <button type="button" class="psx-tema" data-clave="salix-tema" data-rotulo="Tema" data-auto="Automático" data-claro="Claro" data-oscuro="Oscuro" aria-label="Tema"></button>
+        </div>
       </div>
     </div>
 
   </div>
 </footer>
 
-<style>
-  /* Lo único propio de Salix en el pie: el botón de tema claro/oscuro. */
-  /* ─── Toggle Tema Minimalista ─── */
-  .tema-toggle {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: var(--superficie);
-    border: 1px solid var(--borde);
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-    cursor: pointer;
-    transition: background .3s, border-color .3s, transform .3s;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-  }
-
-  .tema-toggle:hover {
-    border-color: var(--texto-terciario);
-    transform: scale(1.1);
-  }
-
-  .tema-toggle:active { transform: scale(0.95); }
-
-  .tema-icono {
-    width: 14px; height: 14px;
-    color: var(--texto-secundario);
-    position: absolute;
-    transition: opacity .4s, transform .4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /* Estado sistema (default): mostrar monitor */
-  .icono-sol-f     { opacity: 0; transform: scale(0.5) rotate(90deg); }
-  .icono-luna-f    { opacity: 0; transform: scale(0.5) rotate(-90deg); }
-  .icono-sistema-f { opacity: 1; transform: scale(1) rotate(0deg); }
-
-  /* Estado claro forzado: mostrar sol */
-  :global([data-pref="claro"]) .icono-sol-f     { opacity: 1; transform: scale(1) rotate(0deg); }
-  :global([data-pref="claro"]) .icono-luna-f    { opacity: 0; transform: scale(0.5) rotate(-90deg); }
-  :global([data-pref="claro"]) .icono-sistema-f { opacity: 0; transform: scale(0.5) rotate(90deg); }
-
-  /* Estado oscuro forzado: mostrar luna */
-  :global([data-pref="oscuro"]) .icono-sol-f     { opacity: 0; transform: scale(0.5) rotate(90deg); }
-  :global([data-pref="oscuro"]) .icono-luna-f    { opacity: 1; transform: scale(1) rotate(0deg); color: var(--salix); }
-  :global([data-pref="oscuro"]) .icono-sistema-f { opacity: 0; transform: scale(0.5) rotate(-90deg); }
-
-</style>

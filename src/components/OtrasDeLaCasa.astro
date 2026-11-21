@@ -1,0 +1,110 @@
+---
+// «Más de la casa»: las otras páginas de la casa (productos y sitios hechos), al pie de cada página
+// interior. Salen de la misma lista que la rueda de la portada (src/casa/cosas.ts): lo que tiene
+// `pagina`. Cada una lleva el ícono oficial de su marca, entero.
+import { RUEDA } from '../casa/cosas';
+import { RAIZ_CASA } from '../casa/navegacion';
+
+interface Props {
+  /** La página que se está viendo: no se lista. */
+  actual: string;
+}
+const { actual } = Astro.props;
+const otras = RUEDA.filter((p) => p.pagina && p.pagina !== actual);
+---
+
+<section class="tramo">
+  <div class="ancho">
+    <h2 class="titulo" data-asoma><span>Más</span> de la casa.</h2>
+    <ul class="otras">
+      {otras.map((p, i) => (
+        <li data-asoma style={`--i:${i}`}>
+          <a href={`${RAIZ_CASA}${p.pagina}/`}>
+            <span class:list={['producto-logo', { 'producto-logo--logo': p.fondo }]} style={p.fondo ? `background:${p.fondo}` : undefined}>
+              <img src={p.imagen} width="512" height="512" alt="" loading="lazy" decoding="async" />
+            </span>
+            <span class="otras-texto"><strong>{p.nombre}</strong> <span>{p.que}</span></span>
+            <span class="otras-flecha" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .otras {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  }
+  @media (min-width: 40rem) {
+    .otras {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .otras {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .otras a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-block-size: 4rem;
+    padding: 0.75rem 1rem 0.75rem 0.75rem;
+    border-radius: 0.875rem;
+    background: var(--fondo-alt);
+    box-shadow: inset 0 0 0 1px var(--borde);
+    transition:
+      box-shadow 0.3s,
+      translate 0.5s var(--curva);
+  }
+  .otras .producto-logo {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+  .otras-texto {
+    display: grid;
+    min-inline-size: 0;
+    line-height: 1.3;
+  }
+  .otras-texto strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+  .otras-texto span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    color: var(--texto-secundario);
+  }
+  .otras-flecha {
+    margin-inline-start: auto;
+    color: var(--texto-terciario);
+    transition:
+      translate 0.3s var(--curva),
+      color 0.3s;
+  }
+  @media (hover: hover) {
+    .otras a:hover {
+      translate: 0 -0.125rem;
+      box-shadow: inset 0 0 0 1px var(--texto-terciario);
+    }
+    .otras a:hover .otras-flecha {
+      translate: 0.1875rem 0;
+      color: var(--texto);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .otras a,
+    .otras-flecha {
+      transition: none;
+    }
+  }
+</style>

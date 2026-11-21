@@ -59,38 +59,94 @@ html:has(.psx-barra):not([data-msx-telon='activo'], [data-msx-telon='sube'])::af
   pointer-events: none;
 }
 
-/* La barra de scroll de la página arranca DEBAJO de la barra fija, no por encima de ella.
-   Solo existe en Chrome/Edge/Safari (el margen del riel es de ::-webkit-scrollbar); Firefox
-   conserva la suya de siempre. Y solo con mouse (hover): con el dedo el sistema la muestra flotante.
-   ⚠️ Chrome ignora ::-webkit-scrollbar si scrollbar-color o scrollbar-width no son `auto`,
-   por eso acá se vuelven a `auto` (el producto puede haberlos fijado para toda la página).
-   Va en <html> Y en <body>: Chrome dibuja la barra de la página con el estilo del <body> si él
-   tiene uno propio (un `::-webkit-scrollbar` suelto del producto lo alcanza), y si no con el de <html>.
-   Lee --psx-texto desde <html>: si el producto lo mapea más abajo (Flux, en .kit-root), cae al
-   color de texto del sistema. */
-@supports selector(::-webkit-scrollbar) {
-  @media (hover: hover) {
-    :is(html, body):has(.psx-barra) {
-      scrollbar-color: auto;
-      scrollbar-width: auto;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar {
-      width: 0.5rem;
-      background: transparent;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar-track {
-      margin-top: var(--psx-alto-barra);
-      background: transparent;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar-thumb {
-      background: color-mix(in srgb, var(--psx-texto, CanvasText) 22%, transparent);
-      border: 2px solid transparent;
-      border-radius: 999px;
-      background-clip: padding-box;
-    }
-    :is(html, body):has(.psx-barra)::-webkit-scrollbar-thumb:hover {
-      background-color: color-mix(in srgb, var(--psx-texto, CanvasText) 40%, transparent);
-    }
+/* La barra de scroll de la página la dibuja la pieza: flota sobre la página, arranca DEBAJO de la
+   barra fija y no ocupa lugar. La del navegador se esconde.
+   Por qué no la del navegador: una barra con estilo propio (`::-webkit-scrollbar`) siempre ocupa su
+   franja, aunque el aparato use barras flotantes, y esa franja muestra el fondo de <html>, no lo que
+   la página tiene al lado. En cuanto una portada o una sección es de otro color, queda un carril que
+   corta la página de arriba abajo, pegado a la barra fija (Sal, 2026-11-20, en la portada de Nuvix).
+   Solo con mouse o trackpad (con el dedo el sistema ya la muestra flotante) y solo con JavaScript,
+   que es quien dibuja la nuestra (`montarPublicoSalix`): sin él queda la del navegador, entera.
+   Va en <html> Y en <body>: el navegador dibuja la barra de la página con el estilo del <body> si él
+   tiene uno propio, y si no con el de <html>. */
+@media (hover: hover) and (pointer: fine) and (scripting: enabled) {
+  :is(html, body):has(.psx-barra) {
+    scrollbar-width: none;
+  }
+  :is(html, body):has(.psx-barra)::-webkit-scrollbar {
+    display: none;
+  }
+}
+/* El riel no se ve ni se toca: solo el pulgar. Es gris, con un borde claro apenas marcado, para
+   leerse igual sobre una sección clara que sobre una oscura (no depende del color del producto).
+   Aparece al mover la página o al acercar el puntero al borde, y se va solo. */
+.psx-scroll {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 298; /* debajo del menú móvil (299) y de la barra (300) */
+  width: 0.875rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease 0.15s;
+}
+.psx-scroll--visible {
+  opacity: 1;
+  transition-duration: 0.12s;
+  transition-delay: 0s;
+}
+.psx-scroll-pulgar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  /* El alto y el lugar los escribe publico-salix.ts, una vez por cuadro. */
+  height: var(--psx-scroll-alto, 0px);
+  transform: translateY(var(--psx-scroll-y, 0px));
+  pointer-events: none;
+  touch-action: none;
+}
+.psx-scroll--visible .psx-scroll-pulgar {
+  pointer-events: auto;
+}
+/* Lo que se ve del pulgar: angosto en reposo, un poco más ancho al acercarse o al arrastrarlo. */
+.psx-scroll-pulgar::before {
+  content: '';
+  position: absolute;
+  top: 0.125rem;
+  right: 0.1875rem;
+  bottom: 0.125rem;
+  width: 0.25rem;
+  border-radius: 999px;
+  background: rgba(128, 128, 128, 0.55);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
+  transition:
+    width 0.15s ease,
+    background-color 0.15s ease;
+}
+.psx-scroll--arrastra .psx-scroll-pulgar::before {
+  width: 0.4375rem;
+  background: rgba(128, 128, 128, 0.8);
+}
+@media (hover: hover) {
+  .psx-scroll-pulgar:hover::before {
+    width: 0.4375rem;
+    background: rgba(128, 128, 128, 0.8);
+  }
+}
+html.psx-sin-scroll .psx-scroll {
+  display: none;
+}
+@media print {
+  .psx-scroll {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .psx-scroll,
+  .psx-scroll-pulgar::before {
+    transition: none;
   }
 }
 
@@ -924,6 +980,133 @@ html.psx-sin-scroll {
   text-transform: uppercase;
   color: var(--psx-texto-3);
 }
+/* ── Tema ── En la base del pie, al lado del idioma (publico-salix.md §6). Un botón redondo del alto y
+   con el borde del idioma: cada toque pasa al modo siguiente (automático, claro, oscuro) y arriba
+   asoma un instante el nombre del modo en que quedó. Los íconos los dibuja la hoja (máscaras) sobre
+   tres piezas que pone `montarPublicoSalix`; cada producto escribe solo los nombres. Solo lo lleva un
+   producto con dos temas. */
+.psx-tema {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--psx-borde);
+  border-radius: 50%;
+  background: none;
+  color: var(--psx-texto-2);
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.16s ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Sin JavaScript no hay íconos ni nada que hacer: no se dibuja. */
+.psx-tema:empty {
+  display: none;
+}
+.psx-tema:active {
+  transform: scale(0.94);
+}
+@media (hover: hover) {
+  .psx-tema:hover {
+    color: var(--psx-texto);
+    border-color: color-mix(in srgb, var(--psx-texto) 28%, transparent);
+  }
+}
+/* Los tres íconos, uno encima del otro: el del modo actual a la vista, los otros dos girados y chicos. */
+.psx-tema-icono {
+  grid-area: 1 / 1;
+  width: 0.9375rem;
+  height: 0.9375rem;
+  background: currentColor;
+  -webkit-mask: var(--psx-icono) center / contain no-repeat;
+  mask: var(--psx-icono) center / contain no-repeat;
+  opacity: 0;
+  transform: rotate(-70deg) scale(0.6);
+  transition:
+    opacity 0.2s ease,
+    transform 0.32s cubic-bezier(0.2, 0, 0, 1);
+}
+.psx-tema[data-pref='auto'] .psx-tema-icono[data-de='auto'],
+.psx-tema[data-pref='claro'] .psx-tema-icono[data-de='claro'],
+.psx-tema[data-pref='oscuro'] .psx-tema-icono[data-de='oscuro'] {
+  opacity: 1;
+  transform: none;
+}
+/* Automático: medio círculo lleno, lo que decide el aparato. */
+.psx-tema-icono[data-de='auto'] {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 1 0 17z' fill='black'/%3E%3C/svg%3E");
+}
+.psx-tema-icono[data-de='claro'] {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3.75'/%3E%3Cpath d='M12 2.5v2.25M12 19.25v2.25M2.5 12h2.25M19.25 12h2.25M5.28 5.28l1.6 1.6M17.12 17.12l1.6 1.6M5.28 18.72l1.6-1.6M17.12 6.88l1.6-1.6'/%3E%3C/svg%3E");
+}
+.psx-tema-icono[data-de='oscuro'] {
+  --psx-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z'/%3E%3C/svg%3E");
+}
+/* El nombre del modo: asoma arriba del botón al tocarlo (`.psx-tema--dice`, un instante) y al pasar
+   el puntero. Con un solo ícono no se ven las opciones; así se sabe en cuál quedó. */
+.psx-tema::after {
+  content: attr(data-ahora);
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  right: 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.4375rem;
+  background: var(--psx-texto);
+  color: var(--psx-fondo);
+  font-size: 0.75rem;
+  font-weight: 550;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(0.1875rem);
+  transition:
+    opacity 0.16s ease,
+    transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.psx-tema--dice::after {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: hover) {
+  .psx-tema:hover::after {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.35s;
+  }
+  .psx-tema--dice:hover::after {
+    transition-delay: 0s;
+  }
+}
+@media (pointer: coarse) {
+  .psx-tema {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .psx-tema-icono {
+    width: 1.0625rem;
+    height: 1.0625rem;
+  }
+}
+/* El cambio de tema funde toda la página de una vez, en vez de que cada pieza cambie a su ritmo. */
+html.psx-tema-cambia::view-transition-old(root),
+html.psx-tema-cambia::view-transition-new(root) {
+  animation-duration: 0.28s;
+  animation-timing-function: ease;
+}
+/* Los controles de la base (idioma y tema) van juntos, contra el borde. */
+.psx-pie-controles {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* En la fila del menú, lo propio del producto va junto a la derecha (el idioma y la firma). */
 .psx-menu-pie-extra {
   display: flex;
@@ -970,8 +1153,14 @@ html.psx-sin-scroll {
     gap: 0 1rem;
     padding-top: 0.75rem;
   }
+  /* Lo propio ocupa su renglón: los controles a la izquierda y el crédito o la firma a la derecha. */
   .psx-pie-base-extra {
-    gap: 0 1rem;
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: 0 0.75rem;
+  }
+  .psx-pie-controles {
+    order: -1;
   }
   .psx-cierre-extra {
     display: none;
@@ -981,6 +1170,22 @@ html.psx-sin-scroll {
     right: auto;
     left: 0;
     transform-origin: 0 100%;
+  }
+  .psx-pie-base .psx-tema::after {
+    right: auto;
+    left: 0;
+  }
+}
+
+/* En un teléfono angosto el idioma de la base muestra su código («ES»), como en la fila del menú: así
+   los controles y el crédito o la firma siguen entrando en un renglón. */
+@media (max-width: 340px) {
+  .psx-pie-base .psx-idioma-nombre {
+    display: none;
+  }
+  .psx-pie-base .psx-idioma-codigo {
+    display: inline;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -1017,8 +1222,14 @@ html.psx-sin-scroll {
   .psx-menu,
   .psx-menu-enlace,
   .psx-menu-pie,
-  .psx-h-linea {
+  .psx-h-linea,
+  .psx-tema,
+  .psx-tema::after {
     transition: none;
+  }
+  .psx-tema-icono {
+    transform: none;
+    transition: opacity 0.2s ease;
   }
   .psx-menu-enlace {
     transform: none;

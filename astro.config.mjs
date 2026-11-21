@@ -10,6 +10,15 @@ export default defineConfig({
   // Comprimir el output para producción
   compressHTML: true,
 
+  // Las direcciones de la web anterior que ya no tienen página propia llevan a donde quedó lo suyo.
+  // Go, Play y Book todavía no existen: van a «Lo que viene».
+  redirects: {
+    '/sites': '/sitios/',
+    '/go': '/#viene',
+    '/play': '/#viene',
+    '/book': '/#viene',
+  },
+
   // Integraciones
   integrations: [sitemap()],
 

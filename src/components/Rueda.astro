@@ -1,0 +1,262 @@
+---
+// ============================================================
+// Rueda.astro — todo lo que hace la casa, pasando de frente como en un tambor.
+// Cada ficha es un producto, un servicio, algo que viene o un sitio hecho; se ve como un ícono de app
+// y lleva a su parte de la portada. Debajo, un solo cartel dice el nombre de la que está al frente.
+// Sin JavaScript (o con «reducir movimiento») es una fila quieta de fichas, cada una con su nombre.
+// El avance, el arrastre y la profundidad viven en src/scripts/rueda.ts.
+// ============================================================
+import IconoProducto from './IconoProducto.astro';
+import { RUEDA } from '../casa/cosas';
+
+interface Props {
+  /** Lo que va antes del `#` de cada enlace: '' en la portada, la ruta de la portada en el resto. */
+  base?: string;
+}
+const { base = '' } = Astro.props;
+---
+
+<div class="rueda" data-rueda>
+  <span class="rueda-luz" aria-hidden="true"></span>
+  <ul class="rueda-fichas" aria-label="Lo que hace Salix">
+    {RUEDA.map((p) => (
+      <li>
+        <a
+          class:list={['rueda-ficha', { 'rueda-ficha--obra': p.obra }]}
+          href={`${base}#${p.ancla}`}
+          style={`--c:var(--linea-${p.id});${p.fondo ? `--fondo-ficha:${p.fondo};` : ''}`}
+          data-ficha
+          data-color={`var(--linea-${p.id})`}
+          data-nombre={p.nombre}
+          data-que={p.que}
+          draggable="false"
+        >
+          <span class:list={['rueda-icono', { 'rueda-icono--oficial': p.imagen, 'rueda-icono--logo': p.imagen && p.fondo, 'rueda-icono--obra': p.obra }]}>
+            {p.imagen && <img src={p.imagen} width="512" height="512" alt="" loading="eager" decoding="async" draggable="false" />}
+            {!p.imagen && p.icono && <IconoProducto nombre={p.icono} tamaño={28} />}
+          </span>
+          <span class="rueda-rotulo"><strong>{p.nombre}</strong> <span>{p.que}</span></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <p class="rueda-cartel" data-rueda-cartel aria-hidden="true">
+    <strong data-rueda-nombre>{RUEDA[0].nombre}</strong>
+    <span data-rueda-que>{RUEDA[0].que}</span>
+  </p>
+</div>
+
+<script>
+  import { montarRuedas } from '../scripts/rueda';
+  document.addEventListener('DOMContentLoaded', montarRuedas);
+</script>
+
+<style>
+  .rueda {
+    /* El lado de la ficha del frente: crece con la pantalla, de un teléfono chico a un monitor. */
+    --lado: clamp(4.25rem, 3.2rem + 4.4vw, 6.75rem);
+    position: relative;
+    inline-size: min(100%, 48rem);
+    margin-inline: auto;
+  }
+  /* Poco alto (un teléfono acostado, una ventana baja): la ficha cede. */
+  @media (max-height: 34rem) {
+    .rueda {
+      --lado: 4.25rem;
+    }
+  }
+  .rueda-luz,
+  .rueda-cartel {
+    display: none;
+  }
+
+  /* ── Quieta (sin JavaScript o con «reducir movimiento»): una fila de fichas con su nombre ── */
+  .rueda-fichas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 1rem;
+  }
+  .rueda-ficha {
+    display: grid;
+    justify-items: center;
+    gap: 0.625rem;
+    inline-size: 8.5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* La ficha: un ícono de app. Los oficiales van enteros, tal como son; lo que todavía no tiene ícono
+     propio va en una ficha de la casa, oscura, con su dibujo de trazo. A todas las despega del fondo
+     la misma sombra y el mismo borde fino. */
+  .rueda-icono {
+    display: grid;
+    place-items: center;
+    inline-size: var(--lado);
+    block-size: var(--lado);
+    overflow: hidden;
+    border-radius: calc(var(--lado) * 0.235);
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0) 48%),
+      #1b1c21;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 1.5rem 2rem -1.25rem rgba(0, 0, 0, 0.6);
+    color: #f2efe8;
+    transition: box-shadow 0.6s ease;
+  }
+  .rueda-icono :global(svg) {
+    inline-size: 42%;
+    block-size: 42%;
+  }
+  .rueda-icono--obra {
+    color: rgba(242, 239, 232, 0.5);
+  }
+  .rueda-icono--oficial {
+    background: var(--fondo-ficha, none);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--texto) 12%, transparent),
+      0 1.5rem 2rem -1.25rem rgba(0, 0, 0, 0.6);
+  }
+  .rueda-icono img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    -webkit-user-drag: none;
+  }
+  .rueda-icono--logo img {
+    inline-size: 60%;
+    block-size: 60%;
+    object-fit: contain;
+  }
+  .rueda-rotulo {
+    display: grid;
+    justify-items: center;
+    gap: 0.125rem;
+    font-size: 0.75rem;
+    color: var(--texto-secundario);
+    text-align: center;
+    text-wrap: balance;
+  }
+  .rueda-rotulo strong {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--texto);
+  }
+
+  /* ── Viva: rueda.ts mueve las fichas y un solo cartel dice el nombre de la del frente ── */
+  :global(.rueda--viva).rueda {
+    block-size: calc(var(--lado) * 1.62 + 5.25rem);
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  :global(.rueda--arrastra).rueda {
+    cursor: grabbing;
+  }
+  :global(.rueda--viva) .rueda-fichas {
+    display: block;
+    position: absolute;
+    inset: 0;
+    /* Hacia las puntas todo se pierde en el fondo. */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%);
+  }
+  :global(.rueda--viva) .rueda-ficha {
+    position: absolute;
+    inset-block-start: calc(var(--lado) * 0.12 + 0.75rem);
+    inset-inline-start: calc(50% - var(--lado) / 2);
+    display: block;
+    inline-size: var(--lado);
+    will-change: transform, opacity;
+  }
+  :global(.rueda--viva) .rueda-rotulo {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* El reflejo: cada ficha se apoya sobre un piso que la espeja apenas. Solo donde el navegador lo
+     sabe hacer; en el resto, la ficha queda igual sin él. */
+  @supports (-webkit-box-reflect: below) {
+    :global(.rueda--viva) .rueda-icono {
+      -webkit-box-reflect: below 0.375rem linear-gradient(to bottom, transparent 62%, rgba(0, 0, 0, 0.22));
+    }
+  }
+  :global(.rueda--viva) :global(.rueda-ficha--frente) .rueda-icono {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--texto) 22%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent),
+      0 1.5rem 2.25rem -1.25rem rgba(0, 0, 0, 0.7);
+  }
+  /* La luz: detrás y debajo de la ficha del frente, del color de su línea. Cambia de color de a poco
+     cuando pasa la siguiente. */
+  :global(.rueda--viva) .rueda-luz {
+    display: block;
+    position: absolute;
+    inset-block-start: calc(var(--lado) * 0.3);
+    inset-inline-start: calc(50% - var(--lado) * 1.25);
+    inline-size: calc(var(--lado) * 2.5);
+    block-size: calc(var(--lado) * 1.3);
+    border-radius: 50%;
+    background-color: var(--frente, transparent);
+    filter: blur(2.75rem);
+    opacity: 0;
+    transition:
+      background-color 0.9s ease,
+      opacity 1.4s ease 0.3s;
+    pointer-events: none;
+  }
+  /* La luz y el cartel entran cuando las fichas ya se están abriendo. */
+  :global(.rueda--abierta) .rueda-luz {
+    opacity: 0.34;
+  }
+  :global([data-tema='claro']) :global(.rueda--abierta) .rueda-luz {
+    opacity: 0.22;
+  }
+  /* El cartel: el nombre de la ficha que está al frente. */
+  :global(.rueda--viva) .rueda-cartel {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    justify-items: center;
+    gap: 0.125rem;
+    min-block-size: 3rem;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.7s ease 0.75s;
+  }
+  :global(.rueda--abierta) .rueda-cartel {
+    opacity: 1;
+  }
+  .rueda-cartel strong {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .rueda-cartel span {
+    font-size: 0.875rem;
+    color: var(--texto-secundario);
+  }
+  :global(.rueda-cartel--cambia) > * {
+    animation: rueda-cartel 0.5s var(--curva) both;
+  }
+  :global(.rueda-cartel--cambia) > span {
+    animation-delay: 0.06s;
+  }
+  @keyframes rueda-cartel {
+    from {
+      opacity: 0;
+      translate: 0 0.375rem;
+    }
+  }
+  .rueda-ficha:focus-visible {
+    outline: none;
+  }
+  .rueda-ficha:focus-visible .rueda-icono {
+    outline: 2px solid var(--salix);
+    outline-offset: 3px;
+  }
+</style>

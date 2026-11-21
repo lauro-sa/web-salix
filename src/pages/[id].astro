@@ -1,0 +1,338 @@
+---
+// La página de un producto dentro de la web de Salix: todo lo que el producto cuenta en su propia web,
+// con la estética de la casa. No es donde se contrata: los botones llevan a la web del producto.
+// Por el costado baja la línea del producto, con una parada en cada parte. Los textos y las capturas
+// están en src/casa/productos.ts; el movimiento, en src/scripts/casa.ts.
+import Casa from '../layouts/Casa.astro';
+import Mesa from '../components/Mesa.astro';
+import CierreCasa from '../components/CierreCasa.astro';
+import OtrasDeLaCasa from '../components/OtrasDeLaCasa.astro';
+import LogoFlux from '../components/LogoFlux.astro';
+import LogoMenu from '../components/LogoMenu.astro';
+import { ENTRADAS } from '../casa/datos';
+import { DETALLES } from '../casa/productos';
+import { VISTAS_PORTADA } from '../casa/capturas';
+import { RAIZ_CASA, rutaSitio } from '../casa/navegacion';
+
+export function getStaticPaths() {
+  return Object.keys(DETALLES).map((id) => ({ params: { id } }));
+}
+
+const { id } = Astro.params;
+const e = ENTRADAS.find((x) => x.id === id)!;
+const d = DETALLES[id];
+const contacto = `${RAIZ_CASA}#contacto`;
+
+// Las paradas de la línea, en orden: las partes del producto, sus módulos, dónde funciona y los planes.
+const paradas = [
+  ...d.bloques.map((b) => ({ id: b.id, nombre: b.parada })),
+  ...(d.modulos ? [{ id: 'modulos', nombre: d.modulos.parada }] : []),
+  { id: 'donde', nombre: 'Dónde funciona' },
+  { id: 'planes', nombre: d.planes.parada },
+];
+---
+
+<Casa titulo={`${e.nombre} · ${e.que} · Salix`} descripcion={d.bajada} base={RAIZ_CASA} inicio={RAIZ_CASA}>
+  <div style={`--c:var(--linea-${id})`}>
+    <section class="cabeza con-riel" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--nace"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="cabeza-caja riel-cuerpo ancho">
+        <div>
+          <nav class="migas" aria-label="Dónde estás">
+            <a href={RAIZ_CASA}>Salix</a>
+            <span aria-hidden="true">/</span>
+            <a href={`${RAIZ_CASA}#productos`}>Productos</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{e.nombre}</span>
+          </nav>
+          <p class="producto-nombre">
+            <span class="producto-logo">
+              {id === 'flux' && <LogoFlux tamaño={20} />}
+              {id === 'menu' && <LogoMenu tamaño={20} />}
+              {id === 'nuvix' && <span class="logo-nuvix"></span>}
+            </span>
+            {e.nombre}
+            <span class="producto-que">{e.que}</span>
+            <span class:list={['estado', { 'estado--vivo': e.estado === 'En uso' }]}>{e.estado}</span>
+          </p>
+          {d.antetitulo && <p class="antetitulo" data-asoma>{d.antetitulo}</p>}
+          <h1 class="titulo titulo--pagina" data-asoma>{d.liviana && <span>{d.liviana}</span>} {d.tinta}</h1>
+          <p class="bajada" data-asoma style="--i:1">{d.bajada}</p>
+          <div class="acciones" data-asoma style="--i:2">
+            <a class="boton" href={e.url} rel="noopener">Ir a {e.dominio} <span aria-hidden="true">↗</span></a>
+            <a class="boton boton-secundario" href={contacto}>Hablemos</a>
+          </div>
+          {d.nota && <p class="nota" data-asoma style="--i:3">{d.nota}</p>}
+        </div>
+        <Mesa vistas={VISTAS_PORTADA[id]} nombre={e.nombre} data-asoma style="--i:2" />
+      </div>
+
+      <!-- El índice: las paradas de la línea, de corrido. En el teléfono se desliza de costado. -->
+      <nav class="indice riel-cuerpo ancho" aria-label={`Las partes de ${e.nombre}`} data-asoma style="--i:4">
+        <ol>
+          {paradas.map((p) => (
+            <li><a href={`#${p.id}`}><span class="indice-punto" aria-hidden="true"></span>{p.nombre}</a></li>
+          ))}
+        </ol>
+      </nav>
+    </section>
+
+    {d.bloques.map((b) => (
+      <section class="tramo con-riel con-parada" id={b.id} data-riel>
+        <div class="riel" aria-hidden="true">
+          <span class="riel-linea"></span>
+          <span class="riel-punto" data-parada></span>
+        </div>
+        <div class="riel-cuerpo ancho">
+          <p class="parada-nombre">{b.parada}</p>
+          <div class:list={['bloque', { 'bloque--enlazado': b.enlazadas, 'bloque--solo': b.vistas.length === 0 }]} data-vistas={b.enlazadas ? '' : undefined}>
+            <div class="bloque-titulo">
+              <h2 class="titulo" data-asoma>{b.liviana && <span>{b.liviana}</span>} {b.tinta}</h2>
+              {b.bajada && <p class="bajada" data-asoma style="--i:1">{b.bajada}</p>}
+            </div>
+            {b.vistas.length > 0 && (
+              <Mesa class="bloque-mesa" vistas={b.vistas} nombre={`${e.nombre}: ${b.parada}`} rotulos={!b.enlazadas} />
+            )}
+            <div class="bloque-lista">
+              {b.enlazadas ? (
+                <div class="pasos" role="tablist" aria-label={`Capturas de ${b.parada}`}>
+                  {b.hechos.map((h, i) => (
+                    <button type="button" role="tab" class="paso" data-rotulo aria-selected={i === 0 ? 'true' : 'false'}>
+                      <strong>{h.titulo}</strong>
+                      <span>{h.texto}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <ul class="hechos hechos--nombre">
+                  {b.hechos.map((h) => <li><strong>{h.titulo}</strong> {h.texto}</li>)}
+                </ul>
+              )}
+              {b.nota && <p class="nota">{b.nota}</p>}
+            </div>
+          </div>
+        </div>
+      </section>
+    ))}
+
+    {d.modulos && (
+      <section class="tramo con-riel con-parada" id="modulos" data-riel>
+        <div class="riel" aria-hidden="true">
+          <span class="riel-linea"></span>
+          <span class="riel-punto" data-parada></span>
+        </div>
+        <div class="riel-cuerpo ancho">
+          <p class="parada-nombre">{d.modulos.parada}</p>
+          <div class="dos">
+            <h2 class="titulo" data-asoma><span>{d.modulos.liviana}</span> {d.modulos.tinta}</h2>
+            <p class="bajada" data-asoma style="--i:1">{d.modulos.bajada}</p>
+          </div>
+          <ul class="grupos">
+            {d.modulos.grupos.map((g, i) => (
+              <li data-asoma style={`--i:${i % 3}`}>
+                <strong>{g.nombre}</strong>
+                <span>{g.que}</span>
+                <ul>{g.modulos.map((m) => <li>{m}</li>)}</ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    <section class="tramo con-riel con-parada" id="donde" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">Dónde funciona</p>
+        <div class="dos">
+          <h2 class="titulo" data-asoma>{d.donde.liviana && <span>{d.donde.liviana}</span>} {d.donde.tinta}</h2>
+          {d.donde.bajada && <p class="bajada" data-asoma style="--i:1">{d.donde.bajada}</p>}
+        </div>
+        <ul class="hechos hechos--nombre hechos--columnas" data-asoma style={`--i:1;--columnas:${Math.min(4, d.donde.hechos.length)}`}>
+          {d.donde.hechos.map((h) => <li><strong>{h.titulo}</strong> {h.texto}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="tramo con-riel con-parada" id="planes" data-riel>
+      <div class="riel" aria-hidden="true">
+        <span class="riel-linea riel-linea--fin"></span>
+        <span class="riel-punto" data-parada></span>
+      </div>
+      <div class="riel-cuerpo ancho">
+        <p class="parada-nombre">{d.planes.parada}</p>
+        <div class="dos dos--arriba">
+          <h2 class="titulo" data-asoma>{d.planes.liviana && <span>{d.planes.liviana}</span>} {d.planes.tinta}</h2>
+          <div data-asoma style="--i:1">
+            {d.planes.textos.map((t) => <p class="bajada planes-texto">{t}</p>)}
+            <div class="acciones">
+              {d.planes.enlace && (
+                <a class="boton" href={d.planes.enlace.href} rel="noopener">{d.planes.enlace.texto} <span aria-hidden="true">↗</span></a>
+              )}
+              <a class="boton boton-secundario" href={e.url} rel="noopener">{e.dominio} <span aria-hidden="true">↗</span></a>
+            </div>
+            <!-- La web del producto también la hicimos nosotros: tiene su página entre los sitios. -->
+            <a class="enlace planes-sitio" href={rutaSitio(id)}>Cómo es la web de {e.nombre} <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <OtrasDeLaCasa actual={id} />
+
+  <CierreCasa
+    liviana={`¿Querés ver ${e.nombre} con nosotros?`}
+    tinta="Hablemos."
+    bajada="Contanos cómo trabajás y te mostramos cómo quedaría."
+    contacto={contacto}
+  />
+</Casa>
+
+<style>
+  /* ── Un bloque: el título, las capturas y la lista ──
+     En una columna van en ese orden. Con lugar, el texto a la izquierda y la mesa a la derecha, que
+     acompaña mientras se lee la lista. */
+  .bloque {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .bloque-titulo .bajada {
+    margin-top: 1.125rem;
+  }
+  .bloque-lista .hechos,
+  .bloque-lista .pasos {
+    margin-top: 0;
+  }
+  @media (min-width: 56rem) {
+    .bloque {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+      grid-template-rows: auto 1fr;
+      column-gap: clamp(2rem, 5vw, 4.5rem);
+      row-gap: 1.75rem;
+      align-items: start;
+    }
+    .bloque-titulo {
+      grid-area: 1 / 1;
+    }
+    .bloque-lista {
+      grid-area: 2 / 1;
+    }
+    .bloque :global(.bloque-mesa) {
+      grid-area: 1 / 2 / span 2;
+      position: sticky;
+      inset-block-start: calc(var(--psx-alto-barra, 4.5rem) + 1.5rem);
+    }
+    /* Sin capturas: el título a la izquierda y la lista a la derecha, a la misma altura. */
+    .bloque--solo .bloque-lista {
+      grid-area: 1 / 2 / span 2;
+    }
+    .bloque--solo .bloque-lista .hechos {
+      max-inline-size: none;
+    }
+  }
+  /* En el teléfono, cuando cada renglón elige su captura, la mesa queda a la vista mientras se
+     recorre la lista (si la pantalla tiene alto para las dos cosas). */
+  @media (max-width: 55.99rem) and (min-height: 40rem) {
+    .bloque--enlazado :global(.bloque-mesa) {
+      position: sticky;
+      inset-block-start: calc(var(--psx-alto-barra, 4.5rem) + 0.5rem);
+      z-index: 2;
+    }
+    .bloque--enlazado :global(.bloque-mesa .vistas) {
+      block-size: clamp(11rem, 30svh, 16rem);
+    }
+  }
+
+  /* Los pasos: cada renglón elige la captura que se ve. */
+  .pasos {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .paso {
+    display: grid;
+    gap: 0.125rem;
+    padding: 0.75rem 0.875rem;
+    border-radius: 0.625rem;
+    text-align: start;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--texto-secundario);
+    text-wrap: pretty;
+    transition:
+      background-color 0.25s,
+      box-shadow 0.25s;
+  }
+  .paso strong {
+    font-weight: 600;
+    color: var(--texto);
+  }
+  .paso[aria-selected='true'] {
+    background: var(--fondo-alt);
+    box-shadow: inset 0 0 0 1px var(--borde);
+  }
+  @media (hover: hover) {
+    .paso:not([aria-selected='true']):hover {
+      background: var(--superficie);
+    }
+  }
+
+  /* ── Los módulos, por área ── */
+  .grupos {
+    display: grid;
+    gap: 2rem clamp(1.5rem, 4vw, 3rem);
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+  }
+  @media (min-width: 36rem) {
+    .grupos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 56rem) {
+    .grupos {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .grupos > li {
+    display: grid;
+    align-content: start;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--texto);
+  }
+  .grupos strong {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .grupos > li > span {
+    font-size: 0.8125rem;
+    color: var(--texto-secundario);
+  }
+  .grupos ul {
+    margin-top: 0.875rem;
+  }
+  .grupos ul li {
+    padding-block: 0.5rem;
+    border-top: 1px solid var(--borde);
+    font-size: 0.9375rem;
+    color: var(--texto-secundario);
+  }
+
+  .planes-sitio {
+    margin-top: 0.75rem;
+  }
+  .planes-texto + .planes-texto {
+    margin-top: 0.75rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .paso {
+      transition: none;
+    }
+  }
+</style>

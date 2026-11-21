@@ -14,6 +14,9 @@
  * Lo que hace, y nada más:
  *   - la barra de progreso de lectura (escrita en el rAF, con `transform`: sin render ni layout);
  *   - la barra se entinta apenas se baja (`.psx-barra--fija`);
+ *   - la barra de scroll de la página (`.psx-scroll`): con mouse o trackpad esconde la del navegador
+ *     y dibuja una flotante, que arranca debajo de la barra fija, aparece al mover la página o al
+ *     acercar el puntero al borde, y se arrastra. No ocupa lugar: no deja carril al costado;
  *   - marca en `<html>` la mitad de abajo de la página (`.psx-abajo`): con eso un producto cuya página
  *     empieza en un color y termina en otro elige el fondo de atrás, el que el navegador muestra en el
  *     rebote al tirar de más (publico-salix.md, «El fondo de atrás»);
@@ -31,7 +34,14 @@
  *   - el selector de idioma (`.psx-idioma`, en el pie y en el menú): abre y cierra la lista, lleva
  *     el foco a la opción activa y lo devuelve al botón. ELEGIR el idioma es de cada producto: el
  *     de React escucha el clic de su opción; uno sin framework, el evento `psx:idioma` que se emite
- *     con `{ idioma }` al tocar una opción habilitada.
+ *     con `{ idioma }` al tocar una opción habilitada;
+ *   - el botón de tema (`.psx-tema`, en el pie): cada toque pasa al modo siguiente (automático, claro,
+ *     oscuro) y asoma un instante el nombre del modo. Le pone sus tres íconos, guarda la elección en
+ *     `localStorage` bajo la clave de `data-clave` (automático no guarda nada: sigue al aparato),
+ *     escribe `data-tema` («claro» u «oscuro») y `data-pref` («auto», «claro» u «oscuro») en `<html>`
+ *     y emite `psx:tema` con `{ pref, tema }`. Un producto que aplica el tema por su cuenta (React)
+ *     pone `data-solo-avisa` y escucha el evento. El tema ANTES del primer pintado sigue siendo de
+ *     cada producto: un script en el `<head>` que lee la misma clave.
  */
 
 const CLASE_FIJA = 'psx-barra--fija'
@@ -42,6 +52,24 @@ const CLASE_SUELTO = 'psx-pie--suelto'
 const CLASE_SIN_SCROLL = 'psx-sin-scroll'
 const CLASE_ASOMA = 'psx-pie-logo--asoma'
 const CLASE_LATE = 'msx--late'
+const CLASE_SCROLL_VISIBLE = 'psx-scroll--visible'
+const CLASE_SCROLL_ARRASTRA = 'psx-scroll--arrastra'
+const CLASE_TEMA_CAMBIA = 'psx-tema-cambia'
+const CLASE_TEMA_DICE = 'psx-tema--dice'
+/** Lo que se elige en el control de tema: «auto» sigue al aparato. */
+type PrefTema = 'auto' | 'claro' | 'oscuro'
+/** El orden en que el botón de tema pasa de un modo a otro. */
+const MODOS_TEMA: PrefTema[] = ['auto', 'claro', 'oscuro']
+/** Cuánto queda a la vista el nombre del modo después de tocar el botón (en ms). */
+const NOMBRE_TEMA_SE_VA = 1600
+/** Cuándo la pieza dibuja la barra de scroll: la misma condición con la que el CSS esconde la del navegador. */
+const CON_SCROLL_PROPIO = '(hover: hover) and (pointer: fine) and (scripting: enabled)'
+/** El pulgar de la barra de scroll no baja de este alto (en px), para que siempre se pueda agarrar. */
+const PULGAR_MINIMO = 36
+/** Cuánto queda a la vista la barra de scroll después del último movimiento (en ms). */
+const SCROLL_SE_VA = 900
+/** A qué distancia del borde derecho el puntero la hace aparecer (en px). */
+const BORDE_SCROLL = 18
 /** Qué parte del pie tiene que estar destapada para darlo por «a la vista» (el logo repite su entrada). */
 const PIE_A_LA_VISTA = 0.7
 /** Lo mismo para un pie suelto, que entra desde abajo como cualquier bloque. */
@@ -87,6 +115,34 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     pieLogo.style.setProperty('--psx-firma-retraso', retraso)
     reiniciar(pieLogo, CLASE_ASOMA)
   }
+
+  // ── La barra de scroll de la página, dibujada por la pieza (publico-salix.css, `.psx-scroll`) ──
+  // Va en <body>, fuera de la raíz: es fija y de un gris propio, no depende de los colores del producto.
+  let riel: HTMLElement | null = null
+  let pulgar: HTMLElement | null = null
+  if (barra && window.matchMedia(CON_SCROLL_PROPIO).matches) {
+    riel = document.createElement('div')
+    riel.className = 'psx-scroll'
+    riel.setAttribute('aria-hidden', 'true')
+    pulgar = document.createElement('span')
+    pulgar.className = 'psx-scroll-pulgar'
+    riel.append(pulgar)
+    document.body.append(riel)
+  }
+  let ultimoPulgar = ''
+  /** Cuántos px puede recorrer el pulgar: con eso el arrastre se convierte en scroll. */
+  let recorridoPulgar = 0
+  let arrastrando = false
+  let sobreElBorde = false
+  let seVa = 0
+  const mostrarScroll = () => {
+    if (!riel) return
+    riel.classList.add(CLASE_SCROLL_VISIBLE)
+    window.clearTimeout(seVa)
+    seVa = window.setTimeout(() => {
+      if (!arrastrando && !sobreElBorde) riel?.classList.remove(CLASE_SCROLL_VISIBLE)
+    }, SCROLL_SE_VA)
+  }
   const medir = () => {
     raf = 0
     const alto = document.documentElement.scrollHeight
@@ -100,9 +156,24 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
     }
     barra?.classList.toggle(CLASE_FIJA, window.scrollY > 12)
     document.documentElement.classList.toggle(CLASE_ABAJO, p > 0.5)
+    const altoBarra = barra?.offsetHeight ?? 0
+    if (pulgar) {
+      // El riel va de la barra fija al borde de abajo. Si la página no tiene scroll, no hay pulgar.
+      const largo = window.innerHeight - altoBarra
+      const altoPulgar = max > 0 ? Math.max(PULGAR_MINIMO, Math.round((largo * window.innerHeight) / alto)) : 0
+      recorridoPulgar = Math.max(0, largo - altoPulgar)
+      const y = Math.round((altoBarra + recorridoPulgar * p) * 10) / 10
+      const valor = `${altoPulgar}|${y}`
+      if (valor !== ultimoPulgar) {
+        pulgar.style.setProperty('--psx-scroll-alto', `${altoPulgar}px`)
+        pulgar.style.setProperty('--psx-scroll-y', `${y}px`)
+        // Aparece cuando la página se mueve, no al cargar.
+        if (ultimoPulgar && altoPulgar > 0) mostrarScroll()
+        ultimoPulgar = valor
+      }
+    }
     // Qué parte del pie destapó la cortina (0 si va suelto o no hay pie): con eso se acomoda el cierre.
     let pesoCierre = 0
-    const altoBarra = barra?.offsetHeight ?? 0
     if (pie) {
       const altoPie = pie.offsetHeight
       // Un pie más alto que la pantalla no puede ir pegado al fondo: su parte de arriba no se
@@ -176,6 +247,54 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
   medir()
   window.addEventListener('scroll', pedir, { passive: true })
   window.addEventListener('resize', pedir)
+  if (riel && pulgar) {
+    const elRiel = riel
+    const elPulgar = pulgar
+    let inicioY = 0
+    let inicioScroll = 0
+    // Acercar el puntero al borde derecho la muestra; al alejarlo, se va sola.
+    const alMover = (e: PointerEvent) => {
+      const cerca = e.clientX >= window.innerWidth - BORDE_SCROLL
+      if (cerca === sobreElBorde) return
+      sobreElBorde = cerca
+      mostrarScroll()
+    }
+    const alAgarrar = (e: PointerEvent) => {
+      if (e.button !== 0) return
+      e.preventDefault() // sin seleccionar texto mientras se arrastra
+      arrastrando = true
+      inicioY = e.clientY
+      inicioScroll = window.scrollY
+      elPulgar.setPointerCapture(e.pointerId)
+      elRiel.classList.add(CLASE_SCROLL_ARRASTRA)
+    }
+    const alArrastrar = (e: PointerEvent) => {
+      if (!arrastrando || recorridoPulgar <= 0) return
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      // Sin suavizado, aunque la página lo tenga: el pulgar va con el puntero.
+      window.scrollTo({ top: inicioScroll + (e.clientY - inicioY) * (max / recorridoPulgar), behavior: 'instant' as ScrollBehavior })
+    }
+    const alSoltar = () => {
+      if (!arrastrando) return
+      arrastrando = false
+      elRiel.classList.remove(CLASE_SCROLL_ARRASTRA)
+      mostrarScroll()
+    }
+    // El alto de la página cambia sin que nadie mueva el scroll (una imagen que carga, algo que se despliega).
+    const alCrecer = 'ResizeObserver' in window ? new ResizeObserver(pedir) : null
+    alCrecer?.observe(document.body)
+    window.addEventListener('pointermove', alMover, { passive: true })
+    elPulgar.addEventListener('pointerdown', alAgarrar)
+    elPulgar.addEventListener('pointermove', alArrastrar)
+    elPulgar.addEventListener('pointerup', alSoltar)
+    elPulgar.addEventListener('pointercancel', alSoltar)
+    soltar.push(() => {
+      alCrecer?.disconnect()
+      window.clearTimeout(seVa)
+      window.removeEventListener('pointermove', alMover)
+      elRiel.remove()
+    })
+  }
   soltar.push(() => {
     cancelAnimationFrame(raf)
     window.removeEventListener('scroll', pedir)
@@ -309,6 +428,82 @@ export function montarPublicoSalix(raiz: ParentNode = document): () => void {
       lista.removeEventListener('click', alOpcion)
       caja.removeEventListener('focusout', alSalirFoco)
       document.removeEventListener('pointerdown', alAfuera)
+    })
+  })
+
+  // ── Tema ──
+  raiz.querySelectorAll<HTMLElement>('.psx-tema').forEach((boton) => {
+    const clave = boton.dataset.clave
+    const soloAvisa = boton.hasAttribute('data-solo-avisa')
+    const html = document.documentElement
+    const sistemaOscuro = window.matchMedia('(prefers-color-scheme: dark)')
+    // Los tres íconos los pone la pieza (el producto escribe el botón vacío, con los nombres).
+    if (!boton.querySelector('.psx-tema-icono')) {
+      for (const modo of MODOS_TEMA) {
+        const icono = document.createElement('span')
+        icono.className = 'psx-tema-icono'
+        icono.dataset.de = modo
+        icono.setAttribute('aria-hidden', 'true')
+        boton.appendChild(icono)
+      }
+    }
+    const leer = (): PrefTema => {
+      try {
+        const guardado = clave ? localStorage.getItem(clave) : null
+        return guardado === 'claro' || guardado === 'oscuro' ? guardado : 'auto'
+      } catch {
+        return 'auto'
+      }
+    }
+    let pref = leer()
+    let relojNombre = 0
+    const aplicar = (avisar: boolean) => {
+      const tema = pref === 'auto' ? (sistemaOscuro.matches ? 'oscuro' : 'claro') : pref
+      const nombre = boton.dataset[pref] ?? pref
+      boton.dataset.pref = pref
+      boton.dataset.ahora = nombre
+      boton.setAttribute('aria-label', boton.dataset.rotulo ? `${boton.dataset.rotulo}: ${nombre}` : nombre)
+      if (!soloAvisa) {
+        html.setAttribute('data-tema', tema)
+        html.setAttribute('data-pref', pref)
+      }
+      if (avisar) boton.dispatchEvent(new CustomEvent('psx:tema', { bubbles: true, detail: { pref, tema } }))
+    }
+    aplicar(false)
+    const alToque = () => {
+      // Cada toque pasa al modo siguiente: automático, claro, oscuro, y de vuelta.
+      pref = MODOS_TEMA[(MODOS_TEMA.indexOf(pref) + 1) % MODOS_TEMA.length]
+      try {
+        if (!clave) throw new Error('sin clave')
+        if (pref === 'auto') localStorage.removeItem(clave)
+        else localStorage.setItem(clave, pref)
+      } catch {
+        // Sin almacenamiento (modo privado estricto) la elección vale hasta salir de la página.
+      }
+      // El nombre del modo asoma un instante: con un solo ícono no se ven las opciones.
+      boton.classList.add(CLASE_TEMA_DICE)
+      window.clearTimeout(relojNombre)
+      relojNombre = window.setTimeout(() => boton.classList.remove(CLASE_TEMA_DICE), NOMBRE_TEMA_SE_VA)
+      // Toda la página cambia de una vez, fundida, si el navegador sabe hacerlo.
+      const doc = document as Document & { startViewTransition?: (cambio: () => void) => { finished: Promise<void> } }
+      if (soloAvisa || !doc.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        aplicar(true)
+        return
+      }
+      html.classList.add(CLASE_TEMA_CAMBIA)
+      doc
+        .startViewTransition(() => aplicar(true))
+        .finished.catch(() => undefined)
+        .then(() => html.classList.remove(CLASE_TEMA_CAMBIA))
+    }
+    // En automático, si el aparato cambia de claro a oscuro, la página lo sigue.
+    const alSistema = () => pref === 'auto' && aplicar(true)
+    boton.addEventListener('click', alToque)
+    sistemaOscuro.addEventListener('change', alSistema)
+    soltar.push(() => {
+      boton.removeEventListener('click', alToque)
+      sistemaOscuro.removeEventListener('change', alSistema)
+      window.clearTimeout(relojNombre)
     })
   })
 

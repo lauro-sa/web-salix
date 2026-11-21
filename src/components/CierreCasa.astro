@@ -1,0 +1,34 @@
+---
+// El cierre de una página de la casa: el último bloque, el que se acomoda entre la barra y el pie
+// cuando la cortina lo destapa (publico-salix.css, `.psx-cierre`). Una invitación corta y las ramas
+// que cuelgan de arriba. Los estilos están en casa-piezas.css.
+import { CORREO } from '../casa/datos';
+
+interface Props {
+  /** El renglón liviano del título. */
+  liviana: string;
+  /** El renglón en tinta. */
+  tinta: string;
+  bajada: string;
+  /** A dónde lleva el botón: el formulario de contacto. */
+  contacto: string;
+  boton?: string;
+}
+const { liviana, tinta, bajada, contacto, boton = 'Escribinos' } = Astro.props;
+---
+
+<section class="cierre psx-cierre">
+  <div class="cierre-caja psx-cierre-caja ancho">
+    <div class="cierre-texto">
+      <h2 class="titulo"><span>{liviana}</span> {tinta}</h2>
+      <p class="bajada psx-cierre-extra">{bajada}</p>
+      <div class="cierre-acciones">
+        <a class="boton" href={contacto}>{boton}</a>
+        <a class="enlace" href={`mailto:${CORREO}`}>{CORREO} <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+    <div class="cierre-ramas psx-cierre-extra" aria-hidden="true" data-asoma>
+      {[30, 54, 72, 86, 92, 86, 72, 54, 30].map((largo, i) => <span style={`--largo:${largo}%;--i:${i}`}></span>)}
+    </div>
+  </div>
+</section>
